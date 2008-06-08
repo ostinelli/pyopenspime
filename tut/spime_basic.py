@@ -36,17 +36,9 @@ import sys
 #sys.path.append('../classes') # use the local library
 from pyopenspime.core import Client
 
-###### Logging
-def log(level, msg):
-    print('[%s] %s' % (level, msg))
-
-#import logging
-#logging.basicConfig(level = 10)
-#log = logging.getLogger("MySpime").log
-
 ###### PyOpenSpime
 # Create new client -> bind log callback function
-c = Client('spime@developer.openspime.com/spime', log_callback_function = log)
+c = Client('spime@developer.openspime.com/spime')
 
 # Connect to OpenSpime SpimeGate
 c.connect()
@@ -77,9 +69,9 @@ c.set_iq_handlers(on_success)
 ###### Send
 c.send_stanza(iq, 'scopenode@developer.openspime.com/testscope')
 
-###### Listening loop (server up)
+###### Listening loop (client up)
 try:
-    while c.loop():
+    while c.loop(1):
         pass
 except KeyboardInterrupt:
     log.info(u'disconnecting and exiting')
@@ -90,4 +82,3 @@ except:
     #log.error( "error (%s) while looping: %s" % (sys.exc_info()[0].__name__, sys.exc_info()[1]))
     raise
     exit(2)
-

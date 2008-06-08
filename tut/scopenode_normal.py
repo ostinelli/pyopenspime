@@ -30,28 +30,29 @@
 
 """ScopeNode, normal code"""
 
-# imports
+###### Imports
 import sys
+#sys.path.append('../classes') # use the local library
 from pyopenspime.core import Client
-from common import Logger
 
+###### Logging
+import logging
+logging.basicConfig(level = 10)
+log = logging.getLogger("MyScopeNode")
 
-# create new logger, level 3 is DEBUG
-log = Logger('logs', 3)
+###### PyOpenSpime
+# Create new client -> bind log callback function
+c = Client(osid_or_osid_path = 'scopenode@developer.openspime.com/testscope', log_callback_function = log.log)
 
-# create new client -> bind log callback function
-c = Client(osid_or_osid_path='scopenode@developer.openspime.com/testscope', log_callback_function=log.append)
-    
-# connect
+# Connect to OpenSpime SpimeGate
 try:
     c.connect()
 except:
-    log.error( "error (%s) while connecting: %s" % (sys.exc_info()[0].__name__, sys.exc_info()[1]))
+    log.error("error (%s) while connecting: %s" % (sys.exc_info()[0].__name__, sys.exc_info()[1]))
     exit(1)
 
-# ===\/=== callback functions
-
-def OnHandlerReceived(extname, extobj, stanza):
+###### Callback function
+def on_data_received(extname, extobj, stanza):
     if extname == 'datareporting':
         # ok data received send confirmation message
         print extobj.entries[0]
@@ -61,15 +62,12 @@ def OnHandlerReceived(extname, extobj, stanza):
         c.send(extobj.error('inconsistent-data-with-scope', 'openspime:protocol:extension:data:error', \
                             'Data is not consistent with scope of this ScopeNode.'), stanza.getFrom())
         """
+c.on_data_received = on_data_received
 
-c.on_openspime_extension_received = OnHandlerReceived
-
-# ===/\=== callback functions
-
-# enter listening loop
+###### Listening loop (server up)
 try:
-    while True:
-        c.loop()
+    while c.loop(1):
+        pass
 except KeyboardInterrupt:
     log.info(u'disconnecting and exiting')
     if c.isConnected == True:

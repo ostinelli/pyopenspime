@@ -31,29 +31,33 @@
 
 """Spime, normal code"""
 
-# imports
+###### Imports
 import sys
+#sys.path.append('../classes') # use the local library
 from pyopenspime.core import Client
-from common import Logger
 
-# create new logger, level 3 is DEBUG
-log = Logger('logs', 3)
+###### Logging
+import logging
+logging.basicConfig(level = 10)
+log = logging.getLogger("MySpime")
 
-# create new client -> bind log callback function
-c = Client(osid_or_osid_path='spime@developer.openspime.com/spime', log_callback_function=log.append)
+###### PyOpenSpime
+# Create new client -> bind log callback function
+c = Client(osid_or_osid_path = 'spime@developer.openspime.com/spime', log_callback_function = log.log)
 
-# connect
+# Connect to OpenSpime SpimeGate
 try:
     c.connect()
 except:
-    log.error( "error (%s) while connecting: %s" % (sys.exc_info()[0].__name__, sys.exc_info()[1]))
+    log.error("error (%s) while connecting: %s" % (sys.exc_info()[0].__name__, sys.exc_info()[1]))
     exit(1)
 
-# create data reporting message which requests for confirmation (i.e. of type 'iq')
+###### Data
+# Create data reporting message which requests for confirmation (i.e. of type 'iq')
 import pyopenspime.extension.datareporting
 dr = pyopenspime.extension.datareporting.ExtObj()
 
-# add node
+# Add node
 dr.add_entry(u"""<entry>
         <date>2008-04-02T17:54:22+01:00</date>
         <exposure>outdoor</exposure>
@@ -66,28 +70,29 @@ dr.add_entry(u"""<entry>
 # build message of kind 'iq', i.e. will wait for a confirmation or error message.
 iq = dr.build('iq')
 
+###### Callback function
 # define callbacks to data reporting
-def CallbackOK(stanza_id, stanza):
+def on_success(stanza_id, stanza):
     log.info(u'data with id \'%s\' succesfully received by recipient.' % stanza_id)
 
-def CallbackKO(stanza_id, error_cond, error_description, stanza):
+def on_failure(stanza_id, error_cond, error_description, stanza):
     log.error(u"error (%s) on transmission of data with id \'%s\': %s" % (error_cond, stanza_id, error_description))
 
-def CallbackTimeout(stanza_id):
+def on_timeout(stanza_id):
     log.error(u'timeout waiting confirmation for data with id \'%s\'.' % stanza_id)
 
 # set handlers
-c.set_iq_handlers(CallbackOK, CallbackKO, CallbackTimeout, 60)
+c.set_iq_handlers(on_success, on_failure, on_timeout, 60)
 
-# send
+###### Send
 log.info(u'sending data reporting message with id \'%s\'' % iq.getID())
-c.send_stanza(iq, 'scopenode@developer.openspime.com/testscope', encrypt=True, sign=True)
+c.send_stanza(iq, 'scopenode@developer.openspime.com/testscope', encrypt = True, sign = True)
 log.info(u'data reporting message queued for sending.')
 
-# enter listening loop
+###### Listening loop (client up)
 try:
-    while True:
-        c.loop()
+    while c.loop(1):
+        pass
 except KeyboardInterrupt:
     log.info(u'disconnecting and exiting')
     if c.isConnected == True:

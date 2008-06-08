@@ -314,7 +314,7 @@ class Client(pyopenspime.xmpp.Client):
                     # callback ok
                     self.__iq_callback_handlers[iq_id][0](iq_id, stanza)
                 if stanza.getType() == 'error':
-                    self.log(10, u'calling the callback_error function')
+                    self.log(10, u'calling the callback_failure function')
                     # get error info
                     error = Error(stanza=stanza).get_error()
                     # callback ko
@@ -621,7 +621,7 @@ class Client(pyopenspime.xmpp.Client):
         self.log(10, u'sending pubkey request to cert authority <%s>' % cert_osid)
         ID = self.send_stanza_with_handlers(pubkey_iq, \
                 callback_success=self.__pubkey_fromcert_verify_signature_ok, \
-                callback_error=self.__pubkey_fromcert_verify_signature_ko, \
+                callback_failure=self.__pubkey_fromcert_verify_signature_ko, \
                 callback_timeout=self.__pubkey_fromcert_verify_signature_timeout, timeout=30)
         # save stanza in memory
         self.__stanza_waiting_pubkey[ID] = stanza
@@ -734,7 +734,7 @@ class Client(pyopenspime.xmpp.Client):
                     self.log(10, u'sending pubkey request directly to entity <%s>' % to_osid)
                     ID = self.send_stanza_with_handlers(pubkey_iq, \
                                        callback_success=self.__pubkey_from_entity_send_ok, \
-                                       callback_error=self.__pubkey_from_entity_send_ko, \
+                                       callback_failure=self.__pubkey_from_entity_send_ko, \
                                        callback_timeout=self.__pubkey_from_entity_send_timeout, timeout=20)
                     
                     # save stanza in memory
@@ -908,8 +908,8 @@ class Client(pyopenspime.xmpp.Client):
         @type  callback_success: function
         @param callback_success: Callback function called when a 'result' response is received.
             This parameter is ignored if the stanza being sent is not an <iq/> stanza.
-        @type  callback_error: function
-        @param callback_error: Callback function called when a 'error' response is received.
+        @type  callback_failure: function
+        @param callback_failure: Callback function called when a 'error' response is received.
             This parameter is ignored if the stanza being sent is not an <iq/> stanza.
         @type  callback_timeout: function
         @param callback_timeout: Callback function called when no response is received after the timeout period.
@@ -917,7 +917,7 @@ class Client(pyopenspime.xmpp.Client):
         @type  timeout: int
         @param timeout: If a callback_timeout function has been specified, this parameter specifies the timeout in seconds
             after which the callback_timeout function is called if no response is received. This parameter
-            also specifies the time life of the callback_success and callback_error functions, after which their 
+            also specifies the time life of the callback_success and callback_failure functions, after which their 
             handler will be removed.
             This parameter is ignored if the stanza being sent is not an <iq/> stanza."""
         
@@ -1022,8 +1022,8 @@ class Client(pyopenspime.xmpp.Client):
         @type  callback_success: function
         @param callback_success: Callback function called when a 'result' response is received.
             This parameter is ignored if the stanza being sent is not an <iq/> stanza.
-        @type  callback_error: function
-        @param callback_error: Callback function called when a 'error' response is received.
+        @type  callback_failure: function
+        @param callback_failure: Callback function called when a 'error' response is received.
             This parameter is ignored if the stanza being sent is not an <iq/> stanza.
         @type  callback_timeout: function
         @param callback_timeout: Callback function called when no response is received after the timeout period.
@@ -1031,7 +1031,7 @@ class Client(pyopenspime.xmpp.Client):
         @type  timeout: int
         @param timeout: If a callback_timeout function has been specified, this parameter specifies the timeout in seconds
             after which the callback_timeout function is called if no response is received. This parameter
-            also specifies the time life of the callback_success and callback_error functions, after which their 
+            also specifies the time life of the callback_success and callback_failure functions, after which their 
             handler will be removed.
             This parameter is ignored if the stanza being sent is not an <iq/> stanza.
 
@@ -1040,7 +1040,7 @@ class Client(pyopenspime.xmpp.Client):
         
         self.log(10, u'setting \'from\' attribute of stanza')
         stanza.setFrom(self.osid)
-        if callback_success <> None or callback_error <> None or callback_timeout <> None:
+        if callback_success <> None or callback_failure <> None or callback_timeout <> None:
             if stanza.getName().strip().lower() == 'iq':
                 self.log(10, u'serializing the stanza id')
                 if stanza.getID() == None:

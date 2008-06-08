@@ -36,14 +36,6 @@ import sys
 #sys.path.append('../classes') # use the local library
 from pyopenspime.core import Client
 
-###### Logging
-def log(level, msg):
-    print('[%s] %s' % (level, msg))
-
-#import logging
-#logging.basicConfig(level = 10)
-#log = logging.getLogger("MySpime").log
-
 ###### PyOpenSpime
 # Create new client -> bind log callback function
 c = Client('scopenode@developer.openspime.com/testscope')
