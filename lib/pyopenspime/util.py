@@ -1,6 +1,6 @@
 #
 # PyOpenSpime - Utility Functions
-# version 1.0
+# version 0.1
 # last update 2008 06 07
 #
 # Copyright (C) 2008, licensed under GPL v2

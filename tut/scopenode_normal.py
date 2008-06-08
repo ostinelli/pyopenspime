@@ -1,10 +1,11 @@
 #
 # PyOpenSpime - ScopeNode example, normal functionality
-# version 1.0
+# version 0.1
 # last update 2008 06 07
 #
 # Copyright (C) 2008, licensed under GPL v2
 # Roberto Ostinelli <roberto AT openspime DOT com>
+# Davide 'Folletto' Casali <folletto AT gmail DOT com>
 #
 #
 # This program is free software; you can redistribute it and/or modify
