@@ -46,7 +46,7 @@ def log(level, msg):
 
 ###### PyOpenSpime
 # Create new client -> bind log callback function
-c = Client('spime@developer.openspime.com/spime', log_callback_function=log)
+c = Client('spime@developer.openspime.com/spime', log_callback_function = log)
 
 # Connect to OpenSpime SpimeGate
 c.connect()
@@ -79,8 +79,8 @@ c.send_stanza(iq, 'scopenode@developer.openspime.com/testscope')
 
 ###### Listening loop (server up)
 try:
-    while True:
-        c.loop()
+    while c.loop():
+        pass
 except KeyboardInterrupt:
     log.info(u'disconnecting and exiting')
     if c.isConnected == True:

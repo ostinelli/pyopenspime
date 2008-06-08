@@ -66,8 +66,8 @@ c.on_data_received = on_data_received
 
 ###### Listening loop (server up)
 try:
-    while True:
-        c.loop()
+    while c.loop():
+        pass
 except KeyboardInterrupt:
     log.info(u'disconnecting and exiting')
     if c.isConnected == True:

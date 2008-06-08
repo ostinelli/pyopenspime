@@ -5,6 +5,7 @@
 #
 # Copyright (C) 2008, licensed under GPL v2
 # Roberto Ostinelli <roberto AT openspime DOT com>
+# Davide 'Folletto' Casali <folletto AT gmail DOT com>
 #
 #
 # This program is free software; you can redistribute it and/or modify
@@ -41,7 +42,7 @@ from pyopenspime.conf.settings import *
 
 class Client(pyopenspime.xmpp.Client):
     """
-    PyOpensPime XMPP Client
+    PyOpenSpime XMPP Client
     """
     
     def __init__(self, osid_or_osid_path, osid_pass='', server='', port=5222, rsa_pub_key_path='', rsa_priv_key_path='', rsa_priv_key_pass='', rsa_key_cache_path='cache', cert_authority='', accepted_cert_authorities_filepath='certification-authorities.conf', try_reconnect=60, log_callback_function=None):
@@ -246,10 +247,6 @@ class Client(pyopenspime.xmpp.Client):
     
     
     ###### Private functions
-    def __on_log(self, entry, verbosity):
-        # private log fallback
-        pass
-    
     def __load_key_bio(self, rsa_pub_key_path, rsa_priv_key_path, rsa_priv_key_pass):
         """
         Loads the RSA key pair.
@@ -927,6 +924,8 @@ class Client(pyopenspime.xmpp.Client):
         self.log(10, u'setting iq handlers')
         if isinstance(timeout, int) == False:
             raise Exception, 'timeout must be expressed in integer seconds.'
+        
+        # attach callbacks, if any
         if callback_success != None: self.on_iq_success = callback_success
         if callback_failure != None: self.on_iq_failure = callback_failure
         if callback_timeout != None: self.on_iq_timeout = callback_timeout
@@ -968,17 +967,21 @@ class Client(pyopenspime.xmpp.Client):
 
         self.log(20, u'client ready.')
     
-    def loop(self):
+    def loop(self, delay=1):
         """
         Main listening loop for the client. Handles events.
+        
+        @type  delay: int
+        @param delay: delay in seconds between loops
         """
 
         # main client loop
-        result = self.Process(1)
+        result = self.Process(delay)
         if result == True:
             self.log(30, u'incoming malformed xml, ignored.') 
         # handle iq callback timeout
         self.__iq_callback_timeout()
+        return True # to be used in a while client.loop(1): iterator
     
     def send_stanza(self, stanza, to_osid, encrypt=False, sign=False):
         """Sends out a stanza.
