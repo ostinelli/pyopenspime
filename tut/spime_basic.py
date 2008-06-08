@@ -36,8 +36,15 @@ import sys
 #sys.path.append('../classes') # use the local library
 from pyopenspime.core import Client
 
+def log(level, msg):
+    print('[%s] %s' % (level, msg))
+
+#import logging
+#logging.basicConfig(level = 10)
+#log = logging.getLogger("MySpime").log
+
 # create new client -> bind log callback function
-c = Client('spime@developer.openspime.com/spime')
+c = Client('spime@developer.openspime.com/spime', log_callback_function=log)
 
 # connect
 c.connect()
@@ -67,7 +74,6 @@ def Callback(stanza_id, stanza):
 c.set_iq_handlers(Callback)
 
 # send
-print("Sending...")
 c.send_stanza(iq, 'scopenode@developer.openspime.com/testscope')
 
 

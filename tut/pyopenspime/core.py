@@ -91,16 +91,14 @@ class Client(pyopenspime.xmpp.Client):
         sys.stderr = codecs.getwriter(encoding)(sys.stderr, errors = "replace")
         
         # set log callback function
-        if log_callback_function == None:
-            self.log = self.__on_log
-        else:
-            self.log = log_callback_function
-        
+        if log_callback_function != None:
+            self.on_log = log_callback_function
+                
         # try to get openspime package     
         if os.path.isdir(osid_or_osid_path) == True:
             try:
                 # package found, read xml configuration
-                self.log( 'openspime configuration package found, reading', 3)
+                self.log(10, 'openspime configuration package found, reading')
                 f = open( "%s/conf.xml" % osid_or_osid_path, "r" )
                 n_conf = pyopenspime.xmpp.simplexml.Node(node=f.read())
                 f.close()
@@ -110,52 +108,52 @@ class Client(pyopenspime.xmpp.Client):
                 c_port = None
                 c_rsa_priv_key_pass = None
                 c_cert_authority = None
-                self.log( 'getting values from package', 3)
+                self.log(10, 'getting values from package')
                 try:
                     c_osid_pass = pyopenspime.util.parse_all_children(n_conf, 'osid-pass').getData()
                 except:
-                    self.log( 'could not get osid-pass from openspime configuration package.', 3)
+                    self.log(10, 'could not get osid-pass from openspime configuration package.')
                 try:
                     c_server = pyopenspime.util.parse_all_children(n_conf, 'server').getData()
                 except:
-                    self.log( 'could not get server from openspime configuration package.', 3)
+                    self.log(10, 'could not get server from openspime configuration package.')
                 try:
                     c_port = pyopenspime.util.parse_all_children(n_conf, 'port').getData()
                 except:
-                    self.log( 'could not get port from openspime configuration package.', 3)
+                    self.log(10, 'could not get port from openspime configuration package.')
                 try:
                     c_rsa_priv_key_pass = pyopenspime.util.parse_all_children(n_conf, 'rsa-priv-key-pass').getData()
                 except:
-                    self.log( 'could not get rsa-priv-key-pass from openspime configuration package.', 3)
+                    self.log(10, 'could not get rsa-priv-key-pass from openspime configuration package.')
                 try:
                     c_cert_authority = pyopenspime.util.parse_all_children(n_conf, 'cert-authority').getData()
                 except:
-                    self.log( 'could not get cert-authority from openspime configuration package.', 3)
+                    self.log(10, 'could not get cert-authority from openspime configuration package.')
                 # set default path to keys if nothing has been forced in init params
                 if rsa_pub_key_path == '':
                     rsa_pub_key_path = '%s/keys/public.pem' % osid_or_osid_path
-                    self.log( 'rsa_pub_key_path set.', 3)
+                    self.log(10, 'rsa_pub_key_path set.')
                 if rsa_priv_key_path == '':
                     rsa_priv_key_path = '%s/keys/private.pem' % osid_or_osid_path
-                    self.log( 'rsa_priv_key_path set.', 3)
+                    self.log(10, 'rsa_priv_key_path set.')
                 # set read values if nothing has been forced in init params
                 if osid_pass == '' and c_osid_pass <> None:
                     osid_pass = c_osid_pass
-                    self.log( 'osid_pass set.', 3)
+                    self.log(10, 'osid_pass set.')
                 if server == '' and c_server <> None and c_server <> '':
                     server = c_server
-                    self.log( 'c_server set.', 3)
+                    self.log(10, 'c_server set.')
                 if port == 5222 and c_port <> None and c_port <> '':
                     port = c_port
-                    self.log( 'c_port set.', 3)
+                    self.log(10, 'c_port set.')
                 if rsa_priv_key_pass == '' and c_rsa_priv_key_pass <> None:
                     rsa_priv_key_pass = c_rsa_priv_key_pass
-                    self.log( 'rsa_priv_key_pass set.', 3)
+                    self.log(10, 'rsa_priv_key_pass set.')
                 if cert_authority == '' and c_cert_authority <> None:
                     cert_authority = c_cert_authority
-                    self.log( 'cert_authority set.', 3)
+                    self.log(10, 'cert_authority set.')
             except:
-                self.log('openspime configuration package is corrupted, aborting.', 0)
+                self.log(40, 'openspime configuration package is corrupted, aborting.')
                 exit(1004)
         
         # save
@@ -184,8 +182,8 @@ class Client(pyopenspime.xmpp.Client):
                 rsa_priv_key_pass = pyopenspime.util.to_utf8(rsa_priv_key_pass)
                 self.__load_key_bio(rsa_pub_key_path, rsa_priv_key_path, rsa_priv_key_pass)
             except:
-                self.log( u'error (%s) while loading RSA keys: %s.' % (unicode(sys.exc_info()[0].__name__), \
-                                                                   unicode(sys.exc_info()[1])), 0)
+                self.log(40, u'error (%s) while loading RSA keys: %s.' % (unicode(sys.exc_info()[0].__name__), \
+                                                                   unicode(sys.exc_info()[1])))
                 exit(1000)
         else:
             self._endec = None
@@ -195,14 +193,14 @@ class Client(pyopenspime.xmpp.Client):
             # check that directory exists
             if os.path.isdir(rsa_key_cache_path) == False:
                 # create cache directory if it does not exist
-                self.log( 'cache directory does not exist, creating', 3)
+                self.log(10, 'cache directory does not exist, creating')
                 try:
                     os.mkdir(rsa_key_cache_path)
-                    self.log( 'cache directory created.', 3)
+                    self.log(10, 'cache directory created.')
                 except:
                     self.rsa_key_cache_path = None
                     msg = u'specified key cache directory \'%s\' does not exist and could not be created.' % unicode(rsa_key_cache_path)
-                    self.log(msg, 0)
+                    self.log(40, msg)
                     exit(1001)
             else:
                 # ensure slash or backslash is NOT included
@@ -216,7 +214,7 @@ class Client(pyopenspime.xmpp.Client):
         self.cert_authority = cert_authority
         # save
         if isinstance(try_reconnect, int) == False:
-            self.log('reconnect must be expressed as integer.', 0)
+            self.log(40, 'reconnect must be expressed as integer.')
             exit(1002)
         self.try_reconnect = try_reconnect
         
@@ -224,7 +222,7 @@ class Client(pyopenspime.xmpp.Client):
         if accepted_cert_authorities_filepath <> '':
             if os.path.isfile(accepted_cert_authorities_filepath) == False:
                 msg = u'specified accepted certified authorities file \'%s\' does not exist or cannot be accessed.' % unicode(accepted_cert_authorities_filepath)
-                self.log(msg, 0)
+                self.log(40, msg)
                 exit(1003)
             # read
             self.__accepted_cert_authorities = []
@@ -239,7 +237,7 @@ class Client(pyopenspime.xmpp.Client):
         # init component
         pyopenspime.xmpp.Client.__init__(self, self.osid.getDomain(), port, [])
         
-        self.log(u'client succesfully initialized.', 2)
+        self.log(20, u'client succesfully initialized.')
     
     def __setattr__(self, name, value):
         
@@ -265,7 +263,7 @@ class Client(pyopenspime.xmpp.Client):
         """
         
         # create EnDec object 
-        self.log(u'loading client RSA keys', 3)       
+        self.log(10, u'loading client RSA keys')
         try:
             self._endec = EnDec()
             self._endec.load_rsa_pub_key(rsa_pub_key_path)
@@ -273,7 +271,7 @@ class Client(pyopenspime.xmpp.Client):
         except:
             self._endec = None
             raise
-        self.log(u'client RSA keys successfully loaded.', 2)
+        self.log(20, u'client RSA keys successfully loaded.')
     
     def __presence_handler(self, dispatcher, stanza):
         pass
@@ -283,15 +281,15 @@ class Client(pyopenspime.xmpp.Client):
         
         msg_from = unicode(stanza.getFrom())
         msg_id = stanza.getID()
-        self.log( u'received message from <%s>.' % (msg_from), 3)
+        self.log(10, u'received message from <%s>.' % (msg_from))
         #############print "\r\nRECEIVED MESSAGE\r\n\r\n%s\r\n" % stanza
         # get openspime content
-        self.log(u'check if incoming <message/> stanza is of the openspime protocol', 3)
+        self.log(10, u'check if incoming <message/> stanza is of the openspime protocol')
         handler = self.__stanza_handler(stanza)
         if handler <> None:
             # ok stanza handled
             if handler[0] <> '':
-                self.log( u'openspime extension found, calling callback handler', 3)
+                self.log(10, u'openspime extension found, calling callback handler')
                 # call handler
                 self.on_openspime_extension_received(handler[0], handler[1], stanza)
                 # return
@@ -307,42 +305,42 @@ class Client(pyopenspime.xmpp.Client):
         
         iq_from = unicode(stanza.getFrom())
         iq_id = stanza.getID()
-        self.log( u'received iq from <%s>.' % (iq_from), 3)
+        self.log(10, u'received iq from <%s>.' % (iq_from))
         ##############print "\r\nRECEIVED IQ\r\n\r\n%s\r\n" % stanza
         # check if <iq/> is of type 'error' or 'result'
-        self.log(u'checking if received <iq/> is of type \'result\' or \'error\'', 3)
+        self.log(10, u'checking if received <iq/> is of type \'result\' or \'error\'')
         if stanza.getType() == 'result' or stanza.getType() == 'error':
             # look if callbacks have been defined
             if self.__iq_callback_handlers.has_key(iq_id) == True:
                 if stanza.getType() == 'result':
-                    self.log(u'calling the callback_success function', 3)
+                    self.log(10, u'calling the callback_success function')
                     # callback ok
                     self.__iq_callback_handlers[iq_id][0](iq_id, stanza)
                 if stanza.getType() == 'error':
-                    self.log(u'calling the callback_error function', 3)
+                    self.log(10, u'calling the callback_error function')
                     # get error info
                     error = Error(stanza=stanza).get_error()
                     # callback ko
                     self.__iq_callback_handlers[iq_id][1](iq_id, error[0], error[1], stanza)
                 # free key
-                self.log(u'removing callback_handler key', 3)
+                self.log(10, u'removing callback_handler key')
                 del self.__iq_callback_handlers[iq_id]
                 # exit
                 return True
         
         # check if received stanza is a pubkeys request
         if stanza.getType() == 'get':
-            self.log(u'checking if received stanza is a pubkeys request', 3)
+            self.log(10, u'checking if received stanza is a pubkeys request')
             if self.__iq_pubkey_request(stanza) == True:
                 return True
         
         # get openspime content
-        self.log(u'check if incoming <iq/> stanza is of the openspime protocol', 3)
+        self.log(10, u'check if incoming <iq/> stanza is of the openspime protocol')
         handler = self.__stanza_handler(stanza)
         if handler <> None:
             # ok stanza handled
             if handler[0] <> '':
-                self.log( u'openspime \'%s\' extension found, calling callback' % handler[0], 3)
+                self.log(10, u'openspime \'%s\' extension found, calling callback' % handler[0])
                 # call handler
                 self.on_openspime_extension_received(handler[0], handler[1], stanza)
                 # return
@@ -357,12 +355,12 @@ class Client(pyopenspime.xmpp.Client):
         for key in self.__iq_callback_handlers:
             if self.__iq_callback_handlers[key][3] < time.time():
                 # timeout
-                self.log(u'timeout waiting for reponse on <iq/> stanza with id \'%s\'.' % key, 3)
-                self.log(u'calling timeout handler', 3)
+                self.log(10, u'timeout waiting for reponse on <iq/> stanza with id \'%s\'.' % key)
+                self.log(10, u'calling timeout handler')
                 # callback
                 self.__iq_callback_handlers[key][2](key)
                 # free key
-                self.log(u'removing callback_handler key', 3)
+                self.log(10, u'removing callback_handler key')
                 del self.__iq_callback_handlers[key]
                 break
     
@@ -380,7 +378,7 @@ class Client(pyopenspime.xmpp.Client):
                 if osid == self.osid:
                     if self._endec <> None:
                         # ok prepare response
-                        self.log(u'request pubkey received, send public key', 3)
+                        self.log(10, u'request pubkey received, send public key')
                         pubkey_iq = pyopenspime.xmpp.protocol.Iq(typ='result', to=iq_from)
                         pubkey_iq.setID(iq_id)
                         n_pubkey = pubkey_iq.addChild(u'pubkeys', namespace=u'urn:xmpp:tmp:pubkey', attrs={ u'jid': osid })
@@ -390,11 +388,11 @@ class Client(pyopenspime.xmpp.Client):
                         n_Modulus.setData(binascii.b2a_base64(self._endec.rsa_pub_key.n).replace('\r','').replace('\n',''))
                         n_Exponent = n_RSAKeyValue.addChild(u'Exponent')
                         n_Exponent.setData(binascii.b2a_base64(self._endec.rsa_pub_key.e).replace('\r','').replace('\n',''))                   
-                        self.log(u'sending pubkey response', 3)
+                        self.log(10, u'sending pubkey response')
                         self.send_stanza(pubkey_iq, iq_from)
                     else:
                         # ko prepare response no keys!
-                        self.log(u'request pubkey received however no public RSA key has been specified, send error response.', 3)
+                        self.log(10, u'request pubkey received however no public RSA key has been specified, send error response.')
                         # prepare response                
                         pubkey_iq = pyopenspime.xmpp.protocol.Iq(typ='error', to=iq_from)
                         pubkey_iq.setID(iq_id)
@@ -402,17 +400,17 @@ class Client(pyopenspime.xmpp.Client):
                         n_error = n_pubkey.addChild(u'error', attrs={ u'code': u'404', u'type': u'cancel' })
                         n_error_cond = n_error.addChild(u'no-available-public-key', \
                                                 namespace=u'openspime:protocol:core:error')
-                        self.log(u'sending error response', 3)
+                        self.log(10, u'sending error response')
                         self.send_stanza(pubkey_iq, iq_from)  
                 else:
-                    self.log(u'request for another entity, send error', 3)
+                    self.log(10, u'request for another entity, send error')
                     # prepare response                
                     pubkey_iq = pyopenspime.xmpp.protocol.Iq(typ='error', to=iq_from)
                     pubkey_iq.setID(iq_id)
                     n_pubkey = pubkey_iq.addChild(u'pubkeys', namespace=u'urn:xmpp:tmp:pubkey', attrs={ u'jid': osid })
                     n_error = n_pubkey.addChild(u'error', attrs={ u'code': u'404', u'type': u'cancel' })
                     n_error_cond = n_error.addChild(u'item-not-found', namespace=u'urn:ietf:params:xml:ns:xmpp-stanzas')
-                    self.log(u'sending error response', 3)
+                    self.log(10, u'sending error response')
                     self.send_stanza(pubkey_iq, iq_from)
                 # remember
                 found_request = True
@@ -432,12 +430,12 @@ class Client(pyopenspime.xmpp.Client):
         stanza_kind = stanza.getName().strip().lower()
         
         # check that this is no error or result message
-        self.log(u'checking that <message/> or <iq/> stanza is not of type \'result\' or \'error\'', 3)
+        self.log(10, u'checking that <message/> or <iq/> stanza is not of type \'result\' or \'error\'')
         if stanza_kind == 'iq' and (stanza.getType() == 'result' or stanza.getType() == 'error'):
             return
         
         # check if signature has been provided, look for the <originator/> element
-        self.log(u'get <originator/> node', 3)
+        self.log(10, u'get <originator/> node')
         n_originator = pyopenspime.util.parse_all_children(stanza, 'originator')
         # loop children
         n_sign = None
@@ -445,13 +443,13 @@ class Client(pyopenspime.xmpp.Client):
             if child.getName() == 'sign':
                 # set sign node
                 n_sign = child
-                self.log(u'signature found.', 3)
+                self.log(10, u'signature found.')
 
                 # check that client has a rsa_key_cache_path
                 if self.rsa_key_cache_path == '':
-                    self.log('a rsa key cache path needs to be set to send out encrypted messages, send error response.', 0)
+                    self.log(40, 'a rsa key cache path needs to be set to send out encrypted messages, send error response.')
                     # send error
-                    self.log(u'sending error response.', 3)
+                    self.log(10, u'sending error response.')
                     iq_ko = Error(stanza, 'cancel', 'signature-not-enabled', 'openspime:protocol:core:error', \
                         'the incoming stanza has a signature, but the recipient entity is not enabled to verify signatures.')
                     self.send(iq_ko)
@@ -463,7 +461,7 @@ class Client(pyopenspime.xmpp.Client):
                 else:
                     originator_osid = str(stanza.getFrom())
                 # check if public key of originator is in cache
-                self.log(u'get originator key from cache', 3)
+                self.log(10, u'get originator key from cache')
                 originator_osid_hex = binascii.b2a_hex(originator_osid)
                 originator_key_fromcert_path = '%s/%s.fromcert' % (self.rsa_key_cache_path, originator_osid_hex)
                 # check that filename 'fromcert' exists
@@ -476,46 +474,46 @@ class Client(pyopenspime.xmpp.Client):
                 break                    
         
         # check if decryption is needed, look for the <transport/> element
-        self.log(u'get <transport/> node', 3)
+        self.log(10, u'get <transport/> node')
         n_transport = pyopenspime.util.parse_all_children(stanza, 'transport')
         
         if n_transport <> None:
             # get encoding
-            self.log(u'check encoding of incomed stanza', 3)
+            self.log(10, u'check encoding of incomed stanza')
             attr = n_transport.getAttr('content-type')
             if attr == 'x-openspime/aes-base64':
-                self.log(u'received message is encrypted.', 3)
+                self.log(10, u'received message is encrypted.')
                 
                 # check that client can decrytpt
                 if self._endec == None:
-                    self.log('incoming stanza is encrypted but no rsa key has been specified to decrypt it, send error response.', 0)
+                    self.log(40, 'incoming stanza is encrypted but no rsa key has been specified to decrypt it, send error response.')
                     # send error
-                    self.log(u'sending error response.', 3)
+                    self.log(10, u'sending error response.')
                     iq_ko = Error(stanza, 'cancel', 'decryption-not-enabled', 'openspime:protocol:core:error', \
                         'the incoming stanza was sent encrypted, but the recipient entity is not enabled to decrypt it.')
                     self.send(iq_ko)
                     return
                 
                 # content is encrypted -> get transport-key                
-                self.log(u'get transport-key', 3)
+                self.log(10, u'get transport-key')
                 attr_transport_key = n_transport.getAttr('transport-key')
                 # decrypt
                 try:
-                    self.log(u'trying to decrypt', 3)
+                    self.log(10, u'trying to decrypt')
                     decrypted_content = self._endec.private_decrypt(n_transport.getData(), attr_transport_key)
                 except:
-                    self.log(u'received message could not be decrypted, sending error.', 0)
+                    self.log(40, u'received message could not be decrypted, sending error.')
                     # send error
-                    self.log(u'sending error response.', 3)
+                    self.log(10, u'sending error response.')
                     iq_ko = Error(stanza, 'modify', 'decryption-error', 'openspime:protocol:core:error', \
                         'the incoming stanza was sent encrypted, though there were errors decrypting it (wrong public RSA key of recipient?).')
                     self.send(iq_ko)
                     return
-                self.log(u'message has succesfully been decrypted.', 3)
+                self.log(10, u'message has succesfully been decrypted.')
                 # parse
                 try:
                     # empty node
-                    self.log(u'substituting content of <transport/> node', 3)
+                    self.log(10, u'substituting content of <transport/> node')
                     n_transport = pyopenspime.util.clean_node(n_transport)
                     # create transport child
                     n_transport_child = pyopenspime.xmpp.simplexml.Node(node=decrypted_content)
@@ -525,9 +523,9 @@ class Client(pyopenspime.xmpp.Client):
                     n_transport.delAttr('content-type')
                     n_transport.delAttr('transport-key')
                 except:
-                    self.log(u'malformed <transport/> node in received message, sending error.', 0)
+                    self.log(40, u'malformed <transport/> node in received message, sending error.')
                     # send error
-                    self.log(u'sending error response.', 3)
+                    self.log(10, u'sending error response.')
                     iq_ko = Error(stanza, 'modify', 'xml-malformed-transport-node', 'openspime:protocol:core:error', \
                             'the incoming stanza has been decrypted, but the <transport/> node contains non valid xml.')
                     self.send(iq_ko)
@@ -538,56 +536,56 @@ class Client(pyopenspime.xmpp.Client):
             # create endec object
             endec = EnDec()
             try:
-                self.log(u'loading originator public RSA key', 3)
+                self.log(10, u'loading originator public RSA key')
                 endec.load_rsa_pub_key(originator_key_fromcert_path)
             except:           
                 # check time of fromcert public RSA key
                 sign_info = os.stat(originator_key_fromcert_path)
                 if time.time() - sign_info.st_mtime > 200:
-                    self.log(u'error loading originator public RSA key, requesting newer key', 3)
+                    self.log(10, u'error loading originator public RSA key, requesting newer key')
                     # get cert authority
                     cert_osid = n_originator.getAttr('cert')
                     # request .fromcert key
                     self.__request_fromcert_key(stanza, originator_osid, cert_osid)
                 else:
                     # key corrupted
-                    self.log(u'originator public certified RSA key corruped, signature cold not be verified, sending error.', 0)
+                    self.log(40, u'originator public certified RSA key corruped, signature cold not be verified, sending error.')
                     # send error
-                    self.log(u'sending error response.', 3)
+                    self.log(10, u'sending error response.')
                     iq_ko = Error(stanza, 'cancel', 'signature-error-public-key-corrupted', 'openspime:protocol:core:error', \
                         'the incoming stanza has a signature which could not be validated because the public RSA key of the originator received from the cert authority is corrupted.')
                     self.send(iq_ko)
                 return
             # get signature                
-            self.log(u'get signature', 3)
+            self.log(10, u'get signature')
             signature = child.getData()      
-            self.log(u'get content of <transport/> node', 3)
+            self.log(10, u'get content of <transport/> node')
             try:
                 content = n_transport.getChildren()[0]
             except:
                 # send error
-                self.log(u'sending error response.', 3)
+                self.log(10, u'sending error response.')
                 iq_ko = Error(stanza, 'modify', 'xml-malformed-transport-node', 'openspime:protocol:core:error', \
                         'the incoming stanza has been decrypted, but the <transport/> node contains non valid xml.')
                 self.send(iq_ko)
                 return
             # check
-            self.log(u'verifying signature', 3)
+            self.log(10, u'verifying signature')
             if endec.public_check_sign(content, signature) == True:
-                self.log(u'signature was succesfully verified.', 3)
+                self.log(10, u'signature was succesfully verified.')
             else:              
                 # check time of fromcert public RSA key
                 sign_info = os.stat(originator_key_fromcert_path)
                 if time.time() - sign_info.st_mtime > 200:
-                    self.log(u'signature cold not yet be verified, requesting newer key', 3)
+                    self.log(10, u'signature cold not yet be verified, requesting newer key')
                     # get cert authority
                     cert_osid = n_originator.getAttr('cert')
                     # request .fromcert key
                     self.__request_fromcert_key(stanza, originator_osid, cert_osid)
                 else:
-                    self.log(u'signature cold not be verified, even with a recent key, sending error.', 0)                    
+                    self.log(40, u'signature cold not be verified, even with a recent key, sending error.')
                     # send error
-                    self.log(u'sending error response.', 3)
+                    self.log(10, u'sending error response.')
                     iq_ko = Error(stanza, 'modify', 'invalid-signature', 'openspime:protocol:core:error', \
                             'the incoming stanza has a signature which could not be validated. ')
                     self.send(iq_ko)
@@ -595,26 +593,26 @@ class Client(pyopenspime.xmpp.Client):
         # import extensions
         for ext in PYOPENSPIME_EXTENSIONS_LOADED:
             # example: import pyopenspime.extension.datareporting
-            self.log(u'trying \'%s\' extension for validity' % ext, 3)
+            self.log(10, u'trying \'%s\' extension for validity' % ext)
             exec( 'import pyopenspime.extension.%s' % ext )
             # call extension validate function
             exec( 'result = pyopenspime.extension.%s.validate(stanza)' % ext )
             if result == True:
                 # ok we have a match, call core main function                
-                self.log(u'extension \'%s\' matches, calling main function' % ext, 3)
+                self.log(10, u'extension \'%s\' matches, calling main function' % ext)
                 exec( 'extobj = pyopenspime.extension.%s.main(stanza)' % ext )
-                self.log(u'received \'%s\' extension object.' % ext, 3)
+                self.log(10, u'received \'%s\' extension object.' % ext)
                 return (ext, extobj)
             else:           
-                self.log(u'extension \'%s\' does not match.' % ext, 3)
+                self.log(10, u'extension \'%s\' does not match.' % ext)
     
     def __request_fromcert_key(self, stanza, originator_osid, cert_osid):
         
         # check if in accepted_cert_authorities
         if not cert_osid in self.__accepted_cert_authorities:
-            self.log(u'cert authority \'%s\' not in cert authorities list, sending error.', 0)
+            self.log(40, u'cert authority \'%s\' not in cert authorities list, sending error.')
             # send error
-            self.log(u'sending error response.', 3)
+            self.log(10, u'sending error response.')
             iq_ko = Error(stanza, 'modify', 'signature-error-invalid-cert-auth', 'openspime:protocol:core:error', \
                 'the incoming stanza has a signature certified by a certification authority not accepted by the recipient entity.')
             self.send(iq_ko)
@@ -623,7 +621,7 @@ class Client(pyopenspime.xmpp.Client):
         pubkey_iq = pyopenspime.xmpp.protocol.Iq(typ='get', to=cert_osid)
         pubkey_iq.addChild(u'pubkeys', namespace=u'urn:xmpp:tmp:pubkey', \
                 attrs={ 'jid': originator_osid })
-        self.log(u'sending pubkey request to cert authority <%s>' % cert_osid, 3)
+        self.log(10, u'sending pubkey request to cert authority <%s>' % cert_osid)
         ID = self.send_stanza_with_handlers(pubkey_iq, \
                 callback_success=self.__pubkey_fromcert_verify_signature_ok, \
                 callback_error=self.__pubkey_fromcert_verify_signature_ko, \
@@ -670,7 +668,7 @@ class Client(pyopenspime.xmpp.Client):
     
     def __pubkey_fromcert_verify_signature_ok(self, stanza_id, stanza):
         
-        self.log( "received response from cert authority on pubkey request with id \'%s\', can now verify signature." % stanza_id, 3)
+        self.log(10, "received response from cert authority on pubkey request with id \'%s\', can now verify signature." % stanza_id)
         
         # save received key(s) from cert
         if self.__treat_pubkey_response_and_save_key_bio(stanza, True) == False:
@@ -679,20 +677,20 @@ class Client(pyopenspime.xmpp.Client):
         # treat waiting stanza
         self.__iq_handler(self.Dispatcher, self.__stanza_waiting_pubkey[stanza_id])
         # clear stanza handle
-        self.log(u'removing stanza_waiting_pubkey key', 3)
+        self.log(10, u'removing stanza_waiting_pubkey key')
         del self.__stanza_waiting_pubkey[stanza_id]
     
     def __pubkey_fromcert_verify_signature_ko(self, stanza_id, error_cond, error_description, stanza):
         
-        self.log( "received error (%s) from cert authority on pubkey request with id \'%s\', cannot verify signature." % (error_cond,stanza_id), 3)
+        self.log(10, "received error (%s) from cert authority on pubkey request with id \'%s\', cannot verify signature." % (error_cond,stanza_id))
         # clear stanza handle
-        self.log(u'removing stanza_waiting_pubkey key', 3)
+        self.log(10, u'removing stanza_waiting_pubkey key')
     
     def __pubkey_fromcert_verify_signature_timeout(self):
         
-        self.log( "timeout waiting for response from cert authority on pubkey request with id \'%s\', cannot verify signature." % stanza_id, 3)
+        self.log(10, "timeout waiting for response from cert authority on pubkey request with id \'%s\', cannot verify signature." % stanza_id)
         # clear stanza handle
-        self.log(u'removing stanza_waiting_pubkey key', 3)
+        self.log(10, u'removing stanza_waiting_pubkey key')
     
     def __encrypt_and_sign(self, stanza, encrypt=False, sign=False):
         """
@@ -721,22 +719,22 @@ class Client(pyopenspime.xmpp.Client):
             if encrypt == True:
                 
                 # if encryption is requested, check that we have the recipient public RSA key
-                self.log(u'get recipient key from cache', 3)
+                self.log(10, u'get recipient key from cache')
                 to_osid_hex = binascii.b2a_hex(to_osid)
                 to_osid_key_path = '%s/%s' % (self.rsa_key_cache_path, to_osid_hex)
                 # check that filename 'fromcert' exists
                 if os.path.isfile('%s.fromcert' % to_osid_key_path) == True:
-                    self.log(u'recipient cert key found in cache', 3)
+                    self.log(10, u'recipient cert key found in cache')
                     to_osid_key_path = '%s.fromcert' % to_osid_key_path
                 elif os.path.isfile(to_osid_key_path) == True:
-                    self.log(u'recipient non-cert key found in cache', 3)
+                    self.log(10, u'recipient non-cert key found in cache')
                 else:
                     # key is not in cache, download from recipient entity
-                    self.log(u'recipient key not found in cache, requesting it directly', 3)
+                    self.log(10, u'recipient key not found in cache, requesting it directly')
                     pubkey_iq = pyopenspime.xmpp.protocol.Iq(typ='get', to=to_osid)
                     pubkey_iq.addChild(u'pubkeys', namespace=u'urn:xmpp:tmp:pubkey', \
                             attrs={ 'jid': to_osid })
-                    self.log(u'sending pubkey request directly to entity <%s>' % to_osid, 3)
+                    self.log(10, u'sending pubkey request directly to entity <%s>' % to_osid)
                     ID = self.send_stanza_with_handlers(pubkey_iq, \
                                        callback_success=self.__pubkey_from_entity_send_ok, \
                                        callback_error=self.__pubkey_from_entity_send_ko, \
@@ -777,21 +775,21 @@ class Client(pyopenspime.xmpp.Client):
                     n_originator.setAttr('cert', self.cert_authority)
                 else:
                     raise Exception, 'no cert authority has been set for client, cannot sign openspime message.'                # add signature    
-                self.log(u'computing signature', 3)
+                self.log(10, u'computing signature')
                 signature = self._endec.private_sign(transport_child_content)
-                self.log(u'adding signature node', 3)
+                self.log(10, u'adding signature node')
                 n_sign = n_originator.addChild(name=u'sign')
                 n_sign.addData(signature)
             
             # encrypt
             if encrypt == True:
-                self.log(u'adding <tranport/> node \'content-type\' encrypted attribute', 3)
+                self.log(10, u'adding <tranport/> node \'content-type\' encrypted attribute')
                 n_transport.setAttr('content-type', 'x-openspime/aes-base64')                
                 # encrypt content
-                self.log(u'loading public RSA key of recipient', 3)
+                self.log(10, u'loading public RSA key of recipient')
                 endec = EnDec()
                 endec.load_rsa_pub_key(to_osid_key_path)
-                self.log(u'encrypting', 3)
+                self.log(10, u'encrypting')
                 encrypted = endec.public_encrypt(transport_child_content)
                 n_transport = pyopenspime.util.clean_node(n_transport)
                 n_transport.setData(encrypted[0])
@@ -802,7 +800,7 @@ class Client(pyopenspime.xmpp.Client):
     
     def __pubkey_from_entity_send_ok(self, stanza_id, stanza):
 
-        self.log( "received response from entity on pubkey request with id \'%s\', can now send message." % stanza_id, 3)
+        self.log(10, "received response from entity on pubkey request with id \'%s\', can now send message." % stanza_id)
         
         # save received key(s) from cert
         if self.__treat_pubkey_response_and_save_key_bio(stanza, False) == False:
@@ -814,21 +812,21 @@ class Client(pyopenspime.xmpp.Client):
                          self.__outgoing_stanza_waiting_pubkey[stanza_id][1], \
                          self.__outgoing_stanza_waiting_pubkey[stanza_id][2])
         # clear stanza handle
-        self.log(u'removing outgoing_stanza_waiting_pubkey key', 3)
+        self.log(10, u'removing outgoing_stanza_waiting_pubkey key')
         del self.__outgoing_stanza_waiting_pubkey[stanza_id]
     
     def __pubkey_from_entity_send_ko(self, stanza_id, error_cond, error_description, stanza):
 
-        self.log( "received error (%s) from entity on pubkey request with id \'%s\', cannot send message." % (error_cond,stanza_id), 3)
+        self.log(10, "received error (%s) from entity on pubkey request with id \'%s\', cannot send message." % (error_cond,stanza_id))
         # clear stanza handle
-        self.log(u'removing outgoing_stanza_waiting_pubkey key', 3)
+        self.log(10, u'removing outgoing_stanza_waiting_pubkey key')
         del self.__outgoing_stanza_waiting_pubkey[stanza_id]
     
     def __pubkey_from_entity_send_timeout(self, stanza_id):
 
-        self.log( "timeout waiting for response from entity on pubkey request with id \'%s\', cannot send message." % stanza_id, 3)
+        self.log(10, "timeout waiting for response from entity on pubkey request with id \'%s\', cannot send message." % stanza_id)
         # clear stanza handle
-        self.log(u'removing outgoing_stanza_waiting_pubkey key', 3)
+        self.log(10, u'removing outgoing_stanza_waiting_pubkey key')
         del self.__outgoing_stanza_waiting_pubkey[stanza_id]
     
     def __reconnect(self):
@@ -836,7 +834,7 @@ class Client(pyopenspime.xmpp.Client):
         # reconnect client
         try:
             self.__handlerssave = self.Dispatcher.dumpHandlers()
-            self.log('handlers dumped.', 3)
+            self.log(10, 'handlers dumped.')
             if self.__dict__.has_key('ComponentBind'): self.ComponentBind.PlugOut()
             if self.__dict__.has_key('Bind'): self.Bind.PlugOut()
             self._route=0
@@ -844,7 +842,7 @@ class Client(pyopenspime.xmpp.Client):
             if self.__dict__.has_key('SASL'): self.SASL.PlugOut()
             if self.__dict__.has_key('TLS'): self.TLS.PlugOut()
             self.Dispatcher.PlugOut()
-            self.log('dispatcher plugged out.', 3)
+            self.log(10, 'dispatcher plugged out.')
             if self.__dict__.has_key('HTTPPROXYsocket'): self.HTTPPROXYsocket.PlugOut()
             if self.__dict__.has_key('TCPsocket'): self.TCPsocket.PlugOut()
         except:
@@ -856,10 +854,10 @@ class Client(pyopenspime.xmpp.Client):
             except:
                 pass
             self.__handlerssave = None
-            self.log('reconnected.', 3)
+            self.log(10, 'reconnected.')
             self.__trying_reconnection = False
         except:
-            self.log('error while reconnecting, retrying in %s seconds.' % self.try_reconnect, 1)
+            self.log(30, 'error while reconnecting, retrying in %s seconds.' % self.try_reconnect)
             time.sleep(self.try_reconnect)
             self.__reconnect()
     
@@ -872,10 +870,10 @@ class Client(pyopenspime.xmpp.Client):
 
         if self.__trying_reconnection == False:
             self.__trying_reconnection = True
-            self.log('client is disconnected, trying automatic reconnection every %s seconds.' % self.try_reconnect, 1)
+            self.log(30, 'client is disconnected, trying automatic reconnection every %s seconds.' % self.try_reconnect)
             self.__reconnect()
     
-    def on_openspime_extension_received(self, ext_name, ext_object, stanza):
+    def on_data_received(self, ext_name, ext_object, stanza):
         """
         Event raised when an OpenSpime stanza is received. This one does nothing, should be overriden in
         derived classes.
@@ -888,6 +886,22 @@ class Client(pyopenspime.xmpp.Client):
         @param stanza: The stanza, to be used for advanced treatment.
         """
         
+        pass
+    
+    def on_log(self, level, msg):
+        """
+        Logging function triggered internally on log messages.
+        Uses the same syntax of logger.Logger.append()
+        """
+        pass
+    
+    def on_iq_success(self, stanza_id, stanza):
+        pass
+    
+    def on_iq_failure(self, stanza_id, error_cond, error_description, stanza):
+        pass
+    
+    def on_iq_timeout(self, stanza_id):
         pass
     
     def set_iq_handlers(self, callback_success=None, callback_error=None, callback_timeout=None, timeout=60):
@@ -910,46 +924,46 @@ class Client(pyopenspime.xmpp.Client):
             handler will be removed.
             This parameter is ignored if the stanza being sent is not an <iq/> stanza."""
         
-        self.log(u'setting iq handlers', 3)
+        self.log(10, u'setting iq handlers')
         if isinstance(timeout, int) == False:
             raise Exception, 'timeout must be expressed in integer seconds.'        
         self.__iq_handler_functions = (callback_success, callback_error, callback_timeout, timeout)
     
     
-    ###### Support functions
+    ###### Commlink functions
     def connect(self):
 
         """Connects the Client to the server and initializes handlers."""
 
         # connect
-        self.log(u'connecting to <%s>' % unicode(self.Server), 2)
+        self.log(20, u'connecting to <%s>' % unicode(self.Server))
         if pyopenspime.xmpp.Client.connect(self) == "":
             msg = u'could not connect to server <%s>, aborting.' % unicode(self.Server)
-            self.log(msg, 0)
+            self.log(40, msg)
             raise Exception, msg
-        self.log(u'connected.', 3)
+        self.log(10, u'connected.')
 
         # authenticate
-        self.log(u'authenticating client on server', 2)
+        self.log(20, u'authenticating client on server')
         if pyopenspime.xmpp.Client.auth(self, self.osid.getNode(), self.osid_pass, self.osid.getResource()) == None:
             msg = u'could not authenticate, aborting. check osid and password.'
-            self.log(msg, 0)
+            self.log(40, msg)
             raise Exception, msg
-        self.log(u'authenticated.', 3)
+        self.log(10, u'authenticated.')
 
         # notify presence
-        self.log(u'notifying presence', 3)
+        self.log(10, u'notifying presence')
         self.sendInitPresence(0)
 
         # register handlers
-        self.log(u'registering presence handler', 3)
+        self.log(10, u'registering presence handler')
         self.RegisterHandler('presence', self.__presence_handler)
-        self.log(u'registering message handler', 3)
+        self.log(10, u'registering message handler')
         self.RegisterHandler('message', self.__message_handler)
-        self.log(u'registering iq handler', 3)
+        self.log(10, u'registering iq handler')
         self.RegisterHandler('iq', self.__iq_handler)
 
-        self.log(u'client ready.', 2)
+        self.log(20, u'client ready.')
     
     def loop(self):
         """Main listening loop for the client. Handles events."""
@@ -957,7 +971,7 @@ class Client(pyopenspime.xmpp.Client):
         # main client loop
         result = self.Process(1)
         if result == True:
-            self.log(u'incoming malformed xml, ignored.', 1) 
+            self.log(30, u'incoming malformed xml, ignored.') 
         # handle iq callback timeout
         self.__iq_callback_timeout()
     
@@ -972,7 +986,7 @@ class Client(pyopenspime.xmpp.Client):
         @type  sign: boolean
         @param sign: If signature is requested, set to True. Defaults to I{False}."""
         
-        self.log(u'setting \'from\' and \'to\' attribute of stanza', 3)
+        self.log(10, u'setting \'from\' and \'to\' attribute of stanza')
         stanza.setFrom(self.osid)
         stanza.setTo(to_osid)
         # encrypt and sign if necessary
@@ -985,12 +999,12 @@ class Client(pyopenspime.xmpp.Client):
         # add iq handlers
         if stanza.getName().strip().lower() == 'iq':
             if self.__iq_handler_functions <> None and (stanza.getType() == 'set' or stanza.getType() == 'get'):                # add key
-                self.log(u'creating callback handler', 3)
+                self.log(10, u'creating callback handler')
                 self.__iq_callback_handlers[stanza.getID()] = (self.__iq_handler_functions[0], self.__iq_handler_functions[1], \
                                                    self.__iq_handler_functions[2], \
                                                    time.time() + self.__iq_handler_functions[3])        
         # send
-        self.log(u'sending stanza', 3)
+        self.log(10, u'sending stanza')
         self.Dispatcher.send(stanza)  
     
     def send_stanza_with_handlers(self, stanza, callback_success=None, callback_error=None, callback_timeout=None, timeout=60):
@@ -1018,21 +1032,21 @@ class Client(pyopenspime.xmpp.Client):
         @rtype:   unicode
         @return:  ID of sent stanza."""
         
-        self.log(u'setting \'from\' attribute of stanza', 3)
+        self.log(10, u'setting \'from\' attribute of stanza')
         stanza.setFrom(self.osid)
         if callback_success <> None or callback_error <> None or callback_timeout <> None:
             if stanza.getName().strip().lower() == 'iq':
-                self.log(u'serializing the stanza id', 3)
+                self.log(10, u'serializing the stanza id')
                 if stanza.getID() == None:
                     # serialize id
                     ID = self.serialize()
                     stanza.setID(ID)
                 # add key
-                self.log(u'creating callback handler', 3)
+                self.log(10, u'creating callback handler')
                 self.__iq_callback_handlers[ID] = (callback_success, callback_error, callback_timeout, time.time()+timeout)
 
         # send and return ID
-        self.log(u'sending stanza', 3)
+        self.log(10, u'sending stanza')
         return unicode(self.Dispatcher.send(stanza))       
     
     def serialize(self):
@@ -1047,7 +1061,14 @@ class Client(pyopenspime.xmpp.Client):
         
         pass
     
-
+        
+    ###### Support functions
+    def log(self, level, msg):
+        """
+        Internal logging function.
+        """
+        self.on_log(level, msg)
+    
 
 class EnDec():
     """
