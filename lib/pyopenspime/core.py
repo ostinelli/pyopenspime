@@ -173,6 +173,10 @@ class Client(pyopenspime.xmpp.Client):
         self.__outgoing_stanza_waiting_pubkey = {}
         self.__trying_reconnection = False
         
+        self.encrypt = False
+        self.sign = False
+        self.log(10, u'default security set to: encrypt=%s, sign=%s' % (self.encrypt, self.sign))
+        
         # create EnDec object
         self._endec = EnDec()
         
@@ -269,6 +273,10 @@ class Client(pyopenspime.xmpp.Client):
             self._endec = None
             raise
         self.log(20, u'client RSA keys successfully loaded.')
+        
+        self.encrypt = True
+        self.sign = True
+        self.log(10, u'default security set to: encrypt=%s, sign=%s' % (self.encrypt, self.sign))
     
     def __presence_handler(self, dispatcher, stanza):
         pass
@@ -983,7 +991,7 @@ class Client(pyopenspime.xmpp.Client):
         self.__iq_callback_timeout()
         return True # to be used in a while client.loop(1): iterator
     
-    def send_stanza(self, stanza, to_osid, encrypt=False, sign=False):
+    def send_stanza(self, stanza, to_osid, encrypt=None, sign=None):
         """Sends out a stanza.
         @type  stanza: pyopenspime.xmpp.protocol.Protocol
         @param stanza: The stanza to be sent.
@@ -993,6 +1001,10 @@ class Client(pyopenspime.xmpp.Client):
         @param encrypt: If encryption is requested, set to True. Defaults to I{False}.
         @type  sign: boolean
         @param sign: If signature is requested, set to True. Defaults to I{False}."""
+        
+        if encrypt == None: encrypt = self.encrypt
+        if sign == None: sign = self.sign
+        self.log(10, u'security: encrypt=%s, sign=%s' % (encrypt, sign))
         
         self.log(10, u'setting \'from\' and \'to\' attribute of stanza')
         stanza.setFrom(self.osid)
