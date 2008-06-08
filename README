@@ -1,0 +1,61 @@
+======================================================================
+PyOpenSpime v0.1rc1
+2008-06-08
+======================================================================
+
+PyOpenSpime is an OpenSpime <http://openspime.org> network library
+written in Python.
+
+Currently supported:
+. Networking with the SpimeGate server.
+. Nearly complete OpenSpime Core protocol (missing claim).
+. Data Reporting OpenSpime Core protocol extension.
+
+
+INSTALLATION
+======================================================================
+1. Install core dependencies
+2. Install PyOpenSpime
+3. Read and Run the tutorials
+
+
+1. INSTALL CORE DEPENDENCIES
+----------------------------------------------------------------------
+Install the dependencies not included in this package:
+
+. Python 2.5 <http://www.python.org/download/>
+  -> direct download link for win32 users: 
+  <http://www.python.org/ftp/python/2.5.2/python-2.5.2.msi>  
+
+. M2Crypto <http://chandlerproject.org/bin/view/Projects/MeTooCrypto>
+  -> direct download link for win32 users:
+  <http://chandlerproject.org/pub/Projects/MeTooCrypto/M2Crypto-0.18.2.win32-py2.5.exe>
+
+
+2. INSTALL PYOPENSPIME
+----------------------------------------------------------------------
+Unzip the PyOpenSpime-0.1rc1 package in a directory.
+
+
+3. READ AND RUN THE TUTORIALS
+----------------------------------------------------------------------
+The sub directory tut/ contains some commented python scripts to
+explain through examples how the OpenSpime network and the
+PyOpenSpime library work.
+
+
+ADDITIONAL DEPENDENCIES
+======================================================================
+Included in this package are also these additional dependencies:
+. dnspython <http://www.dnspython.org>
+. PyXML <http://pyxml.sourceforge.net>
+. xmpppy <http://xmpppy.sourceforge.net> (patched)
+
+NOTE: the xmpppy version included in the package has been patched
+      and should be used instead of the release version.
+
+
+
+
+
+

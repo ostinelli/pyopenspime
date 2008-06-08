@@ -1,0 +1,7 @@
+<openspime-pkg>
+	<osid-pass>de131313</osid-pass>
+	<server></server>
+	<port></port>
+	<rsa-priv-key-pass>mypass</rsa-priv-key-pass>
+	<cert-authority>services@developer.openspime.com/cert</cert-authority>
+</openspime-pkg>
