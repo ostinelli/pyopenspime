@@ -32,7 +32,7 @@
 
 ###### Imports
 import sys
-#sys.path.append('../classes') # use the local library
+sys.path.append('../lib') # use the local library
 from pyopenspime.core import Client
 
 ###### Logging
