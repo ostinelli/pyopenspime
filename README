@@ -1,5 +1,5 @@
 ======================================================================
-PyOpenSpime v0.1rc1
+PyOpenSpime v0.1
 2008-06-08
 ======================================================================
 
@@ -46,10 +46,10 @@ That maps exactly to a full jid:
 
     osid@developers.openspime.com/client1
 
-The keys/ subfolder is optional, but required for any criptographic
+The keys/ subfolder is optional, but required for any cryptographic
 operation since it contains the public and the private keys.
 
-For a full documentation please go to http://openspime.org.
+For a full documentation please consult http://openspime.org.
 
 
 
@@ -70,9 +70,10 @@ Install the dependencies not included in this package:
 
 . M2Crypto <http://chandlerproject.org/bin/view/Projects/MeTooCrypto>
   -> direct download link for Windows (win32) users:
-  <http://chandlerproject.org/pub/Projects/MeTooCrypto/M2Crypto-0.18.2.win32-py2.5.exe>
+     <http://chandlerproject.org/pub/Projects/MeTooCrypto/M2Crypto-0.18.2.win32-py2.5.exe>
   -> direct download link for Mac OSX (Leopard 10.5, i386) users:
-  <http://chandlerproject.org/pub/Projects/MeTooCrypto/M2Crypto-0.18.2-py2.5-macosx-10.5-i386.egg>
+     <http://chandlerproject.org/pub/Projects/MeTooCrypto/M2Crypto-0.18.2-py2.5-macosx-10.5-i386.egg>
+     NOTE: you can rename .egg to .zip and just take the M2Crypto subfolder.
 
 
 2. INSTALL PYOPENSPIME
@@ -105,6 +106,5 @@ NOTE: the xmpppy version included in the package has been patched
 
 
 
-
-
-
+======================================================================
+Copyright (C) 2008         Roberto Ostinelli, Davide 'Folletto' Casali
