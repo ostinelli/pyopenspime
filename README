@@ -46,6 +46,9 @@ That maps exactly to a full jid:
 
     osid@developers.openspime.com/client1
 
+The keys/ subfolder is optional, but required for any criptographic
+operation since it contains the public and the private keys.
+
 For a full documentation please go to http://openspime.org.
 
 
