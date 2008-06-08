@@ -1,10 +1,11 @@
 #
 # PyOpenSpime - ScopeNode example, basic functionality
 # version 1.0
-# last update 2008 06 07
+# last update 2008 06 08
 #
 # Copyright (C) 2008, licensed under GPL v2
 # Roberto Ostinelli <roberto AT openspime DOT com>
+# Davide 'Folletto' Casali <folletto AT gmail DOT com>
 #
 #
 # This program is free software; you can redistribute it and/or modify
@@ -35,15 +36,23 @@ import sys
 #sys.path.append('../classes') # use the local library
 from pyopenspime.core import Client
 
+###### Logging
+def log(level, msg):
+    print('[%s] %s' % (level, msg))
+
+#import logging
+#logging.basicConfig(level = 10)
+#log = logging.getLogger("MySpime").log
+
 ###### PyOpenSpime
-### Create new client -> bind log callback function
+# Create new client -> bind log callback function
 c = Client('scopenode@developer.openspime.com/testscope')
     
-### Connect to OpenSpime SpimeGate
+# Connect to OpenSpime SpimeGate
 c.connect()
 
 ###### Callback function
-def OnHandlerReceived(extname, extobj, stanza):
+def on_data_received(extname, extobj, stanza):
     if extname == 'datareporting':
         # ok data received send confirmation message
         print extobj.entries[0]
@@ -53,12 +62,9 @@ def OnHandlerReceived(extname, extobj, stanza):
         c.send(extobj.error('inconsistent-data-with-scope', 'openspime:protocol:extension:data:error', \
                             'Data is not consistent with scope of this ScopeNode.'), stanza.getFrom())
         """
+c.on_data_received = on_data_received
 
-c.on_openspime_extension_received = OnHandlerReceived
-
-# ===/\=== callback functions
-
-# enter listening loop
+###### Listening loop (server up)
 try:
     while True:
         c.loop()

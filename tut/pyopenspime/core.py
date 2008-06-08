@@ -166,8 +166,8 @@ class Client(pyopenspime.xmpp.Client):
         self.Port = port
         
         # init
+        self.timeout = 60
         self.__iq_callback_handlers = {}
-        self.__iq_handler_functions = ()
         self.__stanza_waiting_pubkey = {}
         self.__outgoing_stanza_waiting_pubkey = {}
         self.__trying_reconnection = False
@@ -291,7 +291,7 @@ class Client(pyopenspime.xmpp.Client):
             if handler[0] <> '':
                 self.log(10, u'openspime extension found, calling callback handler')
                 # call handler
-                self.on_openspime_extension_received(handler[0], handler[1], stanza)
+                self.on_data_received(handler[0], handler[1], stanza)
                 # return
                 return True
         else:
@@ -342,7 +342,7 @@ class Client(pyopenspime.xmpp.Client):
             if handler[0] <> '':
                 self.log(10, u'openspime \'%s\' extension found, calling callback' % handler[0])
                 # call handler
-                self.on_openspime_extension_received(handler[0], handler[1], stanza)
+                self.on_data_received(handler[0], handler[1], stanza)
                 # return
                 return True
         else:
@@ -904,7 +904,7 @@ class Client(pyopenspime.xmpp.Client):
     def on_iq_timeout(self, stanza_id):
         pass
     
-    def set_iq_handlers(self, callback_success=None, callback_error=None, callback_timeout=None, timeout=60):
+    def set_iq_handlers(self, callback_success, callback_failure=None, callback_timeout=None, timeout=60):
         
         """Sets the handlers for <iq/> stanzas.
 
@@ -926,8 +926,11 @@ class Client(pyopenspime.xmpp.Client):
         
         self.log(10, u'setting iq handlers')
         if isinstance(timeout, int) == False:
-            raise Exception, 'timeout must be expressed in integer seconds.'        
-        self.__iq_handler_functions = (callback_success, callback_error, callback_timeout, timeout)
+            raise Exception, 'timeout must be expressed in integer seconds.'
+        if callback_success != None: self.on_iq_success = callback_success
+        if callback_failure != None: self.on_iq_failure = callback_failure
+        if callback_timeout != None: self.on_iq_timeout = callback_timeout
+        self.timeout = timeout
     
     
     ###### Commlink functions
@@ -966,7 +969,9 @@ class Client(pyopenspime.xmpp.Client):
         self.log(20, u'client ready.')
     
     def loop(self):
-        """Main listening loop for the client. Handles events."""
+        """
+        Main listening loop for the client. Handles events.
+        """
 
         # main client loop
         result = self.Process(1)
@@ -998,16 +1003,14 @@ class Client(pyopenspime.xmpp.Client):
                 return
         # add iq handlers
         if stanza.getName().strip().lower() == 'iq':
-            if self.__iq_handler_functions <> None and (stanza.getType() == 'set' or stanza.getType() == 'get'):                # add key
+            if (stanza.getType() == 'set' or stanza.getType() == 'get'): # add key
                 self.log(10, u'creating callback handler')
-                self.__iq_callback_handlers[stanza.getID()] = (self.__iq_handler_functions[0], self.__iq_handler_functions[1], \
-                                                   self.__iq_handler_functions[2], \
-                                                   time.time() + self.__iq_handler_functions[3])        
+                self.__iq_callback_handlers[stanza.getID()] = (self.on_iq_success, self.on_iq_failure, self.on_iq_timeout, time.time() + self.timeout)
         # send
         self.log(10, u'sending stanza')
         self.Dispatcher.send(stanza)  
     
-    def send_stanza_with_handlers(self, stanza, callback_success=None, callback_error=None, callback_timeout=None, timeout=60):
+    def send_stanza_with_handlers(self, stanza, callback_success=None, callback_failure=None, callback_timeout=None, timeout=60):
         
         """Sends out a stanza with function handlers specified directly. This is NOT to be used for OpenSpime messages.
 
@@ -1043,7 +1046,7 @@ class Client(pyopenspime.xmpp.Client):
                     stanza.setID(ID)
                 # add key
                 self.log(10, u'creating callback handler')
-                self.__iq_callback_handlers[ID] = (callback_success, callback_error, callback_timeout, time.time()+timeout)
+                self.__iq_callback_handlers[ID] = (callback_success, callback_failure, callback_timeout, time.time()+timeout)
 
         # send and return ID
         self.log(10, u'sending stanza')

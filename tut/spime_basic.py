@@ -1,7 +1,7 @@
 #
 # PyOpenSpime - Spime example, basic functionality
 # version 1.0
-# last update 2008 06 07
+# last update 2008 06 08
 #
 # Copyright (C) 2008, licensed under GPL v2
 # Roberto Ostinelli <roberto AT openspime DOT com>
@@ -31,11 +31,12 @@
 
 """Spime, basic code"""
 
-# imports
+###### Imports
 import sys
 #sys.path.append('../classes') # use the local library
 from pyopenspime.core import Client
 
+###### Logging
 def log(level, msg):
     print('[%s] %s' % (level, msg))
 
@@ -43,17 +44,19 @@ def log(level, msg):
 #logging.basicConfig(level = 10)
 #log = logging.getLogger("MySpime").log
 
-# create new client -> bind log callback function
+###### PyOpenSpime
+# Create new client -> bind log callback function
 c = Client('spime@developer.openspime.com/spime', log_callback_function=log)
 
-# connect
+# Connect to OpenSpime SpimeGate
 c.connect()
 
-# create data reporting message which requests for confirmation (i.e. of type 'iq')
+###### Data
+# Create data reporting message which requests for confirmation (i.e. of type 'iq')
 import pyopenspime.extension.datareporting
 dr = pyopenspime.extension.datareporting.ExtObj()
 
-# add node
+# Add node
 dr.add_entry(u"""<entry>
         <date>2008-04-02T17:54:22+01:00</date>
         <exposure>outdoor</exposure>
@@ -66,15 +69,25 @@ dr.add_entry(u"""<entry>
 # build message of kind 'iq', i.e. will wait for a confirmation or error message.
 iq = dr.build('iq')
 
-# define callbacks to data reporting
-def Callback(stanza_id, stanza):
+###### Callback function
+def on_success(stanza_id, stanza):
     print(u'data with id \'%s\' succesfully received by recipient.' % stanza_id)
+c.set_iq_handlers(on_success)
 
-# set handlers
-c.set_iq_handlers(Callback)
-
-# send
+###### Send
 c.send_stanza(iq, 'scopenode@developer.openspime.com/testscope')
 
-
+###### Listening loop (server up)
+try:
+    while True:
+        c.loop()
+except KeyboardInterrupt:
+    log.info(u'disconnecting and exiting')
+    if c.isConnected == True:
+        c.disconnect()
+    exit(0)
+except:
+    #log.error( "error (%s) while looping: %s" % (sys.exc_info()[0].__name__, sys.exc_info()[1]))
+    raise
+    exit(2)
 
