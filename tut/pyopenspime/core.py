@@ -1,7 +1,7 @@
 #
 # PyOpenSpime - Core
 # version 1.0
-# last update 2008 06 07
+# last update 2008 06 08
 #
 # Copyright (C) 2008, licensed under GPL v2
 # Roberto Ostinelli <roberto AT openspime DOT com>
@@ -40,11 +40,13 @@ from pyopenspime.conf.settings import *
 
 
 class Client(pyopenspime.xmpp.Client):
-    """PyOpensPime XMPP Client."""
+    """
+    PyOpensPime XMPP Client
+    """
     
     def __init__(self, osid_or_osid_path, osid_pass='', server='', port=5222, rsa_pub_key_path='', rsa_priv_key_path='', rsa_priv_key_pass='', rsa_key_cache_path='cache', cert_authority='', accepted_cert_authorities_filepath='certification-authorities.conf', try_reconnect=60, log_callback_function=None):
-        
-        """Initialize a Client.
+        """
+        Initialize a Client.
         @type  osid_or_osid_path: str
         @param osid_or_osid_path: The full OSID of the client. If an OpenSpime configuration package is found, this is
             the only parameter that is needed to initialize the Client.
@@ -77,7 +79,8 @@ class Client(pyopenspime.xmpp.Client):
         @type  log_callback_function: function
         @param log_callback_function: Callback function for logger. Function should accept two parameters: unicode
             (the log description) and integer (the verbosity level - 0 for error, 1 for warning, 2 for info,
-            3 for debug)."""
+            3 for debug).
+        """
         
         # XMPP protocol is unicode-based. convert output format to local encoding to avoid UnicodeException error.
         locale.setlocale(locale.LC_CTYPE,"")
@@ -244,19 +247,22 @@ class Client(pyopenspime.xmpp.Client):
         self.__dict__[name] = value
     
     
-    # ===\/=== private functions
+    ###### Private functions
     def __on_log(self, entry, verbosity):
         # private log fallback
         pass
     
     def __load_key_bio(self, rsa_pub_key_path, rsa_priv_key_path, rsa_priv_key_pass):
-        """Loads the RSA key pair.
+        """
+        Loads the RSA key pair.
+        
         @type  rsa_pub_key_path: unicode
         @param rsa_pub_key_path: The path to the RSA public key .pem file.
         @type  rsa_priv_key_path: unicode
         @param rsa_priv_key_path: The path to the RSA private key .pem file.
         @type  rsa_priv_key_pass: unicode
-        @param rsa_priv_key_pass: The RSA private key .pem file password."""
+        @param rsa_priv_key_pass: The RSA private key .pem file password.
+        """
         
         # create EnDec object 
         self.log(u'loading client RSA keys', 3)       
@@ -414,12 +420,13 @@ class Client(pyopenspime.xmpp.Client):
         return found_request
     
     def __stanza_handler(self, stanza):
-        
-        """Handler to dispatch incoming openspime <message/> and <iq/> stanzas to proper extension.
+        """
+        Handler to dispatch incoming openspime <message/> and <iq/> stanzas to proper extension.
         @type  stanza: pyopenspime.xmpp.protocol.Stanza
         @param stanza: The incoming stanza.
         @rtype:   tuple
-        @return:  Tuple containing: (extname, extobj)."""
+        @return:  Tuple containing: (extname, extobj).
+        """
         
         # get stanza kind: <iq/>, <message/>
         stanza_kind = stanza.getName().strip().lower()
@@ -625,14 +632,15 @@ class Client(pyopenspime.xmpp.Client):
         self.__stanza_waiting_pubkey[ID] = stanza
     
     def __treat_pubkey_response_and_save_key_bio(self, stanza, fromcert=False):
-        
-        """Treats an incoming pubkey stanza and saves the public key to a .pem file
+        """
+        Treats an incoming pubkey stanza and saves the public key to a .pem file
         @type  stanza: pyopenspime.xmpp.protocol.Iq
         @param stanza: The response to a pubkey request.
         @type  fromcert: boolean
         @param fromcert: Set to I{True} if response comes from a cert authority. Defaults to I{False}.
         @rtype:   boolean
-        @return:  True if succesful, False if errors encountered."""
+        @return:  True if succesful, False if errors encountered.
+        """
         
         found = False
         for child in stanza.getChildren():
@@ -687,8 +695,8 @@ class Client(pyopenspime.xmpp.Client):
         self.log(u'removing stanza_waiting_pubkey key', 3)
     
     def __encrypt_and_sign(self, stanza, encrypt=False, sign=False):
-        
-        """Function that manages encryption and signature of the OpenSpime Core Reference Schema.
+        """
+        Function that manages encryption and signature of the OpenSpime Core Reference Schema.
 
         Reference is OpenSpime protocol Core Reference Schema v0.9.
 
@@ -698,7 +706,8 @@ class Client(pyopenspime.xmpp.Client):
         @param sign: If signature is requested, set to True. Defaults to I{False}.
             
         @rtype:   pyopenspime.xmpp.simplexml.Node
-        @return:  The <openspime/> encrypted and signed node."""
+        @return:  The <openspime/> encrypted and signed node.
+        """
         
         # get the <openspime/> node
         n_openspime = pyopenspime.util.parse_all_children(stanza, 'openspime')
@@ -857,8 +866,9 @@ class Client(pyopenspime.xmpp.Client):
     
     ###### Events functions
     def DisconnectHandler(self):
-
-        """Handler to manage automatic reconnection."""
+        """
+        Handler to manage automatic reconnection.
+        """
 
         if self.__trying_reconnection == False:
             self.__trying_reconnection = True
@@ -866,8 +876,8 @@ class Client(pyopenspime.xmpp.Client):
             self.__reconnect()
     
     def on_openspime_extension_received(self, ext_name, ext_object, stanza):
-
-        """Event raised when an OpenSpime stanza is received. This one does nothing, should be overriden in
+        """
+        Event raised when an OpenSpime stanza is received. This one does nothing, should be overriden in
         derived classes.
 
         @type  ext_name: unicode
@@ -875,9 +885,35 @@ class Client(pyopenspime.xmpp.Client):
         @type  ext_object: unicode
         @param ext_object: The extension object (varies according to extensions).
         @type  stanza: pyopenspime.xmpp.protocol.Protocol
-        @param stanza: The stanza, to be used for advanced treatment."""
+        @param stanza: The stanza, to be used for advanced treatment.
+        """
         
         pass
+    
+    def set_iq_handlers(self, callback_success=None, callback_error=None, callback_timeout=None, timeout=60):
+        
+        """Sets the handlers for <iq/> stanzas.
+
+        @type  callback_success: function
+        @param callback_success: Callback function called when a 'result' response is received.
+            This parameter is ignored if the stanza being sent is not an <iq/> stanza.
+        @type  callback_error: function
+        @param callback_error: Callback function called when a 'error' response is received.
+            This parameter is ignored if the stanza being sent is not an <iq/> stanza.
+        @type  callback_timeout: function
+        @param callback_timeout: Callback function called when no response is received after the timeout period.
+            This parameter is ignored if the stanza being sent is not an <iq/> stanza.
+        @type  timeout: int
+        @param timeout: If a callback_timeout function has been specified, this parameter specifies the timeout in seconds
+            after which the callback_timeout function is called if no response is received. This parameter
+            also specifies the time life of the callback_success and callback_error functions, after which their 
+            handler will be removed.
+            This parameter is ignored if the stanza being sent is not an <iq/> stanza."""
+        
+        self.log(u'setting iq handlers', 3)
+        if isinstance(timeout, int) == False:
+            raise Exception, 'timeout must be expressed in integer seconds.'        
+        self.__iq_handler_functions = (callback_success, callback_error, callback_timeout, timeout)
     
     
     ###### Support functions
@@ -924,30 +960,6 @@ class Client(pyopenspime.xmpp.Client):
             self.log(u'incoming malformed xml, ignored.', 1) 
         # handle iq callback timeout
         self.__iq_callback_timeout()
-    
-    def set_iq_handlers(self, callback_success=None, callback_error=None, callback_timeout=None, timeout=60):
-        """Sets the handlers for <iq/> stanzas.
-
-        @type  callback_success: function
-        @param callback_success: Callback function called when a 'result' response is received.
-            This parameter is ignored if the stanza being sent is not an <iq/> stanza.
-        @type  callback_error: function
-        @param callback_error: Callback function called when a 'error' response is received.
-            This parameter is ignored if the stanza being sent is not an <iq/> stanza.
-        @type  callback_timeout: function
-        @param callback_timeout: Callback function called when no response is received after the timeout period.
-            This parameter is ignored if the stanza being sent is not an <iq/> stanza.
-        @type  timeout: int
-        @param timeout: If a callback_timeout function has been specified, this parameter specifies the timeout in seconds
-            after which the callback_timeout function is called if no response is received. This parameter
-            also specifies the time life of the callback_success and callback_error functions, after which their 
-            handler will be removed.
-            This parameter is ignored if the stanza being sent is not an <iq/> stanza."""
-        
-        self.log(u'setting iq handlers', 3)
-        if isinstance(timeout, int) == False:
-            raise Exception, 'timeout must be expressed in integer seconds.'        
-        self.__iq_handler_functions = (callback_success, callback_error, callback_timeout, timeout)
     
     def send_stanza(self, stanza, to_osid, encrypt=False, sign=False):
         """Sends out a stanza.
@@ -1038,9 +1050,11 @@ class Client(pyopenspime.xmpp.Client):
 
 
 class EnDec():
-    """Encrypter-Decrypted object.
+    """
+    Encrypter-Decrypted object.
     This object is used to encrypt, descrypt and sign OpenSpime stanzas. It includes RSA and AES support as
-    defined in the OpenSpime Core Protocol v0.9."""
+    defined in the OpenSpime Core Protocol v0.9.
+    """
 
     def __init__(self):
         
@@ -1262,7 +1276,9 @@ class EnDec():
     
 
 class Error(pyopenspime.xmpp.protocol.Iq):
-    """PyOpenSpime Error stanza."""
+    """
+    PyOpenSpime Error stanza.
+    """
     
     def __init__(self, stanza, error_type='modify', error_cond=None, error_namespace=None, error_description=None):  
         """Initialize an OpenSpime error stanza.
@@ -1342,7 +1358,8 @@ class Error(pyopenspime.xmpp.protocol.Iq):
     
 
 def wrap(transport_child_node, originator_osid=None, transport_to_osid=None):
-    """Function that manages the OpenSpime Core Reference Schema. Used by extensions to build a complete <openspime/> node,
+    """
+    Function that manages the OpenSpime Core Reference Schema. Used by extensions to build a complete <openspime/> node,
     before encryption and sign.
     
     Reference is OpenSpime protocol Core Reference Schema v0.9.
@@ -1353,7 +1370,8 @@ def wrap(transport_child_node, originator_osid=None, transport_to_osid=None):
     @type  transport_to_osid: unicode
     @param transport_to_osid: Sets 'to' attribute of the <transport/> element. Defaults to I{None}.
     @rtype:   pyopenspime.xmpp.simplexml.Node
-    @return:  The <openspime/> node."""
+    @return:  The <openspime/> node.
+    """
     
     # create openspime root node
     n_openspime = pyopenspime.xmpp.simplexml.Node( tag='openspime', \
