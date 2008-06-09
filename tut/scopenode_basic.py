@@ -51,8 +51,8 @@ def on_data_received(extname, extobj, stanza):
         c.send_stanza(extobj.accepted(), stanza.getFrom())
         """ example of a gone wrong report:
 
-        c.send(extobj.error('inconsistent-data-with-scope', 'openspime:protocol:extension:data:error', \
-                            'Data is not consistent with scope of this ScopeNode.'), stanza.getFrom())
+        c.send_stanza(extobj.error(error_type='modify', error_cond='inconsistent-data-with-scope', error_namespace='openspime:protocol:extension:data:error', \
+                            error_description='Data is not consistent with scope of this ScopeNode.'), stanza.getFrom())
         """
 c.on_data_received = on_data_received
 

@@ -114,27 +114,29 @@ def parse_all_children(node, node_name, deep_first=False):
     children = node.getChildren()
 
     # if has children
-    if len(children) > 0:
-        if deep_first == False:
-            for child in children:
-                if child.getName() == node_name:
-                    # node found
-                    return child
-            for child in children:
-                # recursively call self
-                parse = parse_all_children(child, node_name, deep_first)
-                if parse <> None:
-                    return parse
-        else:
-            for child in children:
-                if child.getName() == node_name:
-                    # node found
-                    return child
-                # recursively call self
-                parse = parse_all_children(child, node_name, deep_first)
-                if parse <> None:
-                    return parse
-            
+    try:
+        if len(children) > 0:
+            if deep_first == False:
+                for child in children:
+                    if child.getName() == node_name:
+                        # node found
+                        return child
+                for child in children:
+                    # recursively call self
+                    parse = parse_all_children(child, node_name, deep_first)
+                    if parse <> None:
+                        return parse
+            else:
+                for child in children:
+                    if child.getName() == node_name:
+                        # node found
+                        return child
+                    # recursively call self
+                    parse = parse_all_children(child, node_name, deep_first)
+                    if parse <> None:
+                        return parse
+    except:
+        pass            
     return None
 
 
