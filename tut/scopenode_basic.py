@@ -32,7 +32,8 @@
 """ScopeNode, basic code"""
 
 ###### Imports
-import sys
+import sys, os
+os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
 sys.path.append('../lib') # use the local library
 from pyopenspime.core import Client
 
