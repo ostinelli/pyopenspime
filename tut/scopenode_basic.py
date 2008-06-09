@@ -66,8 +66,7 @@ except KeyboardInterrupt:
         c.disconnect()
     exit(0)
 except:
-    #log.error( "error (%s) while looping: %s" % (sys.exc_info()[0].__name__, sys.exc_info()[1]))
-    raise
+    log.error( "error (%s) while looping: %s" % (sys.exc_info()[0].__name__, sys.exc_info()[1]))
     exit(2)
 
 
