@@ -44,7 +44,7 @@ log = logging.getLogger("MyScopeNode")
 
 ###### PyOpenSpime
 # Create new client -> bind log callback function
-c = Client(osid_or_osid_path = 'scopenode@developer.openspime.com/testscope', log_callback_function = log.log)
+c = Client(osid_or_osid_path = 'scopenode@developer.openspime.com/scope', log_callback_function = log.log)
 
 # Connect to OpenSpime SpimeGate
 try:

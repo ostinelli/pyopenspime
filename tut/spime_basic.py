@@ -68,7 +68,7 @@ def on_success(stanza_id, stanza):
 c.set_iq_handlers(on_success)
 
 ###### Send
-c.send_stanza(iq, 'scopenode@developer.openspime.com/testscope')
+c.send_stanza(iq, 'scopenode@developer.openspime.com/scope')
 
 ###### Listening loop (client up)
 try:

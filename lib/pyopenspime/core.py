@@ -677,10 +677,16 @@ class Client(pyopenspime.xmpp.Client):
         
         # save received key(s) from cert
         if self.__treat_pubkey_response_and_save_key_bio(stanza, True) == False:
-            # XXXXXXXXXX
-            raise
-        # treat waiting stanza
-        self.__iq_handler(self.Dispatcher, self.__stanza_waiting_pubkey[stanza_id])
+            # the rsa key received from the cert authority is corrupted
+            self.log(40, 'the RSA key received from the cert authority is corrupted.')
+            # send error
+            self.log(10, u'sending error response.')
+            iq_ko = Error(stanza, 'cancel', 'signature-error-public-key-corrupted', 'openspime:protocol:core:error', \
+                'the incoming stanza has a signature which could not be validated because the public RSA key of the originator received from the cert authority is corrupted.')
+            self.send(iq_ko)
+        else:
+            # treat waiting stanza
+            self.__iq_handler(self.Dispatcher, self.__stanza_waiting_pubkey[stanza_id])
         # clear stanza handle
         self.log(10, u'removing stanza_waiting_pubkey key')
         del self.__stanza_waiting_pubkey[stanza_id]
@@ -809,10 +815,11 @@ class Client(pyopenspime.xmpp.Client):
         
         # save received key(s) from cert
         if self.__treat_pubkey_response_and_save_key_bio(stanza, False) == False:
-            # XXXXXXXXXX
-            raise
-        # treat waiting stanza
-        self.send_stanza(self.__outgoing_stanza_waiting_pubkey[stanza_id][0], \
+            # the rsa key received from the entity is corrupted, cannot send message
+            self.log(10, 'the RSA key received from the entity is corrupted, cannot send message')
+        else:
+            # treat waiting stanza
+            self.send_stanza(self.__outgoing_stanza_waiting_pubkey[stanza_id][0], \
                          self.__outgoing_stanza_waiting_pubkey[stanza_id][0].getTo(), \
                          self.__outgoing_stanza_waiting_pubkey[stanza_id][1], \
                          self.__outgoing_stanza_waiting_pubkey[stanza_id][2])

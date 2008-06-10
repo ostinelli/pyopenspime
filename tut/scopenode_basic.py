@@ -39,7 +39,7 @@ from pyopenspime.core import Client
 
 ###### PyOpenSpime
 # Create new client -> bind log callback function
-c = Client('scopenode@developer.openspime.com/testscope')
+c = Client('scopenode@developer.openspime.com/scope')
     
 # Connect to OpenSpime SpimeGate
 c.connect()

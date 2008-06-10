@@ -87,7 +87,7 @@ c.set_iq_handlers(on_success, on_failure, on_timeout, 60)
 
 ###### Send
 log.info(u'sending data reporting message with id \'%s\'' % iq.getID())
-c.send_stanza(iq, 'scopenode@developer.openspime.com/testscope', encrypt = True, sign = True)
+c.send_stanza(iq, 'scopenode@developer.openspime.com/scope', encrypt = True, sign = True)
 log.info(u'data reporting message queued for sending.')
 
 ###### Listening loop (client up)
