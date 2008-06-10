@@ -40,8 +40,8 @@ osid@developers.openspime.com/
     ...
     clientN/
 
-The root folder MUST have the same name of the osid, while the first
-subdirectory identifies a specific client.
+The root folder MUST have the same name of the bare jid of the osid, while
+the first subdirectory identifies the resource of a specific client.
 That maps exactly to a full jid:
 
     osid@developers.openspime.com/client1
