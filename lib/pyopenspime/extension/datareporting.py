@@ -1,5 +1,11 @@
 #
-# (C) Copyright 2008 Roberto Ostinelli <roberto@openspime.com>
+# PyOpenSpime - Data Reporting Extension
+# version 0.1
+# last update 2008 06 07
+#
+# Copyright (C) 2008, licensed under GPL v2
+# Roberto Ostinelli <roberto AT openspime DOT com>
+#
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +27,6 @@
 # WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
 # OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-#
 
 """Module that manages the OpenSpime Data Reporting protocol extension.
 
