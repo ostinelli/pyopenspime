@@ -18,12 +18,11 @@ COMPONENTS
 The PyOpenSpime package contains a python library to connect easily
 to a OpenSpime SpimeGate infrastructure.
 
-Each spime/scopenode is identified by its osid (OpenSpime ID) that
-is a special JID (JabberID) on a SpimeGate server.
-The configuration of the single spime (or scopenode) can be written
-inside the python code, but it's suggested to use a bundle called
-OpenSpime Package (ospkg) that is a special folder containing all
-the spime/scopenode-related data.
+Each entity (spime, scopenode, service) is identified by its osid
+(OpenSpime ID) which is a special JID (JabberID) on a SpimeGate server.
+The configuration of a single entity can be written inside python code,
+but it is suggested to use a bundle called OpenSpime Package (ospkg)
+which is a special folder containing all the entity-related data.
 
 
 OPENSPIME PACKAGE (OSPKG)
