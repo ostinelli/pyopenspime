@@ -3,16 +3,16 @@
 # version 0.1
 # last update 2008 06 07
 #
-# Copyright (C) 2008, licensed under GPL v2
+# Copyright (C) 2008, licensed under GPL v3
 # Roberto Ostinelli <roberto AT openspime DOT com>
 # Davide 'Folletto' Casali <folletto AT gmail DOT com>
 #
 #
 # This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it under the terms of the GNU General Public License v3 as published by
 # the Free Software Foundation.
 #
-# You should have received a copy of the GNU General Public License
+# You should have received a copy of the GNU General Public License v3
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
