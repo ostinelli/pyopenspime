@@ -794,7 +794,7 @@ class Client(pyopenspime.xmpp.Client):
             
             # encrypt
             if encrypt == True:
-                self.log(10, u'adding <tranport/> node \'content-type\' encrypted attribute')
+                self.log(10, u'adding <transport/> node \'content-type\' encrypted attribute')
                 n_transport.setAttr('content-type', 'x-openspime/aes-base64')                
                 # encrypt content
                 self.log(10, u'loading public RSA key of recipient')
