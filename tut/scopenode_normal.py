@@ -51,7 +51,7 @@ from pyopenspime.core import Client
 
 ###### Logging
 import logging
-logging.basicConfig(level = 10)
+logging.basicConfig(level = 10, format='%(asctime)s %(levelname)s %(message)s')
 log = logging.getLogger("MyScopeNode")
 
 ###### PyOpenSpime
