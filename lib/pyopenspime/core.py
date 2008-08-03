@@ -1,7 +1,7 @@
 #
 # PyOpenSpime - Core
-# version 0.1
-# last update 2008 06 08
+# version 0.2
+# last update 2008 08 04
 #
 # Copyright (C) 2008, licensed under GPL v3
 # Roberto Ostinelli <roberto AT openspime DOT com>
@@ -252,6 +252,7 @@ class Client(pyopenspime.xmpp.Client):
             self.__accepted_cert_authorities = None 
         
         # init component
+        self.Namespace, self.DBG = 'jabber:client', 'client' # check lines: 99 & 101 of xmpp.client 
         pyopenspime.xmpp.Client.__init__(self, self.osid.getDomain(), port, [])
         
         self.log(20, u'client succesfully initialized.')
@@ -323,7 +324,6 @@ class Client(pyopenspime.xmpp.Client):
         iq_from = unicode(stanza.getFrom())
         iq_id = stanza.getID()
         self.log(10, u'received iq from <%s>.' % (iq_from))
-        ##############print "\r\nRECEIVED IQ\r\n\r\n%s\r\n" % stanza
         # check if <iq/> is of type 'error' or 'result'
         self.log(10, u'checking if received <iq/> is of type \'result\' or \'error\'')
         if stanza.getType() == 'result' or stanza.getType() == 'error':
@@ -897,6 +897,12 @@ class Client(pyopenspime.xmpp.Client):
             self.log(30, 'client is disconnected, trying automatic reconnection every %s seconds.' % self.try_reconnect)
             self.__reconnect()
     
+    def on_connect(self):
+        """
+        Event raised on a successful connection to the XMPP server
+        """
+        if hasattr(self, 'connectionMade'): self.connectionMade()
+    
     def on_data_received(self, ext_name, ext_object, stanza):
         """
         Event raised when an OpenSpime stanza is received. This one does nothing, should be overriden in
@@ -909,7 +915,7 @@ class Client(pyopenspime.xmpp.Client):
         @type  stanza: pyopenspime.xmpp.protocol.Protocol
         @param stanza: The stanza, to be used for advanced treatment.
         """
-        pass
+        if hasattr(self, 'dataReceived'): self.dataReceived(ext_name, ext_object, stanza)
     
     def on_log(self, level, msg):
         """
@@ -960,6 +966,14 @@ class Client(pyopenspime.xmpp.Client):
     
     
     ###### Commlink functions
+    def run(self):
+        """
+        Core running loop.
+        """
+        self.connect()
+        while self.loop():
+            pass
+    
     def connect(self):
         """
         Connects the Client to the server and initializes handlers.
@@ -994,6 +1008,7 @@ class Client(pyopenspime.xmpp.Client):
         self.RegisterHandler('iq', self.__iq_handler)
         
         self.log(20, u'client ready.')
+        self.on_connect()
     
     def loop(self, delay=1):
         """
