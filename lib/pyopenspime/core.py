@@ -891,7 +891,7 @@ class Client(pyopenspime.xmpp.Client):
         """
         Handler to manage automatic reconnection.
         """
-
+        
         if self.__trying_reconnection == False:
             self.__trying_reconnection = True
             self.log(30, 'client is disconnected, trying automatic reconnection every %s seconds.' % self.try_reconnect)
@@ -901,7 +901,7 @@ class Client(pyopenspime.xmpp.Client):
         """
         Event raised when an OpenSpime stanza is received. This one does nothing, should be overriden in
         derived classes.
-
+        
         @type  ext_name: unicode
         @param ext_name: The extension name.
         @type  ext_object: unicode
@@ -909,7 +909,6 @@ class Client(pyopenspime.xmpp.Client):
         @type  stanza: pyopenspime.xmpp.protocol.Protocol
         @param stanza: The stanza, to be used for advanced treatment.
         """
-        
         pass
     
     def on_log(self, level, msg):
@@ -929,9 +928,9 @@ class Client(pyopenspime.xmpp.Client):
         pass
     
     def set_iq_handlers(self, callback_success, callback_failure=None, callback_timeout=None, timeout=60):
+        """
+        Sets the handlers for <iq/> stanzas.
         
-        """Sets the handlers for <iq/> stanzas.
-
         @type  callback_success: function
         @param callback_success: Callback function called when a 'result' response is received.
             This parameter is ignored if the stanza being sent is not an <iq/> stanza.
@@ -946,7 +945,8 @@ class Client(pyopenspime.xmpp.Client):
             after which the callback_timeout function is called if no response is received. This parameter
             also specifies the time life of the callback_success and callback_failure functions, after which their 
             handler will be removed.
-            This parameter is ignored if the stanza being sent is not an <iq/> stanza."""
+            This parameter is ignored if the stanza being sent is not an <iq/> stanza.
+        """
         
         self.log(10, u'setting iq handlers')
         if isinstance(timeout, int) == False:
@@ -961,9 +961,10 @@ class Client(pyopenspime.xmpp.Client):
     
     ###### Commlink functions
     def connect(self):
-
-        """Connects the Client to the server and initializes handlers."""
-
+        """
+        Connects the Client to the server and initializes handlers.
+        """
+        
         # connect
         self.log(20, u'connecting to <%s>' % unicode(self.Server))
         if pyopenspime.xmpp.Client.connect(self) == "":
@@ -971,7 +972,7 @@ class Client(pyopenspime.xmpp.Client):
             self.log(40, msg)
             raise Exception, msg
         self.log(10, u'connected.')
-
+        
         # authenticate
         self.log(20, u'authenticating client on server')
         if pyopenspime.xmpp.Client.auth(self, self.osid.getNode(), self.osid_pass, self.osid.getResource()) == None:
@@ -979,11 +980,11 @@ class Client(pyopenspime.xmpp.Client):
             self.log(40, msg)
             raise Exception, msg
         self.log(10, u'authenticated.')
-
+        
         # notify presence
         self.log(10, u'notifying presence')
         self.sendInitPresence(0)
-
+        
         # register handlers
         self.log(10, u'registering presence handler')
         self.RegisterHandler('presence', self.__presence_handler)
@@ -991,7 +992,7 @@ class Client(pyopenspime.xmpp.Client):
         self.RegisterHandler('message', self.__message_handler)
         self.log(10, u'registering iq handler')
         self.RegisterHandler('iq', self.__iq_handler)
-
+        
         self.log(20, u'client ready.')
     
     def loop(self, delay=1):
@@ -1001,7 +1002,7 @@ class Client(pyopenspime.xmpp.Client):
         @type  delay: int
         @param delay: delay in seconds between loops
         """
-
+        
         # main client loop
         result = self.Process(delay)
         if result == True:
@@ -1011,7 +1012,8 @@ class Client(pyopenspime.xmpp.Client):
         return True # to be used in a while client.loop(1): iterator
     
     def send_stanza(self, stanza, to_osid, encrypt=None, sign=None):
-        """Sends out a stanza.
+        """
+        Sends out a stanza.
         @type  stanza: pyopenspime.xmpp.protocol.Protocol
         @param stanza: The stanza to be sent.
         @type  to_osid: unicode
@@ -1019,7 +1021,8 @@ class Client(pyopenspime.xmpp.Client):
         @type  encrypt: boolean
         @param encrypt: If encryption is requested, set to True. Defaults to I{False}.
         @type  sign: boolean
-        @param sign: If signature is requested, set to True. Defaults to I{False}."""
+        @param sign: If signature is requested, set to True. Defaults to I{False}.
+        """
         
         if encrypt == None: encrypt = self.encrypt
         if sign == None: sign = self.sign
@@ -1030,7 +1033,7 @@ class Client(pyopenspime.xmpp.Client):
         stanza.setTo(to_osid)
         # encrypt and sign if necessary
         if encrypt == True or sign == True:
-         
+
             stanza = self.__encrypt_and_sign(stanza, encrypt=encrypt, sign=sign)
             if stanza == None:
                 # we need to wait for public rsa key of recipient, exit sending for now
@@ -1045,9 +1048,9 @@ class Client(pyopenspime.xmpp.Client):
         self.Dispatcher.send(stanza)  
     
     def send_stanza_with_handlers(self, stanza, callback_success=None, callback_failure=None, callback_timeout=None, timeout=60):
+        """
+        Sends out a stanza with function handlers specified directly. This is NOT to be used for OpenSpime messages.
         
-        """Sends out a stanza with function handlers specified directly. This is NOT to be used for OpenSpime messages.
-
         @type  stanza: pyopenspime.xmpp.protocol.Protocol
         @param stanza: The stanza to be sent.
         @type  callback_success: function
@@ -1065,9 +1068,10 @@ class Client(pyopenspime.xmpp.Client):
             also specifies the time life of the callback_success and callback_failure functions, after which their 
             handler will be removed.
             This parameter is ignored if the stanza being sent is not an <iq/> stanza.
-
+        
         @rtype:   unicode
-        @return:  ID of sent stanza."""
+        @return:  ID of sent stanza.
+        """
         
         self.log(10, u'setting \'from\' attribute of stanza')
         stanza.setFrom(self.osid)
@@ -1081,24 +1085,26 @@ class Client(pyopenspime.xmpp.Client):
                 # add key
                 self.log(10, u'creating callback handler')
                 self.__iq_callback_handlers[ID] = (callback_success, callback_failure, callback_timeout, time.time()+timeout)
-
+        
         # send and return ID
         self.log(10, u'sending stanza')
         return unicode(self.Dispatcher.send(stanza))       
     
     def serialize(self):
-
+        
         return pyopenspime.util.generate_rnd_str(16)
     
     def disconnect(self):
-        """Disconnects from server and handles all incoming stanzas before closure."""
-         
+        """
+        Disconnects from server and handles all incoming stanzas before closure.
+        """
+        
         # never called. self.Dispatcher.disconnect() is directly called via the plugin architecture.
         # here for manual completeness only.
         
         pass
     
-        
+    
     ###### Support functions
     def log(self, level, msg):
         """
@@ -1113,11 +1119,12 @@ class EnDec():
     This object is used to encrypt, descrypt and sign OpenSpime stanzas. It includes RSA and AES support as
     defined in the OpenSpime Core Protocol v0.9.
     """
-
+    
     def __init__(self):
+        """
+        Initialize an EnDec object.
+        """
         
-        """Initialize an EnDec object."""
-     
         self.rsa_pub_key_path = ''
         self.rsa_pub_key = None 
         self.rsa_priv_key_path = ''
@@ -1125,23 +1132,25 @@ class EnDec():
         self.rsa_priv_key = None
     
     def load_rsa_pub_key(self, rsa_pub_key_path):
+        """
+        Load public RSA key from .pem file.
         
-        """Load public RSA key from .pem file.
-
         @type  rsa_pub_key_path: unicode
-        @param rsa_pub_key_path: The path to the RSA public key .pem file."""
+        @param rsa_pub_key_path: The path to the RSA public key .pem file.
+        """
         
         self.rsa_pub_key_path = rsa_pub_key_path
         self.rsa_pub_key = M2Crypto.RSA.load_pub_key(rsa_pub_key_path)
     
     def load_rsa_priv_key(self, rsa_priv_key_path, rsa_priv_key_pass):  
+        """
+        Load private RSA key from .pem file.
         
-        """Load private RSA key from .pem file.
-
         @type  rsa_priv_key_path: unicode
         @param rsa_priv_key_path: The path to the RSA private key .pem file.
         @type  rsa_priv_key_pass: unicode
-        @param rsa_priv_key_pass: The RSA private key .pem file password."""      
+        @param rsa_priv_key_pass: The RSA private key .pem file password.
+        """      
         
         self.rsa_priv_key_path = rsa_priv_key_path
         self.rsa_priv_key_pass = rsa_priv_key_pass
@@ -1152,7 +1161,7 @@ class EnDec():
         return self.rsa_priv_key_pass
     
     def __aes_encrypt_base64(self, plaintext, aes_key, aes_vint):
-
+        
         # AES encryption
         mem = M2Crypto.BIO.MemoryBuffer()
         cf = M2Crypto.BIO.CipherStream(mem)
@@ -1164,7 +1173,7 @@ class EnDec():
         return binascii.b2a_base64(mem.read())
     
     def __aes_decrypt_base64(self, encrypted, aes_key, aes_vint):
-
+        
         # AES decryption
         mem = M2Crypto.BIO.MemoryBuffer(binascii.a2b_base64(encrypted))
         cf = M2Crypto.BIO.CipherStream(mem)
@@ -1175,9 +1184,9 @@ class EnDec():
         return decrypted
     
     def __rsa_public_encrypt_base64(self, plaintext):
-
+        
         # RSA public encryption
-
+        
         # get pub_key size
         s = int(( self.rsa_pub_key.__len__() ) / 8) - 11    # take away 11 bytes due to pkcs1_padding
         encrypted = []
@@ -1188,9 +1197,9 @@ class EnDec():
         return binascii.b2a_base64(''.join(encrypted))
     
     def __rsa_private_decrypt_base64(self, encrypted):
-
+        
         # RSA private decryption
-
+        
         encrypted = binascii.a2b_base64(encrypted)
         # get pub_key size
         s = int(self.rsa_priv_key.__len__() / 8)
@@ -1202,9 +1211,9 @@ class EnDec():
         return ''.join(decrypted)
     
     def __rsa_private_encrypt_base64(self, plaintext):
-
+        
         # RSA private encryption
-
+        
         # get pub_key size
         s = int(( self.rsa_pub_key.__len__() ) / 8) - 11    # take away 11 bytes due to pkcs1_padding
         encrypted = []
@@ -1215,9 +1224,9 @@ class EnDec():
         return binascii.b2a_base64(''.join(encrypted))
     
     def __rsa_public_decrypt_base64(self, encrypted):
-
+        
         # RSA public decryption
-
+        
         encrypted = binascii.a2b_base64(encrypted)
         # get pub_key size
         s = int(self.rsa_pub_key.__len__() / 8)
@@ -1229,21 +1238,22 @@ class EnDec():
         return ''.join(decrypted)
     
     def public_encrypt(self, transport):
+        """
+        Encrypts the content of the transport node with public key of recipient.
         
-        """Encrypts the content of the transport node with public key of recipient.
-
         @type  transport: unicode
         @param transport: The <transport/> node content to be encrypted.
-
+        
         @rtype:   tuple
-        @return:  Tuple containing: (base64 encrypted transport, base64 encrypted transport-key)."""
+        @return:  Tuple containing: (base64 encrypted transport, base64 encrypted transport-key).
+        """
         
         # generate a random 32 bytes AES key
         aes_key = M2Crypto.m2.rand_bytes(32)
-
+        
         # generate a random 16 bytes init vector data
         aes_vint = M2Crypto.m2.rand_bytes(16)
-
+        
         # encrypt in AES and encode to base64
         encrypted = self.__aes_encrypt_base64(transport, aes_key, aes_vint).replace('\r', '').replace('\n', '')
         
@@ -1252,26 +1262,27 @@ class EnDec():
             <key>%s</key><vint>%s</vint> \
             </transportkey>" % ( binascii.b2a_base64(aes_key).replace('\r', '').replace('\n', ''), \
                                  binascii.b2a_base64(aes_vint).replace('\r', '').replace('\n', '') )
-
+        
         transport_key = pyopenspime.util.to_utf8(transport_key)
-
+        
         # encrypt the transport key with the public RSA key of recipient
         transport_key_enc = self.__rsa_public_encrypt_base64(transport_key).replace('\r', '').replace('\n', '')
-
+        
         # return tuple
         return [encrypted, transport_key_enc]
     
     def private_decrypt(self, encrypted, transport_key_enc):
+        """
+        Decrypts a string encoded with public key of recipient.
         
-        """Decrypts a string encoded with public key of recipient.
-
         @type  encrypted: str
         @param encrypted: The base64 encrypted content of the <transport/> node.
         @type  transport_key_enc: str
         @param transport_key_enc: The base64 encrypted transport-key.
-
+        
         @rtype:   str
-        @return:  The decrypted <transport/> node content."""
+        @return:  The decrypted <transport/> node content.
+        """
         
         # decrypt the transport key with the private RSA key of recipient
         transport_key = self.__rsa_private_decrypt_base64(transport_key_enc)
@@ -1284,52 +1295,55 @@ class EnDec():
                 aes_key = binascii.a2b_base64(child.getData())
             if child.getName().strip().lower() == 'vint':
                 aes_vint = binascii.a2b_base64(child.getData())
-
+        
         # decrypt transport content
         return self.__aes_decrypt_base64(encrypted, aes_key, aes_vint)
     
     def private_sign(self, content):
+        """
+        Returns the value of the signature of a the <transport/> node. Reference is OpenSpime protocol v0.9.
         
-        """Returns the value of the signature of a the <transport/> node. Reference is OpenSpime protocol v0.9.
-
         @type  content: str
         @param content: The string content of the <transport/> node.
-
+        
         @rtype:   str
-        @return:  The base64 encoded signature of the <transport/> node."""
+        @return:  The base64 encoded signature of the <transport/> node.
+        """
         
         # convert to canonical XML
         content_canonical = pyopenspime.util.convert_to_canonical_xml(content)
-
+        
         # compute sha
         s = sha.sha(content_canonical).digest()
-
+        
         # encrypt the sha using the private RSA key
         return self.__rsa_private_encrypt_base64(s).replace('\r', '').replace('\n', '')
     
     def public_check_sign(self, content, signature):
-        """Returns the value of the signature of a the <transport/> node. Reference is OpenSpime protocol v0.9.
-
+        """
+        Returns the value of the signature of a the <transport/> node. Reference is OpenSpime protocol v0.9.
+        
         @type  content: str
         @param content: The string content of the <transport/> node.
         @type  signature: str
         @param signature: The signature.
-
+        
         @rtype:   boolean
-        @return:  True if signature is valid, False if it is not."""
+        @return:  True if signature is valid, False if it is not.
+        """
         
         # convert to canonical XML
         content_canonical = pyopenspime.util.convert_to_canonical_xml(content)
-
+        
         # compute sha
         s = sha.sha(content_canonical).digest()
-
+        
         # get the sha in the signature
         try:
             sha_in_signature = self.__rsa_public_decrypt_base64(signature)
         except:
             return False
-
+        
         return s == sha_in_signature        
     
 
@@ -1339,8 +1353,9 @@ class Error(pyopenspime.xmpp.protocol.Iq):
     """
     
     def __init__(self, stanza, error_type='modify', error_cond=None, error_namespace=None, error_description=None):  
-        """Initialize an OpenSpime error stanza.
-
+        """
+        Initialize an OpenSpime error stanza.
+        
         @type  stanza: pyopenspime.xmpp.simplexml.Node
         @param stanza: The original stanza that the error is build for.
         @type  error_type: unicode
@@ -1353,51 +1368,53 @@ class Error(pyopenspime.xmpp.protocol.Iq):
         @type  error_namespace: unicode
         @param error_namespace: The error condition namespace.
         @type  error_description: unicode
-        @param error_description: The error description."""
+        @param error_description: The error description.
+        """
         
         # init component
         pyopenspime.xmpp.protocol.Iq.__init__(self, node=stanza)
-
+        
         if error_cond <> None:
-
+            
             # we are building a node
-
+            
             # invert recipient and sender
             frm = self.getFrom()
             to = self.getTo()
             self.setTo(frm)
             self.setFrom(to)
-
+            
             # ensure to have only an error reported, to avoid sending unencrypted data on the network -> empty all query
             self = pyopenspime.util.clean_node(self)
-
+            
             # set 'error' type
             self.setType('error')
-
+            
             # add error node <error type='modify'>
             n_error = self.addChild(name=u'error', attrs={u'type': error_type})
             
             # add bad-request as per xmpp protocol rfc 3920
             n_bad_request = n_error.addChild(name=u'bad-request')
             n_bad_request.setNamespace(u'urn:ietf:params:xml:ns:xmpp-stanzas')
-
+            
             # add error_cond
             n_error_cond = n_error.addChild(name=unicode(error_cond))
-
+            
             # add namespace
             if error_namespace <> None:
                 n_error_cond.setNamespace(unicode(error_namespace))
-
+            
             # add error description
             if error_description <> None:
                 n_error_description = n_error.addChild(name=u'text', payload=unicode(error_description))
     
     def get_error(self):
-
-        """Retrieves error condition and description from an error stanza.
+        """
+        Retrieves error condition and description from an error stanza.
         Reference is OpenSpime protocol Core Reference Schema v0.9.
         @rtype:   tuple of unicode
-        @return:  (error_cond, error_description)"""
+        @return:  (error_cond, error_description)
+        """
         
         # init
         error_cond = u''
@@ -1450,19 +1467,4 @@ def wrap(transport_child_node, originator_osid=None, transport_to_osid=None):
     
     # return openspime node
     return n_openspime
-    
-
-
-
-
-
-
-
-
-
-
-    
-
-
-    
 
