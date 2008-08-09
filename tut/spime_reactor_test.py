@@ -122,7 +122,15 @@ if __name__ == "__main__":
     log = logging.getLogger("MyScopeNode")
     
     ###### OpenSpime
-    #c = TheSpime('dev-spime-3@developer.openspime.com/spime')
-    c = TheScopeNode('dev-scopenode-3@developer.openspime.com/scope')
-    c.on_log = log.log
+    #c = TheSpime('dev-spime-3@developer.openspime.com/spime', log_callback_function = log.log)
+    c = TheScopeNode('dev-scopenode-3@developer.openspime.com/scope', log_callback_function = log.log)
     c.run();
+    
+    import threading
+    import time
+    class IsThreadRunningCheck(threading.Thread):
+        def run(self):
+            while True:
+                time.sleep(2)
+                print "<ping>"
+    IsThreadRunningCheck().start()

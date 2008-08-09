@@ -966,13 +966,24 @@ class Client(pyopenspime.xmpp.Client):
     
     
     ###### Commlink functions
-    def run(self):
+    def run(self, threaded=True):
         """
         Core running loop.
         """
         self.connect()
-        while self.loop():
-            pass
+        
+        def runloop():
+            while self.loop():
+                pass
+        
+        if threaded == True:
+            import threading
+            class OpenSpimeRunThread(threading.Thread):
+                def run(self):
+                    runloop()
+            OpenSpimeRunThread().start()
+        else:
+            runloop()
     
     def connect(self):
         """
