@@ -1022,7 +1022,7 @@ class Client(pyopenspime.xmpp.Client):
         self.log(10, u'registering iq handler')
         self.RegisterHandler('iq', self.__iq_handler)
         
-        self.log(20, u'client ready.')
+        self.log(20, u'client <%s> ready.' % self.osid)
         self.on_connect()
     
     def loop(self, delay=1):
