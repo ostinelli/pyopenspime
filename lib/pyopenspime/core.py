@@ -896,7 +896,7 @@ class Client(pyopenspime.xmpp.Client):
         Handler to manage automatic reconnection.
         """
         
-        if self.__trying_reconnection == False:
+        if self.__trying_reconnection == False and self.try_reconnect > 0:
             self.__trying_reconnection = True
             self.log(30, 'client is disconnected, trying automatic reconnection every %s seconds.' % self.try_reconnect)
             self.__reconnect()
