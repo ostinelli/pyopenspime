@@ -195,9 +195,13 @@ class Client(pyopenspime.xmpp.Client):
         # load keys
         if rsa_pub_key_path <> '' and rsa_priv_key_path <> '':
             try:
-                # convert to string -> M2Crypto needs str not unicode
-                rsa_priv_key_pass = pyopenspime.util.to_utf8(rsa_priv_key_pass)
-                self.__load_key_bio(rsa_pub_key_path, rsa_priv_key_path, rsa_priv_key_pass)
+                # check if files exist
+                if os.path.isfile(rsa_pub_key_path) == False or os.path.isfile(rsa_priv_key_pass) == False:
+                    self.log(20, u'RSA keys do not exist, encryption and digital signature will not be available.')
+                else:
+                    # convert to string -> M2Crypto needs str not unicode
+                    rsa_priv_key_pass = pyopenspime.util.to_utf8(rsa_priv_key_pass)
+                    self.__load_key_bio(rsa_pub_key_path, rsa_priv_key_path, rsa_priv_key_pass)
             except:
                 self.log(40, u'error (%s) while loading RSA keys: %s.' % (unicode(sys.exc_info()[0].__name__), \
                                                                    unicode(sys.exc_info()[1])))
