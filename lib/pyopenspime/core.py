@@ -929,13 +929,13 @@ class Client(pyopenspime.xmpp.Client):
         pass
     
     def on_iq_success(self, stanza_id, stanza):
-        pass
+        if hasattr(self, 'iqSuccess'): self.iqSuccess(stanza_id, stanza)
     
     def on_iq_failure(self, stanza_id, error_cond, error_description, stanza):
-        pass
+        if hasattr(self, 'iqFailure'): self.iqFailure(stanza_id, error_cond, error_description, stanza)
     
     def on_iq_timeout(self, stanza_id):
-        pass
+        if hasattr(self, 'iqTimeout'): self.iqTimeout(stanza_id)
     
     def set_iq_handlers(self, callback_success, callback_failure=None, callback_timeout=None, timeout=60):
         """

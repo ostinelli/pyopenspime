@@ -90,6 +90,17 @@ class TheSpime(Client):
     def dataReceived(self, extname, extobj, stanza):
         print u"data with id '%s' succesfully received by recipient." % stanza.getID()
         #self.transport.loseConnection()
+    
+    def iqSuccess(self, stanza_id, stanza):
+        self.log(10, u'data with id \'%s\' succesfully received by recipient.' % stanza_id)
+    
+    def iqFailure(self, stanza_id, error_cond, error_description, stanza):
+        self.log(40, u"error (%s) on transmission of data with id \'%s\': %s" % (error_cond, stanza_id, error_description))
+    
+    def iqTimeout(self, stanza_id):
+        self.log(40, u'timeout waiting confirmation for data with id \'%s\'.' % stanza_id)
+    
+
 
 class TheScopeNode(Client):
     """
@@ -122,8 +133,8 @@ if __name__ == "__main__":
     log = logging.getLogger("MyScopeNode")
     
     ###### OpenSpime
-    #c = TheSpime('dev-spime-3@developer.openspime.com/spime', log_callback_function = log.log)
-    c = TheScopeNode('dev-scopenode-3@developer.openspime.com/scope', log_callback_function = log.log)
+    c = TheSpime('dev-spime-3@developer.openspime.com/spime', log_callback_function = log.log)
+    #c = TheScopeNode('dev-scopenode-3@developer.openspime.com/scope', log_callback_function = log.log)
     c.run();
     
     import threading
