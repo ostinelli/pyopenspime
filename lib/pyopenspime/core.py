@@ -974,7 +974,8 @@ class Client(pyopenspime.xmpp.Client):
         """
         Core running loop.
         """
-        self.connect()
+        def connect():
+            self.connect()
         
         def runloop():
             while self.loop():
@@ -984,6 +985,7 @@ class Client(pyopenspime.xmpp.Client):
             import threading
             class OpenSpimeRunThread(threading.Thread):
                 def run(self):
+                    connect()
                     runloop()
             OpenSpimeRunThread().start()
         else:
