@@ -1044,7 +1044,10 @@ class Client(pyopenspime.xmpp.Client):
             self.log(30, u'incoming malformed xml, ignored.') 
         # handle iq callback timeout
         self.__iq_callback_timeout()
-        return True # to be used in a while client.loop(1): iterator
+        if self.connected == True:
+            return True # to be used in a while client.loop(1): iterator
+        else:
+            return False
     
     def send_stanza(self, stanza, to_osid, encrypt=None, sign=None):
         """
