@@ -84,7 +84,7 @@ try:
         pass
 except KeyboardInterrupt:
     log.info(u'disconnecting and exiting')
-    if c.isConnected == True:
+    if c.connected == True:
         c.disconnect()
     exit(0)
 except:

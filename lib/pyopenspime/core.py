@@ -184,7 +184,7 @@ class Client(pyopenspime.xmpp.Client):
         self.__stanza_waiting_pubkey = {}
         self.__outgoing_stanza_waiting_pubkey = {}
         self.__trying_reconnection = False
-        
+        self.connected = False
         self.encrypt = False
         self.sign = False
         self.log(10, u'default security set to: encrypt=%s, sign=%s' % (self.encrypt, self.sign))
@@ -895,7 +895,8 @@ class Client(pyopenspime.xmpp.Client):
         """
         Handler to manage automatic reconnection.
         """
-        
+        # set connection status
+        self.connected = False        
         if self.__trying_reconnection == False and self.try_reconnect > 0:
             self.__trying_reconnection = True
             self.log(30, 'client is disconnected, trying automatic reconnection every %s seconds.' % self.try_reconnect)
@@ -905,6 +906,8 @@ class Client(pyopenspime.xmpp.Client):
         """
         Event raised on a successful connection to the XMPP server
         """
+        # set connection status
+        self.connected = True
         if hasattr(self, 'connectionMade'): self.connectionMade()
     
     def on_data_received(self, ext_name, ext_object, stanza):
