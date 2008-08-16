@@ -196,7 +196,7 @@ class Client(pyopenspime.xmpp.Client):
         if rsa_pub_key_path <> '' and rsa_priv_key_path <> '':
             try:
                 # check if files exist
-                if os.path.isfile(rsa_pub_key_path) == False or os.path.isfile(rsa_priv_key_pass) == False:
+                if os.path.isfile(rsa_pub_key_path) == False or os.path.isfile(rsa_priv_key_path) == False:
                     self.log(20, u'RSA keys do not exist, encryption and digital signature will not be available.')
                 else:
                     # convert to string -> M2Crypto needs str not unicode
@@ -290,10 +290,6 @@ class Client(pyopenspime.xmpp.Client):
             self._endec = None
             raise
         self.log(20, u'client RSA keys successfully loaded.')
-        
-        self.encrypt = True
-        self.sign = True
-        self.log(10, u'default security set to: encrypt=%s, sign=%s' % (self.encrypt, self.sign))
     
     def __presence_handler(self, dispatcher, stanza):
         pass
@@ -397,7 +393,7 @@ class Client(pyopenspime.xmpp.Client):
                 # get request
                 osid = child.getAttr('jid')
                 if osid == self.osid:
-                    if self._endec <> None:
+                    if self._endec.rsa_pub_key <> None:
                         # ok prepare response
                         self.log(10, u'request pubkey received, send public key')
                         pubkey_iq = pyopenspime.xmpp.protocol.Iq(typ='result', to=iq_from)
@@ -413,7 +409,7 @@ class Client(pyopenspime.xmpp.Client):
                         self.send_stanza(pubkey_iq, iq_from)
                     else:
                         # ko prepare response no keys!
-                        self.log(10, u'request pubkey received however no public RSA key has been specified, send error response.')
+                        self.log(30, u'request pubkey received however no public RSA key has been specified, send error response.')
                         # prepare response                
                         pubkey_iq = pyopenspime.xmpp.protocol.Iq(typ='error', to=iq_from)
                         pubkey_iq.setID(iq_id)
@@ -922,7 +918,7 @@ class Client(pyopenspime.xmpp.Client):
         @type  stanza: pyopenspime.xmpp.protocol.Protocol
         @param stanza: The stanza, to be used for advanced treatment.
         """
-        if hasattr(self, 'dataReceived'): self.dataReceived(ext_name, ext_object, stanza)
+        if hasattr(self, 'extensionReceived'): self.extensionReceived(ext_name, ext_object, stanza)
     
     def on_log(self, level, msg):
         """
@@ -983,7 +979,7 @@ class Client(pyopenspime.xmpp.Client):
         def runloop():
             while self.loop():
                 pass
-        
+        # threading
         if threaded == True:
             import threading
             class OpenSpimeRunThread(threading.Thread):
@@ -1039,7 +1035,11 @@ class Client(pyopenspime.xmpp.Client):
         """
         
         # main client loop
-        result = self.Process(delay)
+        try:
+            result = self.Process(delay)
+        except:
+            self.log(40, "error (%s) while looping: %s" % (sys.exc_info()[0].__name__, sys.exc_info()[1]) )
+            raise
         if result == True:
             self.log(30, u'incoming malformed xml, ignored.') 
         # handle iq callback timeout
@@ -1061,10 +1061,20 @@ class Client(pyopenspime.xmpp.Client):
         @type  sign: boolean
         @param sign: If signature is requested, set to True. Defaults to I{False}.
         """
-        
+        if self.connected == False:
+            msg = u'client is not connected, could not send message.'
+            self.log(40, msg)
+            raise Exception, msg
+
         if encrypt == None: encrypt = self.encrypt
         if sign == None: sign = self.sign
         self.log(10, u'security: encrypt=%s, sign=%s' % (encrypt, sign))
+        # check if keys are available
+        if sign == True and self._endec.rsa_priv_key == None:
+            # signature requested but no private key available
+            msg = u'digital signature requested but no private key available, aborting the sending operation.'
+            self.log(40, msg)
+            raise Exception, msg 
         
         self.log(10, u'setting \'from\' and \'to\' attribute of stanza')
         stanza.setFrom(self.osid)

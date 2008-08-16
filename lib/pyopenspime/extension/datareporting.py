@@ -58,9 +58,9 @@ def validate(stanza):
     @type  stanza: pyopenspime.xmpp.protocol.Protocol
     @param stanza: Incoming stanza."""
 
-    stanza_type = stanza.getName().strip().lower()
+    stanza_kind = stanza.getName().strip().lower()
 
-    if stanza_type == 'iq' or stanza_type == 'message':
+    if stanza_kind == 'iq' or stanza_kind == 'message':
         for n_root_child in stanza.getChildren():
             if n_root_child.getName() == 'openspime':
                 for n_os_child in n_root_child.getChildren():
@@ -88,7 +88,7 @@ def main(stanza):
         
     # save stanza & kind
     extobj._incomed_stanza = stanza
-    extobj._kind = stanza_kind
+    extobj.stanza_kind = stanza_kind
     
     # get stanza type: set, get, result, error
     stanza_type = stanza.getType()
@@ -125,7 +125,7 @@ class ExtObj():
         # init
         self.entries = []
         self._incomed_stanza = None
-        self._kind = None
+        self.stanza_kind = None
 
     def add_entry(self, entry_xml):
         
@@ -160,6 +160,9 @@ class ExtObj():
         # wrap data node in openspime protocol
         n_openspime = wrap(n_data)
 
+        # save
+        self.stanza_kind = kind
+
         if kind == 'iq':
             # create new Iq stanza
             stanza = Iq(typ='set')
@@ -186,7 +189,7 @@ class ExtObj():
         @return:  The Iq stanza to be sent out as confirmation message."""
         
         # prepare empty iq of type "result"
-        if self._kind <> 'iq':
+        if self.stanza_kind <> 'iq':
             raise Exception, '\'accepted\' responses can only be build for \'iq\' type of data reporting.'
         iq_ok = self._incomed_stanza.buildReply('result')
         return iq_ok
@@ -211,7 +214,7 @@ class ExtObj():
         @return:  The Iq stanza to be sent out as error message."""
         
         # prepare empty iq of type "result"
-        if self._kind <> 'iq':
+        if self.stanza_kind <> 'iq':
             raise Exception, '\'error\' responses can only be build for \'iq\' type of data reporting.'
         iq_ko = Error(self._incomed_stanza, error_type, error_cond, error_namespace, error_description)        
         return iq_ko
