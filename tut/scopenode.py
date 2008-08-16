@@ -53,7 +53,7 @@ from pyopenspime.core import Client
 
 class TheScopeNode(Client):
     """
-    PyOpenSpime 0.2 Basic ScopeNode
+    PyOpenSpime 0.2 Normal ScopeNode
     """
     
     def connectionMade(self):

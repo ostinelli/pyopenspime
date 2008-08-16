@@ -1,5 +1,5 @@
 #
-# PyOpenSpime - Spime example, normal threaded functionality
+# PyOpenSpime - ScopeNode example, basic threaded functionality
 # version 0.2
 # last update 2008 08 16
 #
@@ -41,86 +41,63 @@
 # DAMAGES OR LOSSES), EVEN IF WIDETAG INC OR SUCH AUTHOR HAS BEEN ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGES.
 
-"""Spime, normal code"""
+"""ScopeNode, basic code"""
 
 
 ###### Imports
-import sys, os, threading, time
-
+import sys, os, threading, time, re
 os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
 sys.path.append('../lib') # use the local library
 from pyopenspime.core import Client
 
 
-class TheSpime(Client):
+class TheScopeNode(Client):
     """
-    PyOpenSpime 0.2 Normal Spime
+    PyOpenSpime 0.2 Basic ScopeNode
     """
-    
-    def connectionMade(self):
-        """
-        Called on connection.
-        """
-        pass
     
     def connectionLost(self):
         self.log(30, u'connection lost.')
     
-    def iqSuccess(self, stanza_id, stanza):
-        self.log(10, u'data with id \'%s\' succesfully received by recipient.' % stanza_id)
-    
-    def iqFailure(self, stanza_id, error_cond, error_description, stanza):
-        self.log(40, u"error (%s) on transmission of data with id \'%s\': %s" % (error_cond, stanza_id, error_description))
-    
-    def iqTimeout(self, stanza_id):
-        self.log(40, u'timeout waiting confirmation for data with id \'%s\'.' % stanza_id)   
-
-    def sendData(self):
+    def extensionReceived(self, extname, extobj, stanza):
         """
-        Send a Data Reporting message using the OpenSpime data reporting core extension
+        Called when an openspime extension request has been received.
         """
-        # Create data reporting message which requests for confirmation (i.e. of type 'iq')
-        import pyopenspime.extension.datareporting
-        dr = pyopenspime.extension.datareporting.ExtObj()
+        if extname == 'datareporting':
+            # data received
+            # data ok
+            self.log(20, u'data reporting message received')
+            if extobj.stanza_kind == 'iq':
+                # send confirmation
+                c.send_stanza(extobj.accepted(), stanza.getFrom())
+            # print on screen
+            print "======== \/ RECEIVED DATA ========"
+            for entry_n in extobj.entries:
+                print entry_n
+            print "======== /\ RECEIVED DATA ========"
+        else:
+            # other openspime extensions
+            self.log(30, u'received an unsupported openspime extension request.')            
+            if extobj.stanza_kind == 'iq':
+                # send a feature-not-implemented error
+                c.send_stanza(extobj.error(error_type='cancel', error_cond='feature-not-implemented', error_namespace='urn:ietf:params:xml:ns:xmpp-stanzas', \
+                    error_description='Unsupported openspime extension'), stanza.getFrom())
 
-        # Add xml data node
-        dr.add_entry(u"""<entry>
-                <date>2008-04-02T17:54:22+01:00</date>
-                <exposure>outdoor</exposure>
-                <lat>45.475841199050905</lat>
-                <lon>9.172725677490234</lon>
-                <ele unit='m'>120.0</ele>
-                <ppm>176.4</ppm>
-            </entry>""")
-
-        # build message of kind 'iq', i.e. will wait for a confirmation or error message.
-        iq = dr.build('iq')        
-        self.send_stanza(iq, 'dev-scopenode-2@developer.openspime.com/scope', encrypt = True, sign = True)
-        log.info(u'sending data reporting message with id \'%s\'' % iq.getID()) 
 
 if __name__ == "__main__":
     ###### Logging
     import logging
     logging.basicConfig(level = 10, format='%(asctime)s %(levelname)s %(message)s')
-    log = logging.getLogger("MySpime")
+    log = logging.getLogger("MyScopeNode")
     
     ###### OpenSpime
-    c = TheSpime('dev-spime-2@developer.openspime.com/spime', log_callback_function = log.log)
+    c = TheScopeNode('dev-scopenode-2@developer.openspime.com/scope', log_callback_function = log.log)
     c.run();
-
-    ###### Timer to send out an iq data reporting every 10 seconds
-    delay = 10
+    
+    ###### Visible check on Timer
     class IsThreadRunningCheck(threading.Thread):
         def run(self):
-            t = 0
             while True:
                 time.sleep(1)
-                t += 1
-                print "\b.",
-                if t > delay:
-                    print ''
-                    # send data
-                    if c.connected == True:
-                        c.sendData()
-                    t = 0
+                print '\b.',
     IsThreadRunningCheck().start()

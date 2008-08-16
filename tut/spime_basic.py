@@ -1,5 +1,5 @@
 #
-# PyOpenSpime - Spime example, normal threaded functionality
+# PyOpenSpime - Spime example, basic threaded functionality
 # version 0.2
 # last update 2008 08 16
 #
@@ -41,7 +41,7 @@
 # DAMAGES OR LOSSES), EVEN IF WIDETAG INC OR SUCH AUTHOR HAS BEEN ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGES.
 
-"""Spime, normal code"""
+"""Spime, basic code"""
 
 
 ###### Imports
@@ -54,17 +54,14 @@ from pyopenspime.core import Client
 
 class TheSpime(Client):
     """
-    PyOpenSpime 0.2 Normal Spime
+    PyOpenSpime 0.2 Basic Spime
     """
     
     def connectionMade(self):
         """
-        Called on connection.
+        When connected, talks to the scopenode.
         """
-        pass
-    
-    def connectionLost(self):
-        self.log(30, u'connection lost.')
+        self.sendData()
     
     def iqSuccess(self, stanza_id, stanza):
         self.log(10, u'data with id \'%s\' succesfully received by recipient.' % stanza_id)
@@ -108,19 +105,10 @@ if __name__ == "__main__":
     c = TheSpime('dev-spime-2@developer.openspime.com/spime', log_callback_function = log.log)
     c.run();
 
-    ###### Timer to send out an iq data reporting every 10 seconds
-    delay = 10
+    ###### Visible check on Timer
     class IsThreadRunningCheck(threading.Thread):
         def run(self):
-            t = 0
             while True:
                 time.sleep(1)
-                t += 1
-                print "\b.",
-                if t > delay:
-                    print ''
-                    # send data
-                    if c.connected == True:
-                        c.sendData()
-                    t = 0
+                print '\b.',
     IsThreadRunningCheck().start()
