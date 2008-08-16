@@ -87,10 +87,6 @@ class TheSpime(Client):
     def connectionLost(self):
         print u"Connection lost"
     
-    def dataReceived(self, extname, extobj, stanza):
-        print u"data with id '%s' succesfully received by recipient." % stanza.getID()
-        #self.transport.loseConnection()
-    
     def iqSuccess(self, stanza_id, stanza):
         self.log(10, u'data with id \'%s\' succesfully received by recipient.' % stanza_id)
     
