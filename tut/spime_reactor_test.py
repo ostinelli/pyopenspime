@@ -61,7 +61,6 @@ class TheSpime(Client):
         """
         When connected, talks to the scopenode.
         """
-        print u"Spime <%s> is online." % self.osid
         
         # Create data reporting message which requests for confirmation (i.e. of type 'iq')
         import pyopenspime.extension.datareporting
@@ -80,12 +79,11 @@ class TheSpime(Client):
         # build message of kind 'iq', i.e. will wait for a confirmation or error message.
         iq = dr.build('iq')
         
-        self.send_stanza(iq, 'dev-scopenode-3@developer.openspime.com/scope')#'scopenode@developer.openspime.com/scope')
-        print u"Data '%s' sent." % iq
-        #self.transport.write(iq, 'scopenode@developer.openspime.com/scope')
+        self.send_stanza(iq, 'dev-scopenode-3@developer.openspime.com/scope')
+        log.info(u'sending data reporting message with id \'%s\'' % iq.getID())
     
     def connectionLost(self):
-        print u"Connection lost"
+        self.log(30, u'connection lost.')
     
     def iqSuccess(self, stanza_id, stanza):
         self.log(10, u'data with id \'%s\' succesfully received by recipient.' % stanza_id)
@@ -94,8 +92,7 @@ class TheSpime(Client):
         self.log(40, u"error (%s) on transmission of data with id \'%s\': %s" % (error_cond, stanza_id, error_description))
     
     def iqTimeout(self, stanza_id):
-        self.log(40, u'timeout waiting confirmation for data with id \'%s\'.' % stanza_id)
-    
+        self.log(40, u'timeout waiting confirmation for data with id \'%s\'.' % stanza_id)    
 
 
 class TheScopeNode(Client):
@@ -120,7 +117,7 @@ class TheScopeNode(Client):
             c.send_stanza(extobj.error(error_type='modify', error_cond='inconsistent-data-with-scope', error_namespace='openspime:protocol:extension:data:error', \
                                 error_description='Data is not consistent with scope of this ScopeNode.'), stanza.getFrom())
             """
-        #self.transport.loseConnection()
+
 
 if __name__ == "__main__":
     ###### Logging
@@ -139,5 +136,5 @@ if __name__ == "__main__":
         def run(self):
             while True:
                 time.sleep(2)
-                print "<ping>"
+                print '\b.',
     IsThreadRunningCheck().start()
