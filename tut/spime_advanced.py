@@ -62,6 +62,10 @@ class TheSpime(Client):
         Called on connection.
         """
         pass
+
+    def timer(self):
+        if self.connected == True:
+            self.sendData()
     
     def connectionLost(self):
         self.log(30, u'connection lost.')
@@ -106,21 +110,5 @@ if __name__ == "__main__":
     
     ###### OpenSpime
     c = TheSpime('dev-spime-2@developer.openspime.com/spime', log_callback_function = log.log)
-    c.run();
+    c.run(10);
 
-    ###### Timer to send out an iq data reporting every 10 seconds
-    delay = 10
-    class IsThreadRunningCheck(threading.Thread):
-        def run(self):
-            t = 0
-            while True:
-                time.sleep(1)
-                t += 1
-                print "\b.",
-                if t > delay:
-                    print ''
-                    # send data
-                    if c.connected == True:
-                        c.sendData()
-                    t = 0
-    IsThreadRunningCheck().start()

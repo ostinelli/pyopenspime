@@ -969,15 +969,25 @@ class Client(pyopenspime.xmpp.Client):
     
     
     ###### Commlink functions
-    def run(self, threaded=True):
+    def run(self, timer=0, threaded=True):
         """
         Core running loop.
+
+        
+        @type  timer: int
+        @param timer: Specifies the seconds interval at which the function timer() is called in the client.
         """
         def connect():
             self.connect()
         
         def runloop():
+            t = 0
             while self.loop():
+                t += 1
+                if t > timer and timer > 0:
+                    self.log(10, 'calling timer')
+                    if hasattr(self, 'timer'): self.timer()
+                    t = 0
                 pass
         # threading
         if threaded == True:
@@ -988,6 +998,7 @@ class Client(pyopenspime.xmpp.Client):
                     runloop()
             OpenSpimeRunThread().start()
         else:
+            connect()
             runloop()
     
     def connect(self):

@@ -153,10 +153,3 @@ if __name__ == "__main__":
     c = TheScopeNode('dev-scopenode-2@developer.openspime.com/scope', log_callback_function = log.log)
     c.run();
     
-    ###### Visible check on Timer
-    class IsThreadRunningCheck(threading.Thread):
-        def run(self):
-            while True:
-                time.sleep(1)
-                print '\b.',
-    IsThreadRunningCheck().start()

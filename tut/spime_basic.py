@@ -105,10 +105,3 @@ if __name__ == "__main__":
     c = TheSpime('dev-spime-2@developer.openspime.com/spime', log_callback_function = log.log)
     c.run();
 
-    ###### Visible check on Timer
-    class IsThreadRunningCheck(threading.Thread):
-        def run(self):
-            while True:
-                time.sleep(1)
-                print '\b.',
-    IsThreadRunningCheck().start()
