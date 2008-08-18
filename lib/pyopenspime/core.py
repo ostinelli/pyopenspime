@@ -309,7 +309,7 @@ class Client(pyopenspime.xmpp.Client):
             if handler[0] <> '':
                 self.log(10, u'openspime extension found, calling callback handler')
                 # call handler
-                self.on_data_received(handler[0], handler[1], stanza)
+                self.on_extension_received(handler[0], handler[1], stanza)
                 # return
                 return True
         else:
@@ -359,7 +359,7 @@ class Client(pyopenspime.xmpp.Client):
             if handler[0] <> '':
                 self.log(10, u'openspime \'%s\' extension found, calling callback' % handler[0])
                 # call handler
-                self.on_data_received(handler[0], handler[1], stanza)
+                self.on_extension_received(handler[0], handler[1], stanza)
                 # return
                 return True
         else:
@@ -437,6 +437,7 @@ class Client(pyopenspime.xmpp.Client):
     def __stanza_handler(self, stanza):
         """
         Handler to dispatch incoming openspime <message/> and <iq/> stanzas to proper extension.
+        
         @type  stanza: pyopenspime.xmpp.protocol.Stanza
         @param stanza: The incoming stanza.
         @rtype:   tuple
@@ -892,23 +893,42 @@ class Client(pyopenspime.xmpp.Client):
         Handler to manage automatic reconnection.
         """
         # set connection status
-        self.connected = False        
+        self.connected = False
+        # raise event
+        self.on_disconnect()
         if self.__trying_reconnection == False and self.try_reconnect > 0:
             self.__trying_reconnection = True
-            self.log(30, 'client is disconnected, trying automatic reconnection every %s seconds.' % self.try_reconnect)
+            self.log(30, 'client is disconnected, trying automatic reconnection immediately then every %s seconds.' % self.try_reconnect)
             self.__reconnect()
+
+    def __on_disconnect(self):
+        self.log(30, u'client <%s> was disconnected from the XMPP server.' % self.osid)
+        self.on_disconnect()
+
+    def on_disconnect(self):
+        """
+        Event raised on a disconnection to the XMPP server. This one does nothing, should be overriden in
+        derived classes.
+
+        Note that reconnection attempts are handled automatically, therefore any blocking on_disconnect() derived function will therefore
+        compromise such attempts.
+        """
+        pass
+
+    def __on_connect(self):
+        self.log(20, u'client <%s> ready.' % self.osid)
+        self.on_connect()
     
     def on_connect(self):
         """
-        Event raised on a successful connection to the XMPP server
+        Event raised on a successful connection to the XMPP server. This one does nothing, should be overriden in
+        derived classes.
         """
-        # set connection status
-        self.connected = True
-        if hasattr(self, 'connectionMade'): self.connectionMade()
+        pass
     
-    def on_data_received(self, ext_name, ext_object, stanza):
+    def on_extension_received(self, ext_name, ext_object, stanza):
         """
-        Event raised when an OpenSpime stanza is received. This one does nothing, should be overriden in
+        Event raised when an OpenSpime extension stanza, validated and decrypted if neceesary, is received. This one does nothing, should be overriden in
         derived classes.
         
         @type  ext_name: unicode
@@ -918,7 +938,7 @@ class Client(pyopenspime.xmpp.Client):
         @type  stanza: pyopenspime.xmpp.protocol.Protocol
         @param stanza: The stanza, to be used for advanced treatment.
         """
-        if hasattr(self, 'extensionReceived'): self.extensionReceived(ext_name, ext_object, stanza)
+        pass
     
     def on_log(self, level, msg):
         """
@@ -927,14 +947,55 @@ class Client(pyopenspime.xmpp.Client):
         """
         pass
     
-    def on_iq_success(self, stanza_id, stanza):
-        if hasattr(self, 'iqSuccess'): self.iqSuccess(stanza_id, stanza)
+    def __on_iq_success(self, stanza_id, stanza):
+        self.log(10, u'iq with id \'%s\' succesfully received by recipient.' % stanza_id)
+        self.on_iq_success(stanza_id, stanza)
     
-    def on_iq_failure(self, stanza_id, error_cond, error_description, stanza):
-        if hasattr(self, 'iqFailure'): self.iqFailure(stanza_id, error_cond, error_description, stanza)
+    def __on_iq_error(self, stanza_id, error_cond, error_description, stanza):
+        self.log(40, u"error (%s) on transmission of iq with id \'%s\': %s" % (error_cond, stanza_id, error_description))
+        self.on_iq_error(stanza_id, error_cond, error_description, stanza)
+    
+    def __on_iq_timeout(self, stanza_id):
+        self.log(40, u'timeout waiting confirmation for iq with id \'%s\'.' % stanza_id) 
+        self.on_iq_timeout(stanza_id)
+    
+    def on_iq_success(self, stanza_id, stanza):
+        """
+        Default <iq/> stanza callback in case of success. May be changed using the set_iq_handlers() function. This one does nothing, should be overriden in
+        derived classes.
+
+        @type  stanza_id: int
+        @param stanza_id: The id of the received <iq/> stanza.
+        @type  stanza: pyopenspime.xmpp.protocol.Stanza
+        @param stanza: The confirmation stanza.
+        """
+        pass
+    
+    def on_iq_error(self, stanza_id, error_cond, error_description, stanza):
+        """
+        Default <iq/> stanza callback in case of error. May be changed using the set_iq_handlers() function. This one does nothing, should be overriden in
+        derived classes.        
+
+        @type  stanza_id: int
+        @param stanza_id: The id of the received <iq/> stanza.
+        @type  error_cond: unicode
+        @param error_cond: The error condition received from the recipient.
+        @type  error_description: unicode
+        @param error_description: The full error description received from the recipient.
+        @type  stanza: pyopenspime.xmpp.protocol.Stanza
+        @param stanza: The error stanza.
+        """
+        pass
     
     def on_iq_timeout(self, stanza_id):
-        if hasattr(self, 'iqTimeout'): self.iqTimeout(stanza_id)
+        """
+        Default <iq/> stanza callback in case of timeout. May be changed using the set_iq_handlers() function. This one does nothing, should be overriden in
+        derived classes.
+
+        @type  stanza_id: int
+        @param stanza_id: The id of the received <iq/> stanza.
+        """
+        pass
     
     def set_iq_handlers(self, callback_success, callback_failure=None, callback_timeout=None, timeout=60):
         """
@@ -962,9 +1023,9 @@ class Client(pyopenspime.xmpp.Client):
             raise Exception, 'timeout must be expressed in integer seconds.'
         
         # attach callbacks, if any
-        if callback_success != None: self.on_iq_success = callback_success
-        if callback_failure != None: self.on_iq_failure = callback_failure
-        if callback_timeout != None: self.on_iq_timeout = callback_timeout
+        if callback_success != None: self.__on_iq_success = callback_success
+        if callback_failure != None: self.__on_iq_error = callback_failure
+        if callback_timeout != None: self.__on_iq_timeout = callback_timeout
         self.timeout = timeout
     
     
@@ -972,7 +1033,6 @@ class Client(pyopenspime.xmpp.Client):
     def run(self, timer=0, threaded=True):
         """
         Core running loop.
-
         
         @type  timer: int
         @param timer: Specifies the seconds interval at which the function timer() is called in the client.
@@ -986,7 +1046,7 @@ class Client(pyopenspime.xmpp.Client):
                 t += 1
                 if t > timer and timer > 0:
                     self.log(10, 'calling timer')
-                    if hasattr(self, 'timer'): self.timer()
+                    self.timer()
                     t = 0
                 pass
         # threading
@@ -1000,6 +1060,12 @@ class Client(pyopenspime.xmpp.Client):
         else:
             connect()
             runloop()
+
+    def timer(self):
+        """
+        Called periodically every interval of seconds specified by the run() function. This one does nothing, should be overriden in
+        derived classes.
+        """
     
     def connect(self):
         """
@@ -1034,8 +1100,9 @@ class Client(pyopenspime.xmpp.Client):
         self.log(10, u'registering iq handler')
         self.RegisterHandler('iq', self.__iq_handler)
         
-        self.log(20, u'client <%s> ready.' % self.osid)
-        self.on_connect()
+        # set connection status & raise event
+        self.connected = True
+        self.__on_connect()
     
     def loop(self, delay=1):
         """
@@ -1101,7 +1168,7 @@ class Client(pyopenspime.xmpp.Client):
         if stanza.getName().strip().lower() == 'iq':
             if (stanza.getType() == 'set' or stanza.getType() == 'get'): # add key
                 self.log(10, u'creating callback handler')
-                self.__iq_callback_handlers[stanza.getID()] = (self.on_iq_success, self.on_iq_failure, self.on_iq_timeout, time.time() + self.timeout)
+                self.__iq_callback_handlers[stanza.getID()] = (self.__on_iq_success, self.__on_iq_error, self.__on_iq_timeout, time.time() + self.timeout)
         # send
         self.log(10, u'sending stanza')
         self.Dispatcher.send(stanza)  

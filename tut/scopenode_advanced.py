@@ -56,13 +56,19 @@ class TheScopeNode(Client):
     PyOpenSpime 0.2 Normal ScopeNode
     """
     
-    def connectionMade(self):
-        pass
+    def on_connect(self):
+        """
+        Called on connection.
+        """
+        print u"scopenode is connected!"
     
-    def connectionLost(self):
-        self.log(30, u'connection lost.')
+    def on_disconnect(self):
+        """
+        Called on disconnection.
+        """
+        print u"scopenode has been diconnected!"
     
-    def extensionReceived(self, extname, extobj, stanza):
+    def on_extension_received(self, extname, extobj, stanza):
         """
         Called when an openspime extension request has been received.
         """
@@ -75,7 +81,7 @@ class TheScopeNode(Client):
                 if self.node_check(entry_n) == False:
                     self.log(30, u'received an inconsistent data reporting message.')
                     if extobj.stanza_kind == 'iq':
-                        # non conform, send error
+                        # non conform, send error since the request was containted in an iq stanza 
                         self.log(30, u'received an inconsistent data reporting message, sending error')
                         c.send_stanza(extobj.error(error_type='modify', error_cond='inconsistent-data-with-scope', error_namespace='openspime:protocol:extension:data:error', \
                             error_description='Data is not consistent with scope of this ScopeNode.'), stanza.getFrom())
@@ -83,7 +89,7 @@ class TheScopeNode(Client):
             # data ok
             self.log(20, u'data reporting message received')
             if extobj.stanza_kind == 'iq':
-                # send confirmation
+                # send confirmation since the request was containted in an iq stanza 
                 c.send_stanza(extobj.accepted(), stanza.getFrom())
             # print on screen
             print "======== \/ RECEIVED DATA ========"
@@ -94,7 +100,7 @@ class TheScopeNode(Client):
             # other openspime extensions
             self.log(30, u'received an unsupported openspime extension request.')            
             if extobj.stanza_kind == 'iq':
-                # send a feature-not-implemented error
+                # send a feature-not-implemented error since the request was containted in an iq stanza 
                 c.send_stanza(extobj.error(error_type='cancel', error_cond='feature-not-implemented', error_namespace='urn:ietf:params:xml:ns:xmpp-stanzas', \
                     error_description='Unsupported openspime extension'), stanza.getFrom())
 

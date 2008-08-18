@@ -57,29 +57,32 @@ class TheSpime(Client):
     PyOpenSpime 0.2 Normal Spime
     """
     
-    def connectionMade(self):
+    def on_connect(self):
         """
         Called on connection.
         """
-        pass
+        print u"spime is connected!"
+    
+    def on_disconnect(self):
+        """
+        Called on disconnection.
+        """
+        print u"spime has been disconnected!"
+    
+    def on_iq_success(self, stanza_id, stanza):
+        print u"iq received by recipient!"
+    
+    def on_iq_error(self, stanza_id, error_cond, error_description, stanza):
+        print u"error sending iq with id '%s': (%s) %s" % (stanza_id, error_cond, error_description)
+    
+    def on_iq_timeout(self, stanza_id):
+        print u"timeout waiting for confirmation for sent iq with id '%s'.'" % stanza_id
 
     def timer(self):
         if self.connected == True:
-            self.sendData()
-    
-    def connectionLost(self):
-        self.log(30, u'connection lost.')
-    
-    def iqSuccess(self, stanza_id, stanza):
-        self.log(10, u'data with id \'%s\' succesfully received by recipient.' % stanza_id)
-    
-    def iqFailure(self, stanza_id, error_cond, error_description, stanza):
-        self.log(40, u"error (%s) on transmission of data with id \'%s\': %s" % (error_cond, stanza_id, error_description))
-    
-    def iqTimeout(self, stanza_id):
-        self.log(40, u'timeout waiting confirmation for data with id \'%s\'.' % stanza_id)   
+            self.send_data()
 
-    def sendData(self):
+    def send_data(self):
         """
         Send a Data Reporting message using the OpenSpime data reporting core extension
         """
@@ -110,5 +113,6 @@ if __name__ == "__main__":
     
     ###### OpenSpime
     c = TheSpime('dev-spime-2@developer.openspime.com/spime', log_callback_function = log.log)
+    # set a 10 seconds delay for the timer() function
     c.run(10);
 

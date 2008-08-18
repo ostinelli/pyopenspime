@@ -57,24 +57,15 @@ class TheSpime(Client):
     PyOpenSpime 0.2 Basic Spime
     """
     
-    def connectionMade(self):
+    def on_connect(self):
         """
-        When connected, talks to the scopenode.
+        When connected, sends a data reporting message to a scopenode.
         """
-        self.sendData()
-    
-    def iqSuccess(self, stanza_id, stanza):
-        self.log(10, u'data with id \'%s\' succesfully received by recipient.' % stanza_id)
-    
-    def iqFailure(self, stanza_id, error_cond, error_description, stanza):
-        self.log(40, u"error (%s) on transmission of data with id \'%s\': %s" % (error_cond, stanza_id, error_description))
-    
-    def iqTimeout(self, stanza_id):
-        self.log(40, u'timeout waiting confirmation for data with id \'%s\'.' % stanza_id)   
+        self.send_data()
 
-    def sendData(self):
+    def send_data(self):
         """
-        Send a Data Reporting message using the OpenSpime data reporting core extension
+        Send a data reporting message using the OpenSpime data reporting core extension.
         """
         # Create data reporting message which requests for confirmation (i.e. of type 'iq')
         import pyopenspime.extension.datareporting

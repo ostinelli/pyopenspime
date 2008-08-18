@@ -55,20 +55,16 @@ class TheScopeNode(Client):
     """
     PyOpenSpime 0.2 Basic ScopeNode
     """
-    
-    def connectionLost(self):
-        self.log(30, u'connection lost.')
-    
-    def extensionReceived(self, extname, extobj, stanza):
+
+    def on_extension_received(self, extname, extobj, stanza):
         """
         Called when an openspime extension request has been received.
         """
         if extname == 'datareporting':
             # data received
-            # data ok
             self.log(20, u'data reporting message received')
             if extobj.stanza_kind == 'iq':
-                # send confirmation
+                # send confirmation since the request was containted in an iq stanza 
                 c.send_stanza(extobj.accepted(), stanza.getFrom())
             # print on screen
             print "======== \/ RECEIVED DATA ========"
@@ -79,7 +75,7 @@ class TheScopeNode(Client):
             # other openspime extensions
             self.log(30, u'received an unsupported openspime extension request.')            
             if extobj.stanza_kind == 'iq':
-                # send a feature-not-implemented error
+                # send a feature-not-implemented error since the request was containted in an iq stanza 
                 c.send_stanza(extobj.error(error_type='cancel', error_cond='feature-not-implemented', error_namespace='urn:ietf:params:xml:ns:xmpp-stanzas', \
                     error_description='Unsupported openspime extension'), stanza.getFrom())
 
