@@ -1,7 +1,7 @@
 #
-# PyOpenSpime - Data Reporting Extension
+# PyOpenSpime - Claim Extension
 # version 0.1
-# last update 2008 06 07
+# last update 2008 08 18
 #
 # Copyright (C) 2008, licensed under GPL v3
 # Roberto Ostinelli <roberto AT openspime DOT com>
@@ -45,7 +45,8 @@
 Reference is OpenSpime Data Reporting protocol extension v0.9."""
 
 # imports
-from pyopenspime.xmpp.protocol import Iq, Message
+import time
+from pyopenspime.xmpp.protocol import Iq
 from pyopenspime.xmpp.simplexml import Node
 from pyopenspime.core import wrap, Error
 import pyopenspime.util
@@ -60,13 +61,13 @@ def validate(stanza):
 
     stanza_kind = stanza.getName().strip().lower()
 
-    if stanza_kind == 'iq' or stanza_kind == 'message':
+    if stanza_kind == 'iq':
         for n_root_child in stanza.getChildren():
             if n_root_child.getName() == 'openspime':
                 for n_os_child in n_root_child.getChildren():
                     if n_os_child.getName() == 'transport':
                         for n_transport_child in n_os_child.getChildren():
-                            if n_transport_child.getName() == 'data':
+                            if n_transport_child.getName() == 'claim':
                                 return True
                                 break
                         break
@@ -79,8 +80,8 @@ def main(stanza, client):
 
     @type  stanza: pyopenspime.xmpp.protocol.Protocol
     @param stanza: Incoming stanza."""
-    
-    # get stanza kind: iq, message, presence
+
+    # get stanza kind: iq, message
     stanza_kind = stanza.getName().strip().lower()
 
     # create ExtObj
@@ -88,29 +89,35 @@ def main(stanza, client):
         
     # save stanza & kind
     extobj._incomed_stanza = stanza
-    extobj.stanza_kind = stanza_kind
+    extobj._client = client
     
     # get stanza type: set, get, result, error
     stanza_type = stanza.getType()
     # dispatch
-    if stanza_kind == 'message' or (stanza_kind == 'iq' and stanza_type == 'set'):
-        # reset
-        extobj.entries = []
-        # get entries
+    if stanza_kind == 'iq' and stanza_type == 'set':
+        # get request
         try:
             for n_root_child in stanza.getChildren():
                 if n_root_child.getName() == 'openspime':
                     for n_os_child in n_root_child.getChildren():
                         if n_os_child.getName() == 'transport':
                             for n_transport_child in n_os_child.getChildren():
-                                if n_transport_child.getName() == 'data':
-                                    for n_entry in n_transport_child.getChildren():
-                                        if n_entry.getName() == 'entry':
-                                            extobj.add_entry(n_entry)
+                                if n_transport_child.getName() == 'claim':
+                                    for n_request in n_transport_child.getChildren():
+                                        if n_request.getName() == 'request':
+                                            # get requested osid
+                                            requested_osid = n_request.getAttr('claims')
+                                            # save data in extobj
+                                            extobj.type = 'request'
+                                            extobj.originator_osid = pyopenspime.util.get_originator_osid(stanza)
+                                            extobj.requested_osid = requested_osid
+                                            break
                                     break
                             break
                     break
         except:
+            pass
+
             pass
     return extobj
 
@@ -123,101 +130,98 @@ class ExtObj():
         """Initialize an ExtObj Data Reporting extension object."""
         
         # init
-        self.entries = []
+        self.originator_osid = None
+        self.requested_osid = None
+        self.type = None
         self._incomed_stanza = None
-        self.stanza_kind = None
-
-    def add_entry(self, entry_xml):
+        self._client = None
         
-        """Add a data entry node.
-
-        @type  entry_xml: unicode
-        @param entry_xml: XML unicode string containing data to be added."""
-
-        self.entries.append(Node(node=entry_xml))        
-
-    def build(self, kind):
+    def build(self, osid):
         
-        """Builds the <transport/> node content of the data reporting stanza.
+        """Builds <transport/> node content of the claim request.
 
-        @type  kind: unicode
-        @param kind: Must be I{iq}, I{message} or I{pubsub}. PubSub is not supported by this PyOS version.
+        @type  osid: unicode
+        @param osid: The full OSID of the entity from which we are asking a claim key.
 
         @rtype:   pyopenspime.xmpp.simplexml.Node
         @return:  The stanza to be sent out."""
 
-        if kind <> 'iq' and kind <> 'message':
-            raise Exception, 'data reporting type not supported. currently supported: \'iq\' and \'message\'.'
+        # set type
+        self.type = 'request'
+    
+        # build <claim/> node, children of transport node - unique for extension
+        n_claim = Node( tag=u'claim', \
+            attrs = {u'xmlsn':u'openspime:protocol:extension:claim', u'version':u'0.9'} )
 
-        # build <data/> node, children of transport node - unique for extension
-        n_data = Node( tag=u'data', \
-            attrs =  {u'xmlsn':u'openspime:protocol:extension:data', u'version':u'0.9'} )
-        
-        # add entries
-        for entry in self.entries:
-            n_data.addChild(node=entry)
+        # add request node
+        n_request = n_claim.addChild(name=u'request', attrs={u'claims': osid})
 
         # wrap data node in openspime protocol
-        n_openspime = wrap(n_data)
+        n_openspime = wrap(n_claim)
 
-        # save
-        self.stanza_kind = kind
-
-        if kind == 'iq':
-            # create new Iq stanza
-            stanza = Iq(typ='set')
-            # serialize id
-            stanza.setID(pyopenspime.util.generate_rnd_str(16))
-            # adding <openspime/> node as first child of <iq/> or <message/> stanza
-            stanza.addChild(node=n_openspime)
-        if kind == 'message':
-            # create new Message stanza
-            stanza = Message()
-            # serialize id
-            stanza.setID(pyopenspime.util.generate_rnd_str(16))
-            # adding <openspime/> node as first child of <iq/> or <message/> stanza
-            stanza.addChild(node=n_openspime)
-
+        # create new Iq stanza
+        stanza = Iq(typ='set')
+        # serialize id
+        stanza.setID(pyopenspime.util.generate_rnd_str(16))
+        # adding <openspime/> node as first child of <iq/> stanza
+        stanza.addChild(node=n_openspime)
+        
         # return
         return stanza
 
     def accepted(self):
         
-        """Builds a 'succefully received' stanza according to the OpenSpime Data Reporting protocol extension.
+        """Builds a claim response message.
 
         @rtype:   pyopenspime.xmpp.protocol.Iq
         @return:  The Iq stanza to be sent out as confirmation message."""
+
+        # set type
+        self.type = 'response'
+    
+        # build <claim/> node, children of transport node - unique for extension
+        n_claim = Node( tag=u'claim', \
+            attrs = {u'xmlsn':u'openspime:protocol:extension:claim', u'version':u'0.9'} )
+
+        # add response node
+        n_response = n_claim.addChild(name=u'response', attrs={u'authorizes': self.originator_osid})
+
+        # generate claim key
+        claimkey = self.__generate_claimkey()
         
-        # prepare empty iq of type "result"
-        if self.stanza_kind <> 'iq':
-            raise Exception, '\'accepted\' responses can only be build for \'iq\' type of data reporting.'
+        # add claimkey
+        n_claimkey = n_response.addChild(name=u'claimkey')
+        n_claimkey.setData(claimkey)
+
+        # wrap data node in openspime protocol
+        n_openspime = wrap(n_claim)
+
+        # build response
         iq_ok = self._incomed_stanza.buildReply('result')
+
+        # adding <openspime/> node as first child of <iq/> stanza
+        iq_ok.addChild(node=n_openspime)
+        
+        # return
+        print iq_ok
         return iq_ok
 
-    def error(self, error_type, error_cond, error_namespace=None, error_description=None):
-        
-        """Builds a 'error' stanza according to the OpenSpime Data Reporting protocol extension.
+    def __generate_claimkey(self):
 
-        @type  error_type: unicode
-        @param error_type: The error type as defined by the XMPP protocol. Value MUST be 'cancel' -- do not retry
-        (the error is unrecoverable), 'continue' -- proceed (the condition was only a warning), 'modify' -- retry
-        after changing the data sent, 'auth' -- retry after providing credentials, 'wait' -- retry after waiting
-        (the error is temporary).
-        @type  error_cond: unicode
-        @param error_cond: The error condition.
-        @type  error_namespace: unicode
-        @param error_namespace: The error condition namespace.
-        @type  error_description: unicode
-        @param error_description: The error description.
+        # generate a claim key
 
-        @rtype:   pyopenspime.xmpp.protocol.Iq
-        @return:  The Iq stanza to be sent out as error message."""
+        # claimkey string, with expiration date to one year from now
+        claimkey = "<claimkey xmlns='openspime:protocol:core:claimkey' version='0.9'><osid>%s</osid> \
+                    <expdate>%s</expdate></claimkey>" % ( str(self.requested_osid), str(pyopenspime.util.iso_date_time(year=time.localtime()[0]+1)) )
+        # return encoded claimkey with private RSA key of the claimed entity
+        return self._client._endec.private_encrypt_text(claimkey).replace('\r', '').replace('\n', '')
+
+
         
-        # prepare empty iq of type "result"
-        if self.stanza_kind <> 'iq':
-            raise Exception, '\'error\' responses can only be build for \'iq\' type of data reporting.'
-        iq_ko = Error(self._incomed_stanza, error_type, error_cond, error_namespace, error_description)        
-        return iq_ko
+
+
+
+
 
 
 

@@ -45,7 +45,7 @@
 
 
 ###### Imports
-import sys, os, threading, time
+import sys, os
 
 os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
 sys.path.append('../lib') # use the local library

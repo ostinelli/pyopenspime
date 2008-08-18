@@ -45,7 +45,7 @@
 
 
 ###### Imports
-import sys, os, threading, time, re
+import sys, os, re
 os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
 sys.path.append('../lib') # use the local library
 from pyopenspime.core import Client
@@ -83,14 +83,14 @@ class TheScopeNode(Client):
                     if extobj.stanza_kind == 'iq':
                         # non conform, send error since the request was containted in an iq stanza 
                         self.log(30, u'received an inconsistent data reporting message, sending error')
-                        c.send_stanza(extobj.error(error_type='modify', error_cond='inconsistent-data-with-scope', error_namespace='openspime:protocol:extension:data:error', \
+                        self.send_stanza(extobj.error(error_type='modify', error_cond='inconsistent-data-with-scope', error_namespace='openspime:protocol:extension:data:error', \
                             error_description='Data is not consistent with scope of this ScopeNode.'), stanza.getFrom())
                     return
             # data ok
             self.log(20, u'data reporting message received')
             if extobj.stanza_kind == 'iq':
                 # send confirmation since the request was containted in an iq stanza 
-                c.send_stanza(extobj.accepted(), stanza.getFrom())
+                self.send_stanza(extobj.accepted(), stanza.getFrom())
             # print on screen
             print "======== \/ RECEIVED DATA ========"
             for entry_n in extobj.entries:
@@ -101,7 +101,7 @@ class TheScopeNode(Client):
             self.log(30, u'received an unsupported openspime extension request.')            
             if extobj.stanza_kind == 'iq':
                 # send a feature-not-implemented error since the request was containted in an iq stanza 
-                c.send_stanza(extobj.error(error_type='cancel', error_cond='feature-not-implemented', error_namespace='urn:ietf:params:xml:ns:xmpp-stanzas', \
+                self.send_stanza(extobj.error(error_type='cancel', error_cond='feature-not-implemented', error_namespace='urn:ietf:params:xml:ns:xmpp-stanzas', \
                     error_description='Unsupported openspime extension'), stanza.getFrom())
 
     def node_check(self, n):

@@ -43,8 +43,9 @@
 """PyOpenSpime generic utility functions."""
 
 # imports
-import random
+import random, time
 import pyopenspime.xmpp.simplexml
+from pyopenspime.xmpp.protocol import Protocol
 from xml.dom import minidom
 import c14n
 
@@ -183,10 +184,74 @@ def convert_to_canonical_xml(xml):
     return c14n.Canonicalize(doc)
 
 
+def get_originator_osid(stanza):
+
+    """Returns the originator OSID of an OpenSpime stanza, as specified in protocol v0.9.
+
+    @type  stanza: xmpp.protocol.Protocol
+    @param stanza: The full XMPP stanza.
+    
+    @rtype:   unicode
+    @return:  The originator_osid."""
+
+    # init
+    originator_osid = ''
+    try:
+        for n_root_child in stanza.getChildren():
+            if n_root_child.getName() == 'openspime':
+                for n_originator in n_root_child.getChildren():
+                    if n_originator.getName() == 'originator':
+                        if n_originator.getAttr('osid') <> None:
+                            originator_osid = n_originator.getAttr('osid')
+                        else:
+                            originator_osid = str(stanza.getFrom())
+                        break
+                break
+    except:
+        pass
+    return originator_osid
 
 
+def iso_date_time(year=None, month=None, day=None, hour=None, minute=None, second=None):
 
-
+    """Returns the current date and time in international standard ISO 8601.
+    
+    @type  year: int
+    @param year: The year of the date. Defaults to the one of the current date.
+    @type  month: int
+    @param month: The month of the date. Defaults to the one of the current date.
+    @type  day: int
+    @param day: The day of the date. Defaults to the one of the current date.
+    @type  hour: int
+    @param hour: The hour of the date. Defaults to the one of the current date.
+    @type  minute: int
+    @param minute: The minute of the date. Defaults to the one of the current date.
+    @type  second: int
+    @param second: The second of the date. Defaults to the one of the current date.
+    
+    @rtype:   unicode
+    @return:  The datetime string."""
+    
+    def str_min_len(str_num, str_len):
+        while len(str_num) < str_len:
+            str_num = "0%s" % str_num
+        return str_num
+    get_date = time.localtime()
+    date = [get_date[0],get_date[1],get_date[2],get_date[3],get_date[4],get_date[5],get_date[6],get_date[7],get_date[8]]
+    if year <> None: date[0] = year
+    if month <> None: date[1] = month
+    if day <> None: date[2] = day
+    if hour <> None: date[3] = hour
+    if minute <> None: date[4] = minute
+    if second <> None: date[5] = second
+    # get timezone
+    if -time.timezone < 0:
+        symbol = '-'
+    else:
+        symbol = '+'
+    tz = "%s%s:%s" % ( symbol, str_min_len(str(int(-time.timezone / 3600)), 2), str_min_len(str(int((-time.timezone % 3600)/60)), 2) )
+    # return format
+    return "%s%s" % (time.strftime("%Y-%m-%dT%H:%M:%S", date), tz)
 
 
 

@@ -618,7 +618,7 @@ class Client(pyopenspime.xmpp.Client):
             if result == True:
                 # ok we have a match, call core main function                
                 self.log(10, u'extension \'%s\' matches, calling main function' % ext)
-                exec( 'extobj = pyopenspime.extension.%s.main(stanza)' % ext )
+                exec( 'extobj = pyopenspime.extension.%s.main(stanza, self)' % ext )
                 self.log(10, u'received \'%s\' extension object.' % ext)
                 return (ext, extobj)
             else:           
@@ -1280,7 +1280,7 @@ class EnDec():
         
         self.rsa_priv_key_path = rsa_priv_key_path
         self.rsa_priv_key_pass = rsa_priv_key_pass
-        self.rsa_priv_key = M2Crypto.RSA.load_key(rsa_priv_key_path, callback=self.__rsa_callback_get_passphrase)        
+        self.rsa_priv_key = M2Crypto.RSA.load_key(rsa_priv_key_path, callback=self.__rsa_callback_get_passphrase)
     
     def __rsa_callback_get_passphrase(self, v):
         
@@ -1327,7 +1327,7 @@ class EnDec():
         # RSA private decryption
         
         encrypted = binascii.a2b_base64(encrypted)
-        # get pub_key size
+        # get priv_key size
         s = int(self.rsa_priv_key.__len__() / 8)
         decrypted = []
         # chunk decrypt
@@ -1340,8 +1340,8 @@ class EnDec():
         
         # RSA private encryption
         
-        # get pub_key size
-        s = int(( self.rsa_pub_key.__len__() ) / 8) - 11    # take away 11 bytes due to pkcs1_padding
+        # get priv_key size
+        s = int(( self.rsa_priv_key.__len__() ) / 8) - 11    # take away 11 bytes due to pkcs1_padding
         encrypted = []
         # chunk encrypt
         for i in range(0, len(plaintext), s):
@@ -1362,6 +1362,18 @@ class EnDec():
             decrypted.append(self.rsa_pub_key.public_decrypt(encrypted[i:i+s], M2Crypto.RSA.pkcs1_padding))
         # return
         return ''.join(decrypted)
+
+    def private_encrypt_text(self, plaintext):
+        """
+        Encrypts plaintext with the RSA private key of entity.
+        
+        @type  plaintext: str
+        @param plaintext: The string to be encrypted.
+        
+        @rtype:   str
+        @return:  The base64 encoded plaintext.
+        """
+        return self.__rsa_private_encrypt_base64(plaintext)
     
     def public_encrypt(self, transport):
         """
@@ -1395,8 +1407,8 @@ class EnDec():
         transport_key_enc = self.__rsa_public_encrypt_base64(transport_key).replace('\r', '').replace('\n', '')
         
         # return tuple
-        return [encrypted, transport_key_enc]
-    
+        return [encrypted, transport_key_enc]    
+       
     def private_decrypt(self, encrypted, transport_key_enc):
         """
         Decrypts a string encoded with public key of recipient.
@@ -1470,7 +1482,7 @@ class EnDec():
         except:
             return False
         
-        return s == sha_in_signature        
+        return s == sha_in_signature
     
 
 class Error(pyopenspime.xmpp.protocol.Iq):

@@ -45,7 +45,7 @@
 
 
 ###### Imports
-import sys, os, threading, time, re
+import sys, os
 os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
 sys.path.append('../lib') # use the local library
 from pyopenspime.core import Client
@@ -65,7 +65,7 @@ class TheScopeNode(Client):
             self.log(20, u'data reporting message received')
             if extobj.stanza_kind == 'iq':
                 # send confirmation since the request was containted in an iq stanza 
-                c.send_stanza(extobj.accepted(), stanza.getFrom())
+                self.send_stanza(extobj.accepted(), stanza.getFrom())
             # print on screen
             print "======== \/ RECEIVED DATA ========"
             for entry_n in extobj.entries:
@@ -76,7 +76,7 @@ class TheScopeNode(Client):
             self.log(30, u'received an unsupported openspime extension request.')            
             if extobj.stanza_kind == 'iq':
                 # send a feature-not-implemented error since the request was containted in an iq stanza 
-                c.send_stanza(extobj.error(error_type='cancel', error_cond='feature-not-implemented', error_namespace='urn:ietf:params:xml:ns:xmpp-stanzas', \
+                self.send_stanza(extobj.error(error_type='cancel', error_cond='feature-not-implemented', error_namespace='urn:ietf:params:xml:ns:xmpp-stanzas', \
                     error_description='Unsupported openspime extension'), stanza.getFrom())
 
 
