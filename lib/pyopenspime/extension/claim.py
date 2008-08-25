@@ -94,7 +94,7 @@ def main(stanza, client):
     # get stanza type: set, get, result, error
     stanza_type = stanza.getType()
     # dispatch
-    if stanza_kind == 'iq' and stanza_type == 'set':
+    if stanza_kind == 'iq':
         # get request
         try:
             for n_root_child in stanza.getChildren():
@@ -104,13 +104,29 @@ def main(stanza, client):
                             for n_transport_child in n_os_child.getChildren():
                                 if n_transport_child.getName() == 'claim':
                                     for n_request in n_transport_child.getChildren():
-                                        if n_request.getName() == 'request':
+                                        if n_request.getName() == 'request' and stanza_type == 'set':
+                                            # set type
+                                            extobj.type = 'request'
                                             # get requested osid
                                             requested_osid = n_request.getAttr('claims')
                                             # save data in extobj
-                                            extobj.type = 'request'
                                             extobj.originator_osid = pyopenspime.util.get_originator_osid(stanza)
                                             extobj.requested_osid = requested_osid
+                                            break
+                                        if n_response.getName() == 'response' and stanza_type == 'result':
+                                            # set type
+                                            extobj.type = 'response'
+                                            # get requested osid
+                                            originator_osid = n_response.getAttr('authorizes')
+                                            # save data in extobj
+                                            extobj.originator_osid = stanza.getFrom()
+                                            extobj.requested_osid = originator_osid
+                                            # get key
+                                            for n_key in n_response.getChildren():
+                                                if n_key.getName() == 'claimkey':
+                                                    extobj.claimkey = n_key.getData()
+                                                    print "HERE"
+                                                    break
                                             break
                                     break
                             break
@@ -132,6 +148,7 @@ class ExtObj():
         # init
         self.originator_osid = None
         self.requested_osid = None
+        self.claimkey = None
         self.type = None
         self._incomed_stanza = None
         self._client = None
@@ -145,9 +162,6 @@ class ExtObj():
 
         @rtype:   pyopenspime.xmpp.simplexml.Node
         @return:  The stanza to be sent out."""
-
-        # set type
-        self.type = 'request'
     
         # build <claim/> node, children of transport node - unique for extension
         n_claim = Node( tag=u'claim', \
@@ -175,9 +189,6 @@ class ExtObj():
 
         @rtype:   pyopenspime.xmpp.protocol.Iq
         @return:  The Iq stanza to be sent out as confirmation message."""
-
-        # set type
-        self.type = 'response'
     
         # build <claim/> node, children of transport node - unique for extension
         n_claim = Node( tag=u'claim', \
@@ -203,7 +214,6 @@ class ExtObj():
         iq_ok.addChild(node=n_openspime)
         
         # return
-        print iq_ok
         return iq_ok
 
     def __generate_claimkey(self):

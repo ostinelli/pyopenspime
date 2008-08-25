@@ -57,7 +57,8 @@ class Client(pyopenspime.xmpp.Client):
     PyOpenSpime XMPP Client
     """
     
-    def __init__(self, osid_or_osid_path, osid_pass='', server='', port=5222, rsa_pub_key_path='', rsa_priv_key_path='', rsa_priv_key_pass='', rsa_key_cache_path='cache', cert_authority='', accepted_cert_authorities_filepath='certification-authorities.conf', try_reconnect=60, log_callback_function=None):
+    def __init__(self, osid_or_osid_path, osid_pass='', server='', port=5222, rsa_pub_key_path='', rsa_priv_key_path='', rsa_priv_key_pass='', rsa_key_cache_path='cache', cert_authority='', \
+                 accepted_cert_authorities_filepath='certification-authorities.conf', try_reconnect=60, log_callback_function=None):
         """
         Initialize a Client.
         @type  osid_or_osid_path: str
@@ -214,10 +215,10 @@ class Client(pyopenspime.xmpp.Client):
             # check that directory exists
             if os.path.isdir(rsa_key_cache_path) == False:
                 # create cache directory if it does not exist
-                self.log(10, 'cache directory does not exist, creating')
+                self.log(10, 'rsa cache directory does not exist, creating')
                 try:
                     os.mkdir(rsa_key_cache_path)
-                    self.log(10, 'cache directory created.')
+                    self.log(10, 'rsa cache directory created.')
                 except:
                     self.rsa_key_cache_path = None
                     msg = u'specified key cache directory \'%s\' does not exist and could not be created.' % unicode(rsa_key_cache_path)
@@ -253,7 +254,7 @@ class Client(pyopenspime.xmpp.Client):
                 if len(line) > 0 and line[:1] <> '#':
                     self.__accepted_cert_authorities.append(line)
         else:
-            self.__accepted_cert_authorities = None 
+            self.__accepted_cert_authorities = None
         
         # init component
         self.Namespace, self.DBG = 'jabber:client', 'client' # check lines: 99 & 101 of xmpp.client 
@@ -309,7 +310,7 @@ class Client(pyopenspime.xmpp.Client):
             if handler[0] <> '':
                 self.log(10, u'openspime extension found, calling callback handler')
                 # call handler
-                self.on_extension_received(handler[0], handler[1], stanza)
+                self.__on_extension_received(handler[0], handler[1], stanza)
                 # return
                 return True
         else:
@@ -320,7 +321,8 @@ class Client(pyopenspime.xmpp.Client):
         
         # handles IQ stanzas - MUST return True if stanza is handled, False if not so that 'feature-not-implemented'
         # is sent back as response.
-        
+
+        """
         iq_from = unicode(stanza.getFrom())
         iq_id = stanza.getID()
         self.log(10, u'received iq from <%s>.' % (iq_from))
@@ -359,8 +361,55 @@ class Client(pyopenspime.xmpp.Client):
             if handler[0] <> '':
                 self.log(10, u'openspime \'%s\' extension found, calling callback' % handler[0])
                 # call handler
-                self.on_extension_received(handler[0], handler[1], stanza)
+                self.__on_extension_received(handler[0], handler[1], stanza)
                 # return
+                return True
+        else:
+            # stanza not handled, waiting to receive pubkey
+            return True
+        """
+
+        iq_from = unicode(stanza.getFrom())
+        iq_id = stanza.getID()
+        self.log(10, u'received iq from <%s>.' % (iq_from))
+        
+        # check if received stanza is a pubkeys request
+        if stanza.getType() == 'get':
+            self.log(10, u'checking if received stanza is a pubkeys request')
+            if self.__iq_pubkey_request(stanza) == True:
+                return True
+        
+        # get openspime content
+        self.log(10, u'check if incoming <iq/> stanza is of the openspime protocol')
+        handler = self.__stanza_handler(stanza)
+        if handler <> None:
+            # ok stanza handled
+            if handler[0] <> '':
+                self.log(10, u'openspime \'%s\' extension found, calling callback' % handler[0])
+                # call handler
+                self.__on_extension_received(handler[0], handler[1], stanza)
+                # return
+                return True
+
+        # check if <iq/> is of type 'error' or 'result'
+        self.log(10, u'checking if received <iq/> is of type \'result\' or \'error\'')
+        if stanza.getType() == 'result' or stanza.getType() == 'error':
+            # look if callbacks have been defined
+            if self.__iq_callback_handlers.has_key(iq_id) == True:
+                if stanza.getType() == 'result':
+                    self.log(10, u'calling the callback_success function')
+                    # callback ok
+                    self.__iq_callback_handlers[iq_id][0](iq_id, stanza)
+                if stanza.getType() == 'error':
+                    self.log(10, u'calling the callback_failure function')
+                    # get error info
+                    error = Error(stanza=stanza).get_error()
+                    # callback ko
+                    self.__iq_callback_handlers[iq_id][1](iq_id, error[0], error[1], stanza)
+                # free key
+                self.log(10, u'removing callback_handler key')
+                del self.__iq_callback_handlers[iq_id]
+                # exit
                 return True
         else:
             # stanza not handled, waiting to receive pubkey
@@ -925,11 +974,29 @@ class Client(pyopenspime.xmpp.Client):
         derived classes.
         """
         pass
+
+    def __on_extension_received(self, ext_name, ext_object, stanza):
+
+        # manages extesion received
+        
+        """XXX
+        if self.on_extension_received(ext_name, ext_object, stanza) <> True:
+            # unsupported openspime extension
+            self.log(30, u'received an unsupported openspime extension request.')            
+            if stanza.getName().strip().lower() == 'iq' and (stanza.getType() == 'get' or stanza.getType() == 'set'):
+                # send a feature-not-implemented error since the request was containted in an iq stanza
+                iq_ko = Error(stanza, error_type='cancel', error_cond='feature-not-implemented', error_namespace='urn:ietf:params:xml:ns:xmpp-stanzas', \
+                    error_description='Unsupported OpenSpime extension')  
+                self.send_stanza(iq_ko, stanza.getFrom())
+        """        
+        if self.on_extension_received(ext_name, ext_object, stanza) <> True:
+            return False
+        return True
     
     def on_extension_received(self, ext_name, ext_object, stanza):
         """
-        Event raised when an OpenSpime extension stanza, validated and decrypted if neceesary, is received. This one does nothing, should be overriden in
-        derived classes.
+        Event raised when an OpenSpime extension stanza, validated and decrypted if necessary, is received. This one does nothing, should be overriden in derived classes.
+        This function MUST return True to avoid the client responding with a 'feature-not-implemented' <iq/> error message.
         
         @type  ext_name: unicode
         @param ext_name: The extension name.

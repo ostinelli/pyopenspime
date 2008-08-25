@@ -85,7 +85,8 @@ class TheScopeNode(Client):
                         self.log(30, u'received an inconsistent data reporting message, sending error')
                         self.send_stanza(extobj.error(error_type='modify', error_cond='inconsistent-data-with-scope', error_namespace='openspime:protocol:extension:data:error', \
                             error_description='Data is not consistent with scope of this ScopeNode.'), stanza.getFrom())
-                    return
+                        # extension has been treated, return True
+                        return True
             # data ok
             self.log(20, u'data reporting message received')
             if extobj.stanza_kind == 'iq':
@@ -96,13 +97,8 @@ class TheScopeNode(Client):
             for entry_n in extobj.entries:
                 print entry_n
             print "======== /\ RECEIVED DATA ========"
-        else:
-            # other openspime extensions
-            self.log(30, u'received an unsupported openspime extension request.')            
-            if extobj.stanza_kind == 'iq':
-                # send a feature-not-implemented error since the request was containted in an iq stanza 
-                self.send_stanza(extobj.error(error_type='cancel', error_cond='feature-not-implemented', error_namespace='urn:ietf:params:xml:ns:xmpp-stanzas', \
-                    error_description='Unsupported openspime extension'), stanza.getFrom())
+            # extension has been treated, return True
+            return True
 
     def node_check(self, n):
         """

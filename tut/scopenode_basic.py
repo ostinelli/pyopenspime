@@ -71,13 +71,8 @@ class TheScopeNode(Client):
             for entry_n in extobj.entries:
                 print entry_n
             print "======== /\ RECEIVED DATA ========"
-        else:
-            # other openspime extensions
-            self.log(30, u'received an unsupported openspime extension request.')            
-            if extobj.stanza_kind == 'iq':
-                # send a feature-not-implemented error since the request was containted in an iq stanza 
-                self.send_stanza(extobj.error(error_type='cancel', error_cond='feature-not-implemented', error_namespace='urn:ietf:params:xml:ns:xmpp-stanzas', \
-                    error_description='Unsupported openspime extension'), stanza.getFrom())
+            # extension has been treated, return True
+            return True
 
 
 if __name__ == "__main__":
