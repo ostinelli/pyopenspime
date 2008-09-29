@@ -85,8 +85,8 @@ class TheScopeNode(Client):
                         self.log(30, u'received an inconsistent data reporting message, sending error')
                         self.send_stanza(extobj.error(error_type='modify', error_cond='inconsistent-data-with-scope', error_namespace='openspime:protocol:extension:data:error', \
                             error_description='Data is not consistent with scope of this ScopeNode.'), stanza.getFrom())
-                        # extension has been treated, return True
-                        return True
+                    # extension has been treated, return True
+                    return True
             # data ok
             self.log(20, u'data reporting message received')
             if extobj.stanza_kind == 'iq':
