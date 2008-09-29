@@ -506,39 +506,40 @@ class Client(pyopenspime.xmpp.Client):
         n_originator = pyopenspime.util.parse_all_children(stanza, 'originator')
         # loop children
         n_sign = None
-        for child in n_originator.getChildren():
-            if child.getName() == 'sign':
-                # set sign node
-                n_sign = child
-                self.log(10, u'signature found.')
+        if n_originator <> None:
+            for child in n_originator.getChildren():
+                if child.getName() == 'sign':
+                    # set sign node
+                    n_sign = child
+                    self.log(10, u'signature found.')
 
-                # check that client has a rsa_key_cache_path
-                if self.rsa_key_cache_path == '':
-                    self.log(40, 'a rsa key cache path needs to be set to send out encrypted messages, send error response.')
-                    # send error
-                    self.log(10, u'sending error response.')
-                    iq_ko = Error(stanza, 'cancel', 'signature-not-enabled', 'openspime:protocol:core:error', \
-                        'the incoming stanza has a signature, but the recipient entity is not enabled to verify signatures.')
-                    self.send(iq_ko)
-                    return
-                
-                # get originator
-                if n_originator.getAttr('osid') <> None:
-                    originator_osid = n_originator.getAttr('osid')
-                else:
-                    originator_osid = str(stanza.getFrom())
-                # check if public key of originator is in cache
-                self.log(10, u'get originator key from cache')
-                originator_osid_hex = binascii.b2a_hex(originator_osid)
-                originator_key_fromcert_path = '%s/%s.fromcert' % (self.rsa_key_cache_path, originator_osid_hex)
-                # check that filename 'fromcert' exists
-                if os.path.isfile(originator_key_fromcert_path) == False:
-                    # get cert authority
-                    cert_osid = n_originator.getAttr('cert')
-                    # request .fromcert key
-                    self.__request_fromcert_key(stanza, originator_osid, cert_osid)                    
-                    return
-                break                    
+                    # check that client has a rsa_key_cache_path
+                    if self.rsa_key_cache_path == '':
+                        self.log(40, 'a rsa key cache path needs to be set to send out encrypted messages, send error response.')
+                        # send error
+                        self.log(10, u'sending error response.')
+                        iq_ko = Error(stanza, 'cancel', 'signature-not-enabled', 'openspime:protocol:core:error', \
+                            'the incoming stanza has a signature, but the recipient entity is not enabled to verify signatures.')
+                        self.send(iq_ko)
+                        return
+                    
+                    # get originator
+                    if n_originator.getAttr('osid') <> None:
+                        originator_osid = n_originator.getAttr('osid')
+                    else:
+                        originator_osid = str(stanza.getFrom())
+                    # check if public key of originator is in cache
+                    self.log(10, u'get originator key from cache')
+                    originator_osid_hex = binascii.b2a_hex(originator_osid)
+                    originator_key_fromcert_path = '%s/%s.fromcert' % (self.rsa_key_cache_path, originator_osid_hex)
+                    # check that filename 'fromcert' exists
+                    if os.path.isfile(originator_key_fromcert_path) == False:
+                        # get cert authority
+                        cert_osid = n_originator.getAttr('cert')
+                        # request .fromcert key
+                        self.__request_fromcert_key(stanza, originator_osid, cert_osid)                    
+                        return
+                    break                    
         
         # check if decryption is needed, look for the <transport/> element
         self.log(10, u'get <transport/> node')
