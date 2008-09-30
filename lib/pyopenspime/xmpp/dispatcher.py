@@ -314,7 +314,7 @@ class Dispatcher(PlugIn):
                     handler['func'](session,stanza)
                     """
                     result = handler['func'](session,stanza)
-                    if result == True: user = 0
+                    if result == True or isinstance(result, str) == True: user = 0
 # ---/\--- patch
                 except Exception, typ:
                     if typ.__class__.__name__<>'NodeProcessed':

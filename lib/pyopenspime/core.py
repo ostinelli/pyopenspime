@@ -294,6 +294,21 @@ class Client(pyopenspime.xmpp.Client):
     
     def __presence_handler(self, dispatcher, stanza):
         pass
+
+    def message_handler(self, dispatcher, stanza):
+        """
+        Handler to dispatch incoming openspime <message/> stanzas to proper extension.
+        
+        @type  dispatcher: pyopenspime.xmpp.dispatcher.Dispatcher
+        @param dispatcher: The client's dispatcher.
+        @type  stanza: pyopenspime.xmpp.protocol.Message
+        @param stanza: The incoming stanza.
+        @rtype:   tuple/str
+        @return:  True if stanza has been treated with no errors
+                  string if stanza has been treated with errors
+                  False if stanza has not been treated
+        """
+        return self.__message_handler(dispatcher, stanza)
     
     def __message_handler(self, dispatcher, stanza):
         # handles message stanzas
@@ -305,53 +320,44 @@ class Client(pyopenspime.xmpp.Client):
         # get openspime content
         self.log(10, u'check if incoming <message/> stanza is of the openspime protocol')
         handler = self.__stanza_handler(stanza)
-        if handler <> None:
+        if handler == None:
+            # coming from a pubkey request
+            return True
+        if isinstance(handler, tuple) == True:
             # ok stanza handled
             if handler[0] <> '':
-                self.log(10, u'openspime extension found, calling callback handler')
+                self.log(10, u'openspime \'%s\' extension found, calling callback' % handler[0])
                 # call handler
                 self.__on_extension_received(handler[0], handler[1], stanza)
                 # return
                 return True
-        else:
-            # stanza not handled
-            pass
+        if isinstance(handler, str) == True:
+            # error received
+            return handler
 
-    
     def iq_handler(self, dispatcher, stanza):
-
-        # public method, used for special purposes such as stanza injection        
-        self.__iq_handler(dispatcher, stanza)
+        """
+        Handler to dispatch incoming openspime <iq/> stanzas to proper extension.
+        
+        @type  dispatcher: pyopenspime.xmpp.dispatcher.Dispatcher
+        @param dispatcher: The client's dispatcher.
+        @type  stanza: pyopenspime.xmpp.protocol.Iq
+        @param stanza: The incoming stanza.
+        @rtype:   tuple/str
+        @return:  True if stanza has been treated with no errors
+                  string if stanza has been treated with errors
+                  False if stanza has not been treated, i.e. 'feature-not-implemented'
+        """
+        return self.__iq_handler(dispatcher, stanza)
     
     def __iq_handler(self, dispatcher, stanza):
         
         # handles IQ stanzas - MUST return True if stanza is handled, False if not so that 'feature-not-implemented'
         # is sent back as response.
 
-        """
         iq_from = unicode(stanza.getFrom())
         iq_id = stanza.getID()
         self.log(10, u'received iq from <%s>.' % (iq_from))
-        # check if <iq/> is of type 'error' or 'result'
-        self.log(10, u'checking if received <iq/> is of type \'result\' or \'error\'')
-        if stanza.getType() == 'result' or stanza.getType() == 'error':
-            # look if callbacks have been defined
-            if self.__iq_callback_handlers.has_key(iq_id) == True:
-                if stanza.getType() == 'result':
-                    self.log(10, u'calling the callback_success function')
-                    # callback ok
-                    self.__iq_callback_handlers[iq_id][0](iq_id, stanza)
-                if stanza.getType() == 'error':
-                    self.log(10, u'calling the callback_failure function')
-                    # get error info
-                    error = Error(stanza=stanza).get_error()
-                    # callback ko
-                    self.__iq_callback_handlers[iq_id][1](iq_id, error[0], error[1], stanza)
-                # free key
-                self.log(10, u'removing callback_handler key')
-                del self.__iq_callback_handlers[iq_id]
-                # exit
-                return True
         
         # check if received stanza is a pubkeys request
         if stanza.getType() == 'get':
@@ -362,33 +368,10 @@ class Client(pyopenspime.xmpp.Client):
         # get openspime content
         self.log(10, u'check if incoming <iq/> stanza is of the openspime protocol')
         handler = self.__stanza_handler(stanza)
-        if handler <> None:
-            # ok stanza handled
-            if handler[0] <> '':
-                self.log(10, u'openspime \'%s\' extension found, calling callback' % handler[0])
-                # call handler
-                self.__on_extension_received(handler[0], handler[1], stanza)
-                # return
-                return True
-        else:
-            # stanza not handled, waiting to receive pubkey
+        if handler == None:
+            # coming from a pubkey request
             return True
-        """
-
-        iq_from = unicode(stanza.getFrom())
-        iq_id = stanza.getID()
-        self.log(10, u'received iq from <%s>.' % (iq_from))
-        
-        # check if received stanza is a pubkeys request
-        if stanza.getType() == 'get':
-            self.log(10, u'checking if received stanza is a pubkeys request')
-            if self.__iq_pubkey_request(stanza) == True:
-                return True
-        
-        # get openspime content
-        self.log(10, u'check if incoming <iq/> stanza is of the openspime protocol')
-        handler = self.__stanza_handler(stanza)
-        if handler <> None:
+        if isinstance(handler, tuple) == True:
             # ok stanza handled
             if handler[0] <> '':
                 self.log(10, u'openspime \'%s\' extension found, calling callback' % handler[0])
@@ -396,6 +379,9 @@ class Client(pyopenspime.xmpp.Client):
                 self.__on_extension_received(handler[0], handler[1], stanza)
                 # return
                 return True
+        if isinstance(handler, str) == True:
+            # error received
+            return handler
 
         # check if <iq/> is of type 'error' or 'result'
         self.log(10, u'checking if received <iq/> is of type \'result\' or \'error\'')
@@ -417,9 +403,6 @@ class Client(pyopenspime.xmpp.Client):
                 del self.__iq_callback_handlers[iq_id]
                 # exit
                 return True
-        else:
-            # stanza not handled, waiting to receive pubkey
-            return True
     
     def __iq_callback_timeout(self):
         
@@ -496,7 +479,9 @@ class Client(pyopenspime.xmpp.Client):
         @type  stanza: pyopenspime.xmpp.protocol.Stanza
         @param stanza: The incoming stanza.
         @rtype:   tuple
-        @return:  Tuple containing: (extname, extobj).
+        @return:  if successful: Tuple containing (extname, extobj)
+                  if error found: string containing description
+                  if none: requested pubkey
         """
         
         # get stanza kind: <iq/>, <message/>
@@ -521,13 +506,14 @@ class Client(pyopenspime.xmpp.Client):
 
                     # check that client has a rsa_key_cache_path
                     if self.rsa_key_cache_path == '':
-                        self.log(40, 'a rsa key cache path needs to be set to send out encrypted messages, send error response.')
-                        # send error
-                        self.log(10, u'sending error response.')
-                        iq_ko = Error(stanza, 'cancel', 'signature-not-enabled', 'openspime:protocol:core:error', \
-                            'the incoming stanza has a signature, but the recipient entity is not enabled to verify signatures.')
-                        self.send(iq_ko)
-                        return
+                        self.log(40, 'a rsa key cache path needs to be set to send out encrypted messages.')
+                        if stanza_kind == 'iq':
+                            # send error
+                            self.log(10, u'sending error response.')
+                            iq_ko = Error(stanza, 'cancel', 'signature-not-enabled', 'openspime:protocol:core:error', \
+                                'the incoming stanza has a signature, but the recipient entity is not enabled to verify signatures.')
+                            self.send(iq_ko)
+                        return 'signature-not-enabled'
                     
                     # get originator
                     if n_originator.getAttr('osid') <> None:
@@ -545,7 +531,7 @@ class Client(pyopenspime.xmpp.Client):
                         # request .fromcert key
                         self.__request_fromcert_key(stanza, originator_osid, cert_osid)                    
                         return
-                    break                    
+                    break
         
         # check if decryption is needed, look for the <transport/> element
         self.log(10, u'get <transport/> node')
@@ -560,13 +546,14 @@ class Client(pyopenspime.xmpp.Client):
                 
                 # check that client can decrytpt
                 if self._endec == None:
-                    self.log(40, 'incoming stanza is encrypted but no rsa key has been specified to decrypt it, send error response.')
-                    # send error
-                    self.log(10, u'sending error response.')
-                    iq_ko = Error(stanza, 'cancel', 'decryption-not-enabled', 'openspime:protocol:core:error', \
-                        'the incoming stanza was sent encrypted, but the recipient entity is not enabled to decrypt it.')
-                    self.send(iq_ko)
-                    return
+                    self.log(40, 'incoming stanza is encrypted but no rsa key has been specified to decrypt it.')
+                    if stanza_kind == 'iq':
+                        # send error
+                        self.log(10, u'sending error response.')
+                        iq_ko = Error(stanza, 'cancel', 'decryption-not-enabled', 'openspime:protocol:core:error', \
+                            'the incoming stanza was sent encrypted, but the recipient entity is not enabled to decrypt it.')
+                        self.send(iq_ko)
+                    return 'decryption-not-enabled'
                 
                 # content is encrypted -> get transport-key                
                 self.log(10, u'get transport-key')
@@ -576,13 +563,14 @@ class Client(pyopenspime.xmpp.Client):
                     self.log(10, u'trying to decrypt')
                     decrypted_content = self._endec.private_decrypt(n_transport.getData(), attr_transport_key)
                 except:
-                    self.log(40, u'received message could not be decrypted, sending error.')
-                    # send error
-                    self.log(10, u'sending error response.')
-                    iq_ko = Error(stanza, 'modify', 'decryption-error', 'openspime:protocol:core:error', \
-                        'the incoming stanza was sent encrypted, though there were errors decrypting it (wrong public RSA key of recipient?).')
-                    self.send(iq_ko)
-                    return
+                    self.log(40, u'received message could not be decrypted.')
+                    if stanza_kind == 'iq':
+                        # send error
+                        self.log(10, u'sending error response.')
+                        iq_ko = Error(stanza, 'modify', 'decryption-error', 'openspime:protocol:core:error', \
+                            'the incoming stanza was sent encrypted, though there were errors decrypting it (wrong public RSA key of recipient?).')
+                        self.send(iq_ko)
+                    return 'decryption-error'
                 self.log(10, u'message has succesfully been decrypted.')
                 # parse
                 try:
@@ -597,13 +585,14 @@ class Client(pyopenspime.xmpp.Client):
                     n_transport.delAttr('content-type')
                     n_transport.delAttr('transport-key')
                 except:
-                    self.log(40, u'malformed <transport/> node in received message, sending error.')
-                    # send error
-                    self.log(10, u'sending error response.')
-                    iq_ko = Error(stanza, 'modify', 'xml-malformed-transport-node', 'openspime:protocol:core:error', \
-                            'the incoming stanza has been decrypted, but the <transport/> node contains non valid xml.')
-                    self.send(iq_ko)
-                    return
+                    self.log(40, u'malformed <transport/> node in received message.')
+                    if stanza_kind == 'iq':
+                        # send error
+                        self.log(10, u'sending error response.')
+                        iq_ko = Error(stanza, 'modify', 'xml-malformed-transport-node', 'openspime:protocol:core:error', \
+                                'the incoming stanza has been decrypted, but the <transport/> node contains non valid xml.')
+                        self.send(iq_ko)
+                    return 'xml-malformed-transport-node'
         
         # check if signature has been provided, verify signature
         if n_sign <> None:                    
@@ -623,13 +612,14 @@ class Client(pyopenspime.xmpp.Client):
                     self.__request_fromcert_key(stanza, originator_osid, cert_osid)
                 else:
                     # key corrupted
-                    self.log(40, u'originator public certified RSA key corruped, signature cold not be verified, sending error.')
-                    # send error
-                    self.log(10, u'sending error response.')
-                    iq_ko = Error(stanza, 'cancel', 'signature-error-public-key-corrupted', 'openspime:protocol:core:error', \
-                        'the incoming stanza has a signature which could not be validated because the public RSA key of the originator received from the cert authority is corrupted.')
-                    self.send(iq_ko)
-                return
+                    self.log(40, u'originator public certified RSA key corruped, signature cold not be verified.')
+                    if stanza_kind == 'iq':
+                        # send error
+                        self.log(10, u'sending error response.')
+                        iq_ko = Error(stanza, 'cancel', 'signature-error-public-key-corrupted', 'openspime:protocol:core:error', \
+                            'the incoming stanza has a signature which could not be validated because the public RSA key of the originator received from the cert authority is corrupted.')
+                        self.send(iq_ko)
+                return 'signature-error-public-key-corrupted'
             # get signature                
             self.log(10, u'get signature')
             signature = child.getData()      
@@ -637,12 +627,14 @@ class Client(pyopenspime.xmpp.Client):
             try:
                 content = n_transport.getChildren()[0]
             except:
-                # send error
-                self.log(10, u'sending error response.')
-                iq_ko = Error(stanza, 'modify', 'xml-malformed-transport-node', 'openspime:protocol:core:error', \
-                        'the incoming stanza has been decrypted, but the <transport/> node contains non valid xml.')
-                self.send(iq_ko)
-                return
+                self.log(40, u'the incoming stanza has been decrypted, but the <transport/> node contains non valid xml.')
+                if stanza_kind == 'iq':
+                    # send error
+                    self.log(10, u'sending error response.')
+                    iq_ko = Error(stanza, 'modify', 'xml-malformed-transport-node', 'openspime:protocol:core:error', \
+                            'the incoming stanza has been decrypted, but the <transport/> node contains non valid xml.')
+                    self.send(iq_ko)
+                return 'xml-malformed-transport-node'
             # check
             self.log(10, u'verifying signature')
             if endec.public_check_sign(content, signature) == True:
@@ -657,13 +649,14 @@ class Client(pyopenspime.xmpp.Client):
                     # request .fromcert key
                     self.__request_fromcert_key(stanza, originator_osid, cert_osid)
                 else:
-                    self.log(40, u'signature cold not be verified, even with a recent key, sending error.')
-                    # send error
-                    self.log(10, u'sending error response.')
-                    iq_ko = Error(stanza, 'modify', 'invalid-signature', 'openspime:protocol:core:error', \
-                            'the incoming stanza has a signature which could not be validated. ')
-                    self.send(iq_ko)
-                return
+                    self.log(40, u'signature cold not be verified, even with a recent key.')
+                    if stanza_kind == 'iq':
+                        # send error
+                        self.log(10, u'sending error response.')
+                        iq_ko = Error(stanza, 'modify', 'invalid-signature', 'openspime:protocol:core:error', \
+                                'the incoming stanza has a signature which could not be validated. ')
+                        self.send(iq_ko)
+                return 'invalid-signature'
         # import extensions
         for ext in PYOPENSPIME_EXTENSIONS_LOADED:
             # example: import pyopenspime.extension.datareporting
