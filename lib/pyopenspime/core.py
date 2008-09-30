@@ -1287,16 +1287,13 @@ class Client(pyopenspime.xmpp.Client):
         
         return pyopenspime.util.generate_rnd_str(16)
     
-    def disconnect(self):
+    def closeconnection(self):
         """
         Disconnects from server and handles all incoming stanzas before closure.
         """
-        
-        # never called. self.Dispatcher.disconnect() is directly called via the plugin architecture.
-        # here for manual completeness only.
-        
-        pass
-    
+        self.try_reconnect = 0
+        self.disconnect()  
+        self.log(20, u'disconnected.')  
     
     ###### Support functions
     def log(self, level, msg):
