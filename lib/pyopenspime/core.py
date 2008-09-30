@@ -316,6 +316,12 @@ class Client(pyopenspime.xmpp.Client):
         else:
             # stanza not handled
             pass
+
+    
+    def iq_handler(self, dispatcher, stanza):
+
+        # public method, used for special purposes such as stanza injection        
+        self.__iq_handler(dispatcher, stanza)
     
     def __iq_handler(self, dispatcher, stanza):
         
