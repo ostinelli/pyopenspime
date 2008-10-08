@@ -49,7 +49,7 @@ import sys, os
 
 os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
 sys.path.append('../lib') # use the local library
-from pyopenspime.core import Client
+from pyopenspime.client import Client
 
 
 class TheSpime(Client):
@@ -68,8 +68,8 @@ class TheSpime(Client):
         Send a data reporting message using the OpenSpime data reporting core extension.
         """
         # Create data reporting message which requests for confirmation (i.e. of type 'iq')
-        import pyopenspime.extension.datareporting
-        dr = pyopenspime.extension.datareporting.ExtObj()
+        import pyopenspime.extension.core.datareporting
+        dr = pyopenspime.extension.core.datareporting.ExtObj()
 
         # Add xml data node
         dr.add_entry(u"""<entry>

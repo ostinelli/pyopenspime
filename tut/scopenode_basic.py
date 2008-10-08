@@ -48,7 +48,7 @@
 import sys, os
 os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
 sys.path.append('../lib') # use the local library
-from pyopenspime.core import Client
+from pyopenspime.client import Client
 
 
 class TheScopeNode(Client):
@@ -60,7 +60,7 @@ class TheScopeNode(Client):
         """
         Called when an openspime extension request has been received.
         """
-        if extname == 'datareporting':
+        if extname == 'core.datareporting':
             # data received
             self.log(20, u'data reporting message received')
             if extobj.stanza_kind == 'iq':

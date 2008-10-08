@@ -47,7 +47,7 @@ Reference is OpenSpime Data Reporting protocol extension v0.9."""
 # imports
 from pyopenspime.xmpp.protocol import Iq, Message
 from pyopenspime.xmpp.simplexml import Node
-from pyopenspime.core import wrap, Error
+from pyopenspime.protocol import wrap, Error
 import pyopenspime.util
 
 

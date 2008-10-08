@@ -1,7 +1,7 @@
 #
-# PyOpenSpime - Core
+# PyOpenSpime - Client
 # version 0.2
-# last update 2008 08 04
+#
 #
 # Copyright (C) 2008, licensed under GPL v3
 # Roberto Ostinelli <roberto AT openspime DOT com>
@@ -41,7 +41,7 @@
 # DAMAGES OR LOSSES), EVEN IF WIDETAG INC OR SUCH AUTHOR HAS BEEN ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGES.
 
-"""PyOpensPime Core Module."""
+"""PyOpensPime Client Module."""
 
 import sys, locale, codecs, binascii, time, os.path, sha
 import M2Crypto.RSA
@@ -49,7 +49,10 @@ import M2Crypto.EVP
 import M2Crypto.BIO
 import pyopenspime.xmpp
 import pyopenspime.util
-from pyopenspime.conf.settings import *
+from pyopenspime.extension.conf import *
+from pyopenspime.protocol import Error, wrap
+from pyopenspime.ssl import EnDec
+
 
 
 class Client(pyopenspime.xmpp.Client):
@@ -364,24 +367,6 @@ class Client(pyopenspime.xmpp.Client):
             self.log(10, u'checking if received stanza is a pubkeys request')
             if self.__iq_pubkey_request(stanza) == True:
                 return True
-        
-        # get openspime content
-        self.log(10, u'check if incoming <iq/> stanza is of the openspime protocol')
-        handler = self.__stanza_handler(stanza)
-        if handler == None:
-            # coming from a pubkey request
-            return True
-        if isinstance(handler, tuple) == True:
-            # ok stanza handled
-            if handler[0] <> '':
-                self.log(10, u'openspime \'%s\' extension found, calling callback' % handler[0])
-                # call handler
-                self.__on_extension_received(handler[0], handler[1], stanza)
-                # return
-                return True
-        if isinstance(handler, str) == True:
-            # error received
-            return handler
 
         # check if <iq/> is of type 'error' or 'result'
         self.log(10, u'checking if received <iq/> is of type \'result\' or \'error\'')
@@ -403,6 +388,24 @@ class Client(pyopenspime.xmpp.Client):
                 del self.__iq_callback_handlers[iq_id]
                 # exit
                 return True
+        
+        # get openspime content
+        self.log(10, u'check if incoming <iq/> stanza is of the openspime protocol')
+        handler = self.__stanza_handler(stanza)
+        if handler == None:
+            # coming from a pubkey request
+            return True
+        if isinstance(handler, tuple) == True:
+            # ok stanza handled
+            if handler[0] <> '':
+                self.log(10, u'openspime \'%s\' extension found, calling callback' % handler[0])
+                # call handler
+                self.__on_extension_received(handler[0], handler[1], stanza)
+                # return
+                return True
+        if isinstance(handler, str) == True:
+            # error received
+            return handler
     
     def __iq_callback_timeout(self):
         
@@ -488,7 +491,7 @@ class Client(pyopenspime.xmpp.Client):
         stanza_kind = stanza.getName().strip().lower()
         
         # check that this is no error or result message
-        self.log(10, u'checking that <message/> or <iq/> stanza is not of type \'result\' or \'error\'')
+        self.log(10, u'checking that <iq/> stanza is not of type \'result\' or \'error\'')
         if stanza_kind == 'iq' and (stanza.getType() == 'result' or stanza.getType() == 'error'):
             return
         
@@ -659,7 +662,7 @@ class Client(pyopenspime.xmpp.Client):
                 return 'invalid-signature'
         # import extensions
         for ext in PYOPENSPIME_EXTENSIONS_LOADED:
-            # example: import pyopenspime.extension.datareporting
+            # example: import pyopenspime.extension.core.datareporting
             self.log(10, u'trying \'%s\' extension for validity' % ext)
             exec( 'import pyopenspime.extension.%s' % ext )
             # call extension validate function
@@ -1102,7 +1105,7 @@ class Client(pyopenspime.xmpp.Client):
         Core running loop.
         
         @type  timer: int
-        @param timer: Specifies the seconds interval at which the function timer() is called in the client.
+        @param timer: Specifies the seconds interval at which the function on_timer() is called in the client.
         """
         def connect():
             self.connect()
@@ -1113,7 +1116,7 @@ class Client(pyopenspime.xmpp.Client):
                 t += 1
                 if t > timer and timer > 0:
                     self.log(10, 'calling timer')
-                    self.timer()
+                    self.on_timer()
                     t = 0
                 pass
         # threading
@@ -1128,7 +1131,7 @@ class Client(pyopenspime.xmpp.Client):
             connect()
             runloop()
 
-    def timer(self):
+    def on_timer(self):
         """
         Called periodically every interval of seconds specified by the run() function. This one does nothing, should be overriden in
         derived classes.
@@ -1303,370 +1306,4 @@ class Client(pyopenspime.xmpp.Client):
         self.on_log(level, msg)
     
 
-class EnDec():
-    """
-    Encrypter-Decrypted object.
-    This object is used to encrypt, descrypt and sign OpenSpime stanzas. It includes RSA and AES support as
-    defined in the OpenSpime Core Protocol v0.9.
-    """
-    
-    def __init__(self):
-        """
-        Initialize an EnDec object.
-        """
-        
-        self.rsa_pub_key_path = ''
-        self.rsa_pub_key = None 
-        self.rsa_priv_key_path = ''
-        self.rsa_priv_key_pass = ''
-        self.rsa_priv_key = None
-    
-    def load_rsa_pub_key(self, rsa_pub_key_path):
-        """
-        Load public RSA key from .pem file.
-        
-        @type  rsa_pub_key_path: unicode
-        @param rsa_pub_key_path: The path to the RSA public key .pem file.
-        """
-        
-        self.rsa_pub_key_path = rsa_pub_key_path
-        self.rsa_pub_key = M2Crypto.RSA.load_pub_key(rsa_pub_key_path)
-    
-    def load_rsa_priv_key(self, rsa_priv_key_path, rsa_priv_key_pass):  
-        """
-        Load private RSA key from .pem file.
-        
-        @type  rsa_priv_key_path: unicode
-        @param rsa_priv_key_path: The path to the RSA private key .pem file.
-        @type  rsa_priv_key_pass: unicode
-        @param rsa_priv_key_pass: The RSA private key .pem file password.
-        """      
-        
-        self.rsa_priv_key_path = rsa_priv_key_path
-        self.rsa_priv_key_pass = rsa_priv_key_pass
-        self.rsa_priv_key = M2Crypto.RSA.load_key(rsa_priv_key_path, callback=self.__rsa_callback_get_passphrase)
-    
-    def __rsa_callback_get_passphrase(self, v):
-        
-        return self.rsa_priv_key_pass
-    
-    def __aes_encrypt_base64(self, plaintext, aes_key, aes_vint):
-        
-        # AES encryption
-        mem = M2Crypto.BIO.MemoryBuffer()
-        cf = M2Crypto.BIO.CipherStream(mem)
-        cf.set_cipher('aes_256_cbc', aes_key, aes_vint, 1)
-        cf.write(plaintext)
-        cf.flush()
-        cf.write_close()
-        cf.close()
-        return binascii.b2a_base64(mem.read())
-    
-    def __aes_decrypt_base64(self, encrypted, aes_key, aes_vint):
-        
-        # AES decryption
-        mem = M2Crypto.BIO.MemoryBuffer(binascii.a2b_base64(encrypted))
-        cf = M2Crypto.BIO.CipherStream(mem)
-        cf.set_cipher('aes_256_cbc', aes_key, aes_vint, 0)
-        cf.write_close()
-        decrypted = cf.read()
-        cf.close()
-        return decrypted
-    
-    def __rsa_public_encrypt_base64(self, plaintext):
-        
-        # RSA public encryption
-        
-        # get pub_key size
-        s = int(( self.rsa_pub_key.__len__() ) / 8) - 11    # take away 11 bytes due to pkcs1_padding
-        encrypted = []
-        # chunk encrypt
-        for i in range(0, len(plaintext), s):
-            encrypted.append(self.rsa_pub_key.public_encrypt(plaintext[i:i+s], M2Crypto.RSA.pkcs1_padding))
-        # return base64 encoded
-        return binascii.b2a_base64(''.join(encrypted))
-    
-    def __rsa_private_decrypt_base64(self, encrypted):
-        
-        # RSA private decryption
-        
-        encrypted = binascii.a2b_base64(encrypted)
-        # get priv_key size
-        s = int(self.rsa_priv_key.__len__() / 8)
-        decrypted = []
-        # chunk decrypt
-        for i in range(0, len(encrypted), s):
-            decrypted.append(self.rsa_priv_key.private_decrypt(encrypted[i:i+s], M2Crypto.RSA.pkcs1_padding))
-        # return
-        return ''.join(decrypted)
-    
-    def __rsa_private_encrypt_base64(self, plaintext):
-        
-        # RSA private encryption
-        
-        # get priv_key size
-        s = int(( self.rsa_priv_key.__len__() ) / 8) - 11    # take away 11 bytes due to pkcs1_padding
-        encrypted = []
-        # chunk encrypt
-        for i in range(0, len(plaintext), s):
-            encrypted.append(self.rsa_priv_key.private_encrypt(plaintext[i:i+s], M2Crypto.RSA.pkcs1_padding))
-        # return base64 encoded
-        return binascii.b2a_base64(''.join(encrypted))
-    
-    def __rsa_public_decrypt_base64(self, encrypted):
-        
-        # RSA public decryption
-        
-        encrypted = binascii.a2b_base64(encrypted)
-        # get pub_key size
-        s = int(self.rsa_pub_key.__len__() / 8)
-        decrypted = []
-        # chunk decrypt
-        for i in range(0, len(encrypted), s):
-            decrypted.append(self.rsa_pub_key.public_decrypt(encrypted[i:i+s], M2Crypto.RSA.pkcs1_padding))
-        # return
-        return ''.join(decrypted)
-
-    def private_encrypt_text(self, plaintext):
-        """
-        Encrypts plaintext with the RSA private key of entity.
-        
-        @type  plaintext: str
-        @param plaintext: The string to be encrypted.
-        
-        @rtype:   str
-        @return:  The base64 encoded plaintext.
-        """
-        return self.__rsa_private_encrypt_base64(plaintext)
-    
-    def public_encrypt(self, transport):
-        """
-        Encrypts the content of the transport node with public key of recipient.
-        
-        @type  transport: unicode
-        @param transport: The <transport/> node content to be encrypted.
-        
-        @rtype:   tuple
-        @return:  Tuple containing: (base64 encrypted transport, base64 encrypted transport-key).
-        """
-        
-        # generate a random 32 bytes AES key
-        aes_key = M2Crypto.m2.rand_bytes(32)
-        
-        # generate a random 16 bytes init vector data
-        aes_vint = M2Crypto.m2.rand_bytes(16)
-        
-        # encrypt in AES and encode to base64
-        encrypted = self.__aes_encrypt_base64(transport, aes_key, aes_vint).replace('\r', '').replace('\n', '')
-        
-        # generate the content of the 'transport-key' attribute
-        transport_key = u"<transportkey xmlns='openspime:protocol:core:transportkey' version='0.9'> \
-            <key>%s</key><vint>%s</vint> \
-            </transportkey>" % ( binascii.b2a_base64(aes_key).replace('\r', '').replace('\n', ''), \
-                                 binascii.b2a_base64(aes_vint).replace('\r', '').replace('\n', '') )
-        
-        transport_key = pyopenspime.util.to_utf8(transport_key)
-        
-        # encrypt the transport key with the public RSA key of recipient
-        transport_key_enc = self.__rsa_public_encrypt_base64(transport_key).replace('\r', '').replace('\n', '')
-        
-        # return tuple
-        return [encrypted, transport_key_enc]    
-       
-    def private_decrypt(self, encrypted, transport_key_enc):
-        """
-        Decrypts a string encoded with public key of recipient.
-        
-        @type  encrypted: str
-        @param encrypted: The base64 encrypted content of the <transport/> node.
-        @type  transport_key_enc: str
-        @param transport_key_enc: The base64 encrypted transport-key.
-        
-        @rtype:   str
-        @return:  The decrypted <transport/> node content.
-        """
-        
-        # decrypt the transport key with the private RSA key of recipient
-        transport_key = self.__rsa_private_decrypt_base64(transport_key_enc)
-        
-        # read transportkey: create parser
-        n_transport_key = pyopenspime.xmpp.simplexml.Node(node=transport_key)
-        # parse
-        for child in n_transport_key.getChildren():
-            if child.getName().strip().lower() == 'key':
-                aes_key = binascii.a2b_base64(child.getData())
-            if child.getName().strip().lower() == 'vint':
-                aes_vint = binascii.a2b_base64(child.getData())
-        
-        # decrypt transport content
-        return self.__aes_decrypt_base64(encrypted, aes_key, aes_vint)
-    
-    def private_sign(self, content):
-        """
-        Returns the value of the signature of a the <transport/> node. Reference is OpenSpime protocol v0.9.
-        
-        @type  content: str
-        @param content: The string content of the <transport/> node.
-        
-        @rtype:   str
-        @return:  The base64 encoded signature of the <transport/> node.
-        """
-        
-        # convert to canonical XML
-        content_canonical = pyopenspime.util.convert_to_canonical_xml(content)
-        
-        # compute sha
-        s = sha.sha(content_canonical).digest()
-        
-        # encrypt the sha using the private RSA key
-        return self.__rsa_private_encrypt_base64(s).replace('\r', '').replace('\n', '')
-    
-    def public_check_sign(self, content, signature):
-        """
-        Returns the value of the signature of a the <transport/> node. Reference is OpenSpime protocol v0.9.
-        
-        @type  content: str
-        @param content: The string content of the <transport/> node.
-        @type  signature: str
-        @param signature: The signature.
-        
-        @rtype:   boolean
-        @return:  True if signature is valid, False if it is not.
-        """
-        
-        # convert to canonical XML
-        content_canonical = pyopenspime.util.convert_to_canonical_xml(content)
-        
-        # compute sha
-        s = sha.sha(content_canonical).digest()
-        
-        # get the sha in the signature
-        try:
-            sha_in_signature = self.__rsa_public_decrypt_base64(signature)
-        except:
-            return False
-        
-        return s == sha_in_signature
-    
-
-class Error(pyopenspime.xmpp.protocol.Iq):
-    """
-    PyOpenSpime Error stanza.
-    """
-    
-    def __init__(self, stanza, error_type='modify', error_cond=None, error_namespace=None, error_description=None):  
-        """
-        Initialize an OpenSpime error stanza.
-        
-        @type  stanza: pyopenspime.xmpp.simplexml.Node
-        @param stanza: The original stanza that the error is build for.
-        @type  error_type: unicode
-        @param error_type: The error type as defined by the XMPP protocol. Value MUST be 'cancel' -- do not retry
-        (the error is unrecoverable), 'continue' -- proceed (the condition was only a warning), 'modify' -- retry
-        after changing the data sent, 'auth' -- retry after providing credentials, 'wait' -- retry after waiting
-        (the error is temporary). Defaults to I{modify}.
-        @type  error_cond: unicode
-        @param error_cond: The error condition.
-        @type  error_namespace: unicode
-        @param error_namespace: The error condition namespace.
-        @type  error_description: unicode
-        @param error_description: The error description.
-        """
-        
-        # init component
-        pyopenspime.xmpp.protocol.Iq.__init__(self, node=stanza)
-        
-        if error_cond <> None:
-            
-            # we are building a node
-            
-            # invert recipient and sender
-            frm = self.getFrom()
-            to = self.getTo()
-            self.setTo(frm)
-            self.setFrom(to)
-            
-            # ensure to have only an error reported, to avoid sending unencrypted data on the network -> empty all query
-            self = pyopenspime.util.clean_node(self)
-            
-            # set 'error' type
-            self.setType('error')
-            
-            # add error node <error type='modify'>
-            n_error = self.addChild(name=u'error', attrs={u'type': error_type})
-            
-            # add bad-request as per xmpp protocol rfc 3920
-            n_bad_request = n_error.addChild(name=u'bad-request')
-            n_bad_request.setNamespace(u'urn:ietf:params:xml:ns:xmpp-stanzas')
-            
-            # add error_cond
-            n_error_cond = n_error.addChild(name=unicode(error_cond))
-            
-            # add namespace
-            if error_namespace <> None:
-                n_error_cond.setNamespace(unicode(error_namespace))
-            
-            # add error description
-            if error_description <> None:
-                n_error_description = n_error.addChild(name=u'text', payload=unicode(error_description))
-    
-    def get_error(self):
-        """
-        Retrieves error condition and description from an error stanza.
-        Reference is OpenSpime protocol Core Reference Schema v0.9.
-        @rtype:   tuple of unicode
-        @return:  (error_cond, error_description)
-        """
-        
-        # init
-        error_cond = u''
-        error_description = u''
-        
-        # seek error node
-        n_error = pyopenspime.util.parse_all_children(self, 'error')
-        
-        for child in n_error.getChildren():
-            if child.getName() == 'text':
-                error_description = unicode(child.getData())
-            else:
-                error_cond = unicode(child.getName())
-        
-        return (error_cond, error_description)
-    
-
-def wrap(transport_child_node, originator_osid=None, transport_to_osid=None):
-    """
-    Function that manages the OpenSpime Core Reference Schema. Used by extensions to build a complete <openspime/> node,
-    before encryption and sign.
-    
-    Reference is OpenSpime protocol Core Reference Schema v0.9.
-    
-    @type  transport_child_node: pyopenspime.xmpp.simplexml.Node
-    @type  originator_osid: unicode
-    @param originator_osid: Sets 'osid' attribute of the <originator/> element. Defaults to I{None}.
-    @type  transport_to_osid: unicode
-    @param transport_to_osid: Sets 'to' attribute of the <transport/> element. Defaults to I{None}.
-    @rtype:   pyopenspime.xmpp.simplexml.Node
-    @return:  The <openspime/> node.
-    """
-    
-    # create openspime root node
-    n_openspime = pyopenspime.xmpp.simplexml.Node( tag='openspime', \
-        attrs =  {u'xmlsn':u'openspime:protocol:core', u'version':u'0.9'} )
-    
-    # create <originator/> node
-    n_originator = n_openspime.addChild(name='originator')
-    if originator_osid <> None:
-        n_originator.setAttr('osid', originator_osid)
-    
-    # create <transport/> node
-    n_transport = n_openspime.addChild(name='transport')               
-    if transport_to_osid <> None:
-        n_transport.setAttr('to', transport_to_osid)
-    
-    # add child
-    n_transport.addChild(node=transport_child_node)
-    
-    # return openspime node
-    return n_openspime
 

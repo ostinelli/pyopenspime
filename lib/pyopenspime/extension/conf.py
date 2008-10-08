@@ -6,7 +6,7 @@
 ######################
 
 PYOPENSPIME_EXTENSIONS_LOADED = (
-        'datareporting',
-        'claim',
+        'core.datareporting',
+        'core.claim',
     )
 
