@@ -1,5 +1,5 @@
 #
-# PyOpenSpime - Data Reporting Extension
+# PyOpenSpime - PubKey XMPP Extension
 # version 0.2
 #
 #
@@ -40,16 +40,18 @@
 # DAMAGES OR LOSSES), EVEN IF WIDETAG INC OR SUCH AUTHOR HAS BEEN ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGES.
 
-"""Module that manages the OpenSpime Data Reporting protocol extension."""
+"""Module that manages the PubKey XMPP protocol extension."""
 
 # imports
-from pyopenspime.xmpp.protocol import Iq, Message
+from pyopenspime.xmpp.protocol import Iq
 from pyopenspime.xmpp.simplexml import Node
 from pyopenspime.protocol.core import wrap, Error
 import pyopenspime.util
+import binascii
+import M2Crypto.RSA
 
 
-def validate(stanza, stanza_interpreter):    
+def validate(stanza, stanza_interpreter):        
     """
     Function called by StanzaInterpreter, used to determine if the incoming stanza is to be handled by this extension.
 
@@ -59,27 +61,17 @@ def validate(stanza, stanza_interpreter):
     @rtype:   Boolean
     @return:  True if stanza is to be handled by this extension, False otherwise.
     """
-    
-    # get stanza kind: iq, message, presence
+
     stanza_kind = stanza.getName().strip().lower()
-    # get stanza type: get, set, result, error
     stanza_type = stanza.getType().lower()
 
     if stanza_kind == 'iq':
         # iq must be of type 'set'
-        if stanza_type <> 'set':
+        if stanza_type <> 'get':
             return False
-    
-    if stanza_kind == 'iq' or stanza_kind == 'message':
         for n_root_child in stanza.getChildren():
-            if n_root_child.getName() == 'openspime':
-                for n_os_child in n_root_child.getChildren():
-                    if n_os_child.getName() == 'transport':
-                        for n_transport_child in n_os_child.getChildren():
-                            if n_transport_child.getName() == 'data':
-                                return True
-                                break
-                        break
+            if n_root_child.getName() == 'pubkeys':
+                return True
                 break
     return False
 
@@ -90,121 +82,103 @@ def main(stanza, stanza_interpreter):
     @type  stanza: pyopenspime.xmpp.protocol.Protocol
     @param stanza: Incoming stanza.
 
-    @rtype:   pyopenspime.protocol.extension.core.datareporting.ReqObj()
+    @rtype:   pyopenspime.protocol.extension.xmpp.pubkey.ReqObj()
     @return:  Extension's ReqObj.
     """
-    
-    # get stanza kind: iq, message, presence
-    stanza_kind = stanza.getName().strip().lower()
 
-    # create ReqObj
-    reqobj = ReqObj(stanza_kind)
-        
-    # save stanza
-    reqobj.stanza = stanza
-    
-    # get entries
+    # get osid_pubkey    
     try:
         for n_root_child in stanza.getChildren():
-            if n_root_child.getName() == 'openspime':
-                for n_os_child in n_root_child.getChildren():
-                    if n_os_child.getName() == 'transport':
-                        for n_transport_child in n_os_child.getChildren():
-                            if n_transport_child.getName() == 'data':
-                                for n_entry in n_transport_child.getChildren():
-                                    if n_entry.getName() == 'entry':
-                                        reqobj.add_entry(n_entry)
-                                break
-                        break
+            if n_root_child.getName() == 'pubkeys':
+                osid_pubkey = n_root_child.getAttr('jid')
                 break
     except:
         pass
+
+    # create ReqObj
+    reqobj = ReqObj(osid_pubkey)
+
+    # save
+    reqobj.stanza_interpreter = stanza_interpreter
+    reqobj.stanza = stanza
+
+    # return
     return reqobj
 
 
 class ReqObj():
-    """Data Reporting Extension Request object."""
+    """PubKey XMPP Extension Request object."""
     
-    def __init__(self, kind=None):        
+    def __init__(self, osid_pubkey):        
         """
-        Initialize a Data Reporting Extension Request object.
+        Initialize a PubKey XMPP Extension Request object.
         """
 
         # set extension name here, MUST correspond to the one activated in pyopenspime.protocol.extension.conf
-        self.extname = 'core.datareporting'
+        self.extname = 'xmpp.pubkey'
         # init
+        self.osid_pubkey = osid_pubkey
         self.stanza = None
-        self.entries = []
-        if kind <> 'iq' and kind <> 'message':
-            raise Exception, 'data reporting type not supported. currently supported: \'iq\' and \'message\'.'
-        self.stanza_kind = kind
+        self.stanza_interpreter = None
 
 
-    def add_entry(self, entry_xml):        
-        """
-        Add a data entry node.
-
-        @type  entry_xml: unicode
-        @param entry_xml: XML unicode string containing data to be added.
-        """
-
-        self.entries.append(Node(node=entry_xml))        
-
-
-    def build(self):        
+    def build(self):   
         """
         Builds the <transport/> node content of the data reporting stanza.
          
         @rtype:   pyopenspime.xmpp.simplexml.Node
         @return:  The <transport/> node content typical to the extension.
         """
-
+        
         # empty existing stanza
         self.stanza = ''
         
-        # build <data/> node, children of transport node - unique for extension
-        n_data = Node( tag=u'data', \
-            attrs =  {u'xmlsn':u'openspime:protocol:extension:data', u'version':u'0.9'} )
-        
-        # add entries
-        for entry in self.entries:
-            n_data.addChild(node=entry)
-
-        # wrap data node in openspime protocol
-        n_openspime = wrap(n_data)
-
-        if self.stanza_kind == 'iq':
-            # create new Iq stanza
-            stanza = Iq(typ='set')
-            # serialize id
-            stanza.setID(pyopenspime.util.generate_rnd_str(16))
-            # adding <openspime/> node as first child of <iq/> or <message/> stanza
-            stanza.addChild(node=n_openspime)
-        if self.stanza_kind == 'message':
-            # create new Message stanza
-            stanza = Message()
-            # serialize id
-            stanza.setID(pyopenspime.util.generate_rnd_str(16))
-            # adding <openspime/> node as first child of <iq/> or <message/> stanza
-            stanza.addChild(node=n_openspime)
-        self.stanza = stanza
+        # build <iq/> node
+        pubkey_iq = pyopenspime.xmpp.protocol.Iq(typ='get')
+        pubkey_iq.addChild(u'pubkeys', namespace=u'urn:xmpp:tmp:pubkey', \
+                           attrs={ 'jid': self.osid_pubkey })
+ 
+        self.stanza = pubkey_iq
         # return
-        return stanza
+        return pubkey_iq
 
     
     def accepted(self):        
         """
-        Builds a 'succefully received' stanza according to the OpenSpime Data Reporting protocol extension.
+        Builds a response stanza to the PubKey request received
 
         @rtype:   pyopenspime.xmpp.protocol.Iq
         @return:  The Iq stanza to be sent out as confirmation message.
         """
+
+        if self.stanza_interpreter.osid == self.osid_pubkey:
+            if self.stanza_interpreter.endec.rsa_pub_key <> None:
+                # ok prepare response
+                self.stanza_interpreter.log(10, u'request pubkey received, send public key')
+                pubkey_iq = pyopenspime.xmpp.protocol.Iq(typ='result')
+                n_pubkey = pubkey_iq.addChild(u'pubkeys', namespace=u'urn:xmpp:tmp:pubkey', attrs={ u'jid': self.osid_pubkey })
+                n_KeyInfo = n_pubkey.addChild(u'KeyInfo', namespace=u'http://www.w3.org/2000/09/xmldsig#')
+                n_RSAKeyValue = n_KeyInfo.addChild(u'RSAKeyValue')
+                n_Modulus = n_RSAKeyValue.addChild(u'Modulus')
+                n_Modulus.setData(binascii.b2a_base64(self.stanza_interpreter.endec.rsa_pub_key.n).replace('\r','').replace('\n',''))
+                n_Exponent = n_RSAKeyValue.addChild(u'Exponent')
+                n_Exponent.setData(binascii.b2a_base64(self.stanza_interpreter.endec.rsa_pub_key.e).replace('\r','').replace('\n',''))                   
+            else:
+                # ko prepare response no keys!
+                self.stanza_interpreter.log(30, u'request pubkey received however no public RSA key has been specified, send error response.')
+                # prepare response
+                pubkey_iq = Error(self.stanza, 'cancel', 'no-available-public-key', 'openspime:protocol:core:error', \
+                                'recipient has no available public key.')                
+        else:
+            self.stanza_interpreter.log(10, u'request for another entity, send error')
+            # prepare response       
+            pubkey_iq = Error(self.stanza, 'cancel', 'item-not-found', 'urn:ietf:params:xml:ns:xmpp-stanzas', \
+                            'recipient has no available public key.')                
         
-        # prepare empty iq of type "result"
-        if self.stanza_kind <> 'iq':
-            return
-        iq_ok = self.stanza.buildReply('result')
-        return iq_ok
+        # complete and return
+        pubkey_iq.setTo(self.stanza.getFrom())
+        pubkey_iq.setID(self.stanza.getID())
+        return pubkey_iq
 
 
     def error(self, error_type, error_cond, error_namespace=None, error_description=None):        
@@ -227,9 +201,7 @@ class ReqObj():
         @return:  The Iq stanza to be sent out as error message.
         """
         
-        # prepare empty iq of type "error"
-        if self.stanza_kind <> 'iq':
-            return
+        # prepare empty iq of type "result"
         iq_ko = Error(self.stanza, error_type, error_cond, error_namespace, error_description)        
         return iq_ko
     
@@ -238,7 +210,36 @@ class ReqObj():
         """
         If defined, event is called upon successful response to done request. Must return True if the client event on_response_success should be fired.
         """
-        return True
+
+        # key received, save key
+        for child in stanza.getChildren():
+            if child.getName() == 'pubkeys':
+                # get osid of key owner
+                osid_key_owner = child.getAttr('jid')
+                # get values
+                n_RSAKeyValue = pyopenspime.util.parse_all_children(child, 'RSAKeyValue', True)
+                n_Modulus = pyopenspime.util.parse_all_children(n_RSAKeyValue, 'Modulus', True)
+                n_Exponent = pyopenspime.util.parse_all_children(n_RSAKeyValue, 'Exponent', True)
+                try:
+                    # create key
+                    new_pub_key = M2Crypto.RSA.new_pub_key((binascii.a2b_base64(n_Exponent.getData()), \
+                                                            binascii.a2b_base64(n_Modulus.getData())))
+                    # osid name
+                    osid_key_owner_hex = binascii.b2a_hex(osid_key_owner)
+                    osid_key_owner_key_path = '%s/%s' % (self.stanza_interpreter.rsa_key_cache_path, osid_key_owner_hex)
+                    originator_osid = pyopenspime.util.get_originator_osid(stanza)
+                    if originator_osid <> '':
+                        if osid_key_owner <> originator_osid:
+                            # it's a request to a third party, check if in accepted_cert_authorities [i.e. if it's an authority]
+                            if originator_osid in self.stanza_interpreter.accepted_cert_authorities:
+                                # coming from a cert authority, add the .fromcert extension to file
+                                osid_key_owner_key_path = '%s.fromcert' % osid_key_owner_key_path
+                    # save key
+                    new_pub_key.save_pub_key(osid_key_owner_key_path)
+                    self.stanza_interpreter.log(10, u'a new public key has been received and successfully saved into the cache directory.')
+                except:
+                    self.stanza_interpreter.log(10, u'a new public key has been received, but there was an error in saving the key to cache directory.')
+        return False
     
 
     def on_failure(self, stanza):

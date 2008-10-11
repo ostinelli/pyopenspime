@@ -1,3 +1,8 @@
+# ============================
+# WARNING: MODULE IS OUTDATED.
+# ============================
+
+
 #
 # PyOpenSpime - Claim Extension
 # version 0.1

@@ -1,7 +1,7 @@
 #
-# PyOpenSpime - SSL
+# PyOpenSpime - SSL Module
 # version 0.2
-# last update 2008 08 04
+#
 #
 # Copyright (C) 2008, licensed under GPL v3
 # Roberto Ostinelli <roberto AT openspime DOT com>
@@ -43,13 +43,10 @@
 
 """PyOpensPime SSL Module."""
 
-import sys, locale, codecs, binascii, time, os.path, sha
-import M2Crypto.RSA
-import M2Crypto.EVP
-import M2Crypto.BIO
-import pyopenspime.xmpp
-import pyopenspime.util
-from pyopenspime.extension.conf import *
+# imports
+import binascii, sha
+import M2Crypto.RSA, M2Crypto.BIO
+import pyopenspime.xmpp, pyopenspime.util
 
 
 class EnDec():
@@ -69,7 +66,22 @@ class EnDec():
         self.rsa_priv_key_path = ''
         self.rsa_priv_key_pass = ''
         self.rsa_priv_key = None
-    
+
+    def load_rsa_key_bio(self, rsa_pub_key_path, rsa_priv_key_path, rsa_priv_key_pass):
+        """
+        Load public and private RSA key from .pem files.
+        
+        @type  rsa_pub_key_path: unicode
+        @param rsa_pub_key_path: The path to the RSA public key .pem file.
+        @type  rsa_priv_key_path: unicode
+        @param rsa_priv_key_path: The path to the RSA private key .pem file.
+        @type  rsa_priv_key_pass: unicode
+        @param rsa_priv_key_pass: The RSA private key .pem file password.
+        """
+
+        self.load_rsa_pub_key(rsa_pub_key_path)
+        self.load_rsa_priv_key(rsa_priv_key_path, rsa_priv_key_pass)
+        
     def load_rsa_pub_key(self, rsa_pub_key_path):
         """
         Load public RSA key from .pem file.
@@ -90,9 +102,10 @@ class EnDec():
         @type  rsa_priv_key_pass: unicode
         @param rsa_priv_key_pass: The RSA private key .pem file password.
         """      
-        
+
         self.rsa_priv_key_path = rsa_priv_key_path
-        self.rsa_priv_key_pass = rsa_priv_key_pass
+        # convert to string -> M2Crypto needs str not unicode
+        self.rsa_priv_key_pass = pyopenspime.util.to_utf8(rsa_priv_key_pass)
         self.rsa_priv_key = M2Crypto.RSA.load_key(rsa_priv_key_path, callback=self.__rsa_callback_get_passphrase)
     
     def __rsa_callback_get_passphrase(self, v):

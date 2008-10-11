@@ -573,13 +573,6 @@ class Error(Protocol):
             specify the 'reply' argument as false."""
         if reply: Protocol.__init__(self,to=node.getFrom(),frm=node.getTo(),node=node)
         else: Protocol.__init__(self,node=node)
-# ---\/--- patch
-# empty error node except error itself, so that error nodes do not contain original sent message.
-# this to avoid load but especially to avoid sending out unencrypted stanzas.
-        for child in self.getChildren():
-            self.delChild(child)
-        self.clearData()
-# ---/\--- patch
         self.setError(error)
         if node.getType()=='error': self.__str__=self.__dupstr__
     def __dupstr__(self,dup1=None,dup2=None):

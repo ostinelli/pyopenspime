@@ -97,6 +97,7 @@ class TCPsocket(PlugIn):
                     #TODO: use self.DEBUG()                    
 
 # ---\/--- patch
+# to avoid shutdowns in query errors
                     """
                     print 'An error occurred while looking up %s' % query
                     """

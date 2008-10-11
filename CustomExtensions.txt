@@ -1,0 +1,112 @@
+======================================================================
+HOW TO WRITE CUSTOM EXTENSIONS WITH PyOpenSpime v0.2
+======================================================================
+
+PyOpenSpime allows to write custom OpenSpime Extensions.
+
+
+CREATE A NEW CUSTOM EXTENSION
+======================================================================
+In PyOpenSpime, a new OpenSpime extension is a single python module
+which can be placed in the /lib/pyopenspime/protocol/extension/custom/
+folder.
+
+Create a file and give it an extension name, for instance myext.py.
+
+
+PYOPENSPIME EXTENSION PYTHON MODULE DIRECTIVES
+----------------------------------------------------------------------
+The myext.py module created for this example must contain the
+following function and classes:
+
+
+def validate(stanza, stanza_interpreter):
+-----------------------------------------
+Function is used by PyOpenSpime to determine if an incoming stanza is
+to be handled by this extension. Must return True if stanza is to be
+handled by this extension, False otherwise.
+
+
+def main(stanza, stanza_interpreter):
+-----------------------------------------
+This is the main function called by PyOpenSpime when validate() has
+returned True. This function must return a request object ReqObj()
+that can be used by the OpenSpime client built on
+pyopenspime.client.Client(). Request Objects are entirely
+customizeable and can be personalized according to the needs of the
+extension.
+
+
+class ReqObj():
+-----------------------------------------
+This is the extension's Request Object, which will be passed to the
+client as parameter of the event 'on_request_received'.
+This class is used both to build an outgoing stanza request (i.e.
+when preparing the request from the requester), and to interpret an
+incoming stanza request(i.e. the one received by the recipient of the
+request).
+
+The ReqObj() class must have the following functions:
+
+    . def build(self): 
+	-------------------------------------
+	Function to build the <transport/> node content of the extension's
+	stanza. This one is called when a client sends out a request with:
+	self.send_request(reqobj, 'node@developer.openspime.com/scope').
+	Must return the <transport/> node content typical to the extension.
+	
+	.def accepted(self):  
+	-------------------------------------
+	Should return the response <iq/> stanza of the extension. This is
+	called when a client accepts an incoming request with:
+	self.send_response(reqobj.accepted()).
+	
+	.def error(self, error_type, error_cond, error_namespace=None, \
+				error_description=None) 
+	-------------------------------------
+	Should return an error response <iq/> stanza of the extension.
+	This is called when a client refuses an incoming request with, for
+	example:
+	self.send_response( reqobj.error(error_type='modify', \
+		error_cond='inconsistent-data-with-scope', \
+		error_namespace='openspime:protocol:extension:data:error', \
+        error_description='Data is not consistent with scope.') )
+
+    .def on_success(self, stanza):
+	-------------------------------------
+    If defined, event is called upon successful response to a done
+	request. Must return True if the client event 'on_response_success'
+	should be fired, otherwise False will prevent the event to be fired.
+
+    .def on_failure(self, stanza):
+	-------------------------------------
+    If defined, event is called upon failure response to done request. 
+	Must return True if the client event 'on_response_failure' should
+	be fired, otherwise False will prevent the event to be fired.
+
+    .def on_timeout(self, stanza_id):
+	-------------------------------------
+    If defined, event is called upon timeout waiting response to a
+	done request. Must return True if the client event
+	'on_response_timeout' should be fired, otherwise False will prevent
+	the event to be fired.
+
+
+ACTIVATE THE EXTENSION
+======================================================================
+A custom extension must be activated prior it is called by PyOpenSpime.
+To do so, edit the file:
+/lib/pyopenspime/protocol/extension/conf.py and add your extension
+name to the PYOPENSPIME_EXTENSIONS_LOADED list, as for example:
+
+PYOPENSPIME_EXTENSIONS_LOADED = (
+        'xmpp.pubkey',
+        'core.datareporting',
+		'custom.myext',
+    )
+
+Save and restart the clients.
+
+
+======================================================================
+Copyright (C) 2008         Roberto Ostinelli, Davide 'Folletto' Casali

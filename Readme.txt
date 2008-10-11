@@ -1,6 +1,6 @@
 ======================================================================
-PyOpenSpime v0.1
-2008-06-08
+PyOpenSpime v0.2
+2008-10-11
 ======================================================================
 
 PyOpenSpime is an OpenSpime <http://openspime.org> network library
@@ -81,8 +81,8 @@ Unzip the PyOpenSpime package in a directory.
 
 Inside you'll find the folders:
 . doc/ containing all the documentation
-. tut/ containing some example files with inline explanation comments
 . lib/ containing PyOpenSpime package and the required dependencies (missing M2Crypto)
+. tut/ containing some example files with inline explanation comments
 
 
 3. READ AND RUN THE TUTORIALS

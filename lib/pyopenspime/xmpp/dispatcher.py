@@ -120,13 +120,13 @@ class Dispatcher(PlugIn):
             try: data=self._owner.Connection.receive()
             except IOError: return
 # ---\/--- patch
+# so that client loop() function does not raise errors
             """
             self.Stream.Parse(data)
             """
             try:
                 self.Stream.Parse(data)
             except:
-                # so that client loop() function does not raise errors
                 return True
 # ---/\--- patch
             if len(self._pendingExceptions) > 0:
@@ -310,6 +310,7 @@ class Dispatcher(PlugIn):
             if user or handler['system']:
                 try:
 # ---\/--- patch
+# so that the feature-not-implemented error is only sent when the __iq_handler function returns False
                     """
                     handler['func'](session,stanza)
                     """
