@@ -45,6 +45,9 @@ This class is used both to build an outgoing stanza request (i.e.
 when preparing the request from the requester), and to interpret an
 incoming stanza request(i.e. the one received by the recipient of the
 request).
+ReqObj() MUST have the 'extname' attribute which must correspond to
+the extension name given to the module, and its relative location.
+In the example given, the name would be 'custom.myext'.
 
 The ReqObj() class must have the following functions:
 
