@@ -208,8 +208,8 @@ class EnDec():
         @type  transport: unicode
         @param transport: The <transport/> node content to be encrypted.
         
-        @rtype:   list
-        @return:  list containing: (base64 encrypted transport, base64 encrypted transport-key).
+        @rtype:   tuple
+        @return:  tuple containing: (base64 encrypted transport, base64 encrypted transport-key).
         """
         
         # generate a random 32 bytes AES key
@@ -232,8 +232,8 @@ class EnDec():
         # encrypt the transport key with the public RSA key of recipient
         transport_key_enc = self.__rsa_public_encrypt_base64(transport_key).replace('\r', '').replace('\n', '')
         
-        # return list
-        return [encrypted, transport_key_enc]    
+        # return tuple
+        return (encrypted, transport_key_enc)
        
     def private_decrypt(self, encrypted, transport_key_enc):
         """
