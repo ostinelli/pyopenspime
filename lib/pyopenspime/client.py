@@ -167,12 +167,12 @@ class Client(pyopenspime.xmpp.Client):
         @rtype:   boolean
         @return:  True if stanza is handled, False if not.
         """
-        self.__presence_handler(self.Dispatcher, stanza)
+        return self.__presence_handler(self.Dispatcher, stanza)
 
 
-    def inject_iq(self, stanza):
+    def inject_message(self, stanza):
         """
-        Injects an <iq/> stanza, which will be treated exactly as if it had been received by the client as an XMPP stanza coming from the server.
+        Injects a <message/> stanza, which will be treated exactly as if it had been received by the client as an XMPP stanza coming from the server.
 
         @type  stanza: pyopenspime.xmpp.protocol.Message
         @param stanza: The <message/> stanza.
@@ -180,7 +180,7 @@ class Client(pyopenspime.xmpp.Client):
         @rtype:   boolean
         @return:  True if stanza is handled, False if not.
         """
-        self.__message_handler(self.Dispatcher, stanza)
+        return self.__message_handler(self.Dispatcher, stanza)
 
 
     def inject_iq(self, stanza):
@@ -193,12 +193,12 @@ class Client(pyopenspime.xmpp.Client):
         @rtype:   boolean
         @return:  True if stanza is handled, False if not.
         """
-        self.__iq_handler(self.Dispatcher, stanza)
+        return self.__iq_handler(self.Dispatcher, stanza)
 
         
     def __presence_handler(self, dispatcher, stanza):
-        # handles PRESENCE stanzas        
-        pass
+        # handles PRESENCE stanzas, not implemented - i.e. stanza not treated, return False        
+        return False
 
     
     def __message_handler(self, dispatcher, stanza):
