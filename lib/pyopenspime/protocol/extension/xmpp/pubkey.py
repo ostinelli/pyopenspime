@@ -58,7 +58,7 @@ def validate(stanza, stanza_interpreter):
     @type  stanza: pyopenspime.xmpp.protocol.Protocol
     @param stanza: Incoming stanza.
 
-    @rtype:   Boolean
+    @rtype:   boolean
     @return:  True if stanza is to be handled by this extension, False otherwise.
     """
 

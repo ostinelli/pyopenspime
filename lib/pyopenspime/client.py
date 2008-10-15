@@ -41,7 +41,7 @@
 # DAMAGES OR LOSSES), EVEN IF WIDETAG INC OR SUCH AUTHOR HAS BEEN ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGES.
 
-"""PyOpensPime Client Module."""
+"""Client Module."""
 
 # imports
 import sys, locale, codecs, time
@@ -51,7 +51,7 @@ import pyopenspime.xmpp, pyopenspime.util, pyopenspime.protocol.extension.xmpp.p
 
 class Client(pyopenspime.xmpp.Client):
     """
-    PyOpenSpime XMPP Client
+    PyOpenSpime XMPP Client.
     """
     
     def __init__(self, osid_or_osid_path, osid_pass='', server='', port=5222, try_reconnect=60, rsa_pub_key_path='', rsa_priv_key_path='', rsa_priv_key_pass='', rsa_key_cache_path='cache', \
@@ -155,6 +155,45 @@ class Client(pyopenspime.xmpp.Client):
     def __setattr__(self, name, value):        
         # set default
         self.__dict__[name] = value
+
+
+    def inject_presence(self, stanza):
+        """
+        Injects a <presence/> stanza, which will be treated exactly as if it had been received by the client as an XMPP stanza coming from the server.
+
+        @type  stanza: pyopenspime.xmpp.protocol.Presence
+        @param stanza: The <presence/> stanza.
+
+        @rtype:   boolean
+        @return:  True if stanza is handled, False if not.
+        """
+        self.__presence_handler(self.Dispatcher, stanza)
+
+
+    def inject_iq(self, stanza):
+        """
+        Injects an <iq/> stanza, which will be treated exactly as if it had been received by the client as an XMPP stanza coming from the server.
+
+        @type  stanza: pyopenspime.xmpp.protocol.Message
+        @param stanza: The <message/> stanza.
+
+        @rtype:   boolean
+        @return:  True if stanza is handled, False if not.
+        """
+        self.__message_handler(self.Dispatcher, stanza)
+
+
+    def inject_iq(self, stanza):
+        """
+        Injects an <iq/> stanza, which will be treated exactly as if it had been received by the client as an XMPP stanza coming from the server.
+
+        @type  stanza: pyopenspime.xmpp.protocol.Iq
+        @param stanza: The <iq/> stanza.
+
+        @rtype:   boolean
+        @return:  True if stanza is handled, False if not.
+        """
+        self.__iq_handler(self.Dispatcher, stanza)
 
         
     def __presence_handler(self, dispatcher, stanza):

@@ -1,7 +1,7 @@
 # PyOpenSpime Protocol Extension Settings
 
 
-"""PyOpenSpime Protocol Extension Settings."""
+"""Protocol Extension Settings."""
 
 ######################
 # Loaded extensions  #

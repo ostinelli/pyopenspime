@@ -41,7 +41,7 @@
 # DAMAGES OR LOSSES), EVEN IF WIDETAG INC OR SUCH AUTHOR HAS BEEN ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGES.
 
-"""PyOpensPime OpenSpime Protocol Core Module."""
+"""OpenSpime Protocol Core Module."""
 
 # imports
 import pyopenspime.xmpp, pyopenspime.util

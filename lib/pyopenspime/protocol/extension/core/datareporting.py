@@ -56,7 +56,7 @@ def validate(stanza, stanza_interpreter):
     @type  stanza: pyopenspime.xmpp.protocol.Protocol
     @param stanza: Incoming stanza.
 
-    @rtype:   Boolean
+    @rtype:   boolean
     @return:  True if stanza is to be handled by this extension, False otherwise.
     """
     
@@ -132,6 +132,7 @@ class ReqObj():
 
         # set extension name here, MUST correspond to the one activated in pyopenspime.protocol.extension.conf
         self.extname = 'core.datareporting'
+        
         # init
         self.stanza = None
         self.entries = []
@@ -207,31 +208,23 @@ class ReqObj():
         return iq_ok
 
 
-    def error(self, error_type, error_cond, error_namespace=None, error_description=None):        
+    def error(self, error_num):        
         """
         Builds a 'error' stanza according to the OpenSpime Data Reporting protocol extension.
 
-        @type  error_type: unicode
-        @param error_type: The error type as defined by the XMPP protocol. Value MUST be 'cancel' -- do not retry
-        (the error is unrecoverable), 'continue' -- proceed (the condition was only a warning), 'modify' -- retry
-        after changing the data sent, 'auth' -- retry after providing credentials, 'wait' -- retry after waiting
-        (the error is temporary).
-        @type  error_cond: unicode
-        @param error_cond: The error condition.
-        @type  error_namespace: unicode
-        @param error_namespace: The error condition namespace.
-        @type  error_description: unicode
-        @param error_description: The error description.
+        @type  error_num: int
+        @param error_num: The error number of the response. Currently supported:
+            * 1    : <inconsistent-data-with-scope/>, Data is not consistent with scope of this ScopeNode.
 
-        @rtype:   pyopenspime.xmpp.protocol.Iq
-        @return:  The Iq stanza to be sent out as error message.
+        @rtype:   pyopenspime.xmpp.protocol.Stanza
+        @return:  The stanza to be sent out as error message.
         """
-        
-        # prepare empty iq of type "error"
-        if self.stanza_kind <> 'iq':
-            return
-        iq_ko = Error(self.stanza, error_type, error_cond, error_namespace, error_description)        
-        return iq_ko
+            
+        if error_num == 1:
+            stanza = Error(self.stanza, error_type='modify', error_cond='inconsistent-data-with-scope', error_namespace='openspime:protocol:extension:data:error', \
+                         error_description='Data is not consistent with scope of this ScopeNode.') 
+     
+        return stanza
     
 
     def on_success(self, stanza):
@@ -254,8 +247,6 @@ class ReqObj():
         """
         return True
         
-
-
 
 
 

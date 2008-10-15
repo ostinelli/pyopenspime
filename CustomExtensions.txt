@@ -58,22 +58,21 @@ The ReqObj() class must have the following functions:
 	self.send_request(reqobj, 'node@developer.openspime.com/scope').
 	Must return the <transport/> node content typical to the extension.
 	
-	.def accepted(self):  
+	.def accepted(self, ...):  
 	-------------------------------------
 	Should return the response <iq/> stanza of the extension. This is
 	called when a client accepts an incoming request with:
 	self.send_response(reqobj.accepted()).
+	This may be entirely customized, and parameters could be passed if
+	necessary to build the response.
 	
-	.def error(self, error_type, error_cond, error_namespace=None, \
-				error_description=None) 
+	.def error(self, ...) 
 	-------------------------------------
 	Should return an error response <iq/> stanza of the extension.
-	This is called when a client refuses an incoming request with, for
-	example:
-	self.send_response( reqobj.error(error_type='modify', \
-		error_cond='inconsistent-data-with-scope', \
-		error_namespace='openspime:protocol:extension:data:error', \
-        error_description='Data is not consistent with scope.') )
+	This is called when a client refuses an incoming request.
+	Function may be entirely customized, and parameters could be passed
+	if necessary to build the error response. For example:
+	self.send_response( reqobj.error(1) )
 
     .def on_success(self, stanza):
 	-------------------------------------

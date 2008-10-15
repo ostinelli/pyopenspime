@@ -41,7 +41,7 @@
 # DAMAGES OR LOSSES), EVEN IF WIDETAG INC OR SUCH AUTHOR HAS BEEN ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGES.
 
-"""PyOpensPime Protocol Engine Module."""
+"""Protocol Engine Module."""
 
 # imports
 import sys, os, binascii, time
@@ -440,7 +440,7 @@ class StanzaInterpreter():
         @type  stanza: pyopenspime.xmpp.protocol.Stanza
         @param stanza: The stanza to be checked.
             
-        @rtype:   Boolean
+        @rtype:   boolean
         @return:  True if signature is valid or stanza not signed, otherwise raises errors.
         """
         

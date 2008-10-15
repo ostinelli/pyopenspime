@@ -45,8 +45,10 @@ pyopenspime.client.Client.__iq_on_success	pyopenspime.client.Client-class.html#_
 pyopenspime.client.Client.send_response	pyopenspime.client.Client-class.html#send_response
 pyopenspime.client.Client.__on_connect	pyopenspime.client.Client-class.html#__on_connect
 pyopenspime.client.Client.__save_awaiting_stanza_to_be_treated	pyopenspime.client.Client-class.html#__save_awaiting_stanza_to_be_treated
+pyopenspime.client.Client.inject_presence	pyopenspime.client.Client-class.html#inject_presence
 pyopenspime.client.Client.__iq_on_timeout	pyopenspime.client.Client-class.html#__iq_on_timeout
 pyopenspime.client.Client.run	pyopenspime.client.Client-class.html#run
+pyopenspime.client.Client.inject_iq	pyopenspime.client.Client-class.html#inject_iq
 pyopenspime.client.Client.__on_request_received	pyopenspime.client.Client-class.html#__on_request_received
 pyopenspime.client.Client.on_disconnect	pyopenspime.client.Client-class.html#on_disconnect
 pyopenspime.client.Client.treat_stanza	pyopenspime.client.Client-class.html#treat_stanza

@@ -40,7 +40,7 @@
 # DAMAGES OR LOSSES), EVEN IF WIDETAG INC OR SUCH AUTHOR HAS BEEN ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGES.
 
-"""PyOpenSpime Utility Module."""
+"""Utility Module."""
 
 # imports
 import random, time, os.path

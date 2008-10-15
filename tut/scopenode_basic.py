@@ -24,8 +24,7 @@ class TheScopeNode(Client):
             self.send_response(reqobj.accepted())
             
             # example of an error response:
-            # self.send_response( reqobj.error(error_type='modify', error_cond='inconsistent-data-with-scope', error_namespace='openspime:protocol:extension:data:error', \
-            #                error_description='Data is not consistent with scope of this ScopeNode.') )
+            # self.send_response( reqobj.error(1) )
             
             # print on screen
             print "======== \/ RECEIVED DATA ========"
@@ -45,4 +44,3 @@ if __name__ == "__main__":
     ###### OpenSpime
     c = TheScopeNode('dev-scopenode-2@developer.openspime.com/scope', log_callback_function = log.log)
     c.run();
-
