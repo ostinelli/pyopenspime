@@ -170,14 +170,16 @@ class ReqObj():
                 pubkey_iq = Error(self.stanza, 'cancel', 'no-available-public-key', 'openspime:protocol:core:error', \
                                 'recipient has no available public key.')                
         else:
-            self.stanza_interpreter.log(10, u'request for another entity, send error')
+            self.stanza_interpreter.log(10, u'request for another entity, build error')
             # prepare response       
             pubkey_iq = Error(self.stanza, 'cancel', 'item-not-found', 'urn:ietf:params:xml:ns:xmpp-stanzas', \
                             'recipient has no available public key.')                
         
         # complete and return
-        pubkey_iq.setTo(self.stanza.getFrom())
-        pubkey_iq.setID(self.stanza.getID())
+        try: pubkey_iq.setTo(self.stanza.getFrom())
+        except: pass
+        try: pubkey_iq.setID(self.stanza.getID())
+        except: pass
         return pubkey_iq
 
 

@@ -41,7 +41,7 @@
 # DAMAGES OR LOSSES), EVEN IF WIDETAG INC OR SUCH AUTHOR HAS BEEN ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGES.
 
-"""Spime, basic code"""
+"""Spime, basic code."""
 
 ###### Imports
 import sys, os
@@ -52,7 +52,7 @@ import pyopenspime.protocol.extension.core.datareporting
 
 class TheSpime(Client):
     """
-    PyOpenSpime 0.2 Basic Spime
+    PyOpenSpime 0.2 Basic Spime.
     """
     
     def on_connect(self):

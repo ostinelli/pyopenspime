@@ -81,8 +81,10 @@ class Error(pyopenspime.xmpp.protocol.Iq):
             # invert recipient and sender
             frm = self.getFrom()
             to = self.getTo()
-            self.setTo(frm)
-            self.setFrom(to)
+            try: self.setTo(frm)
+            except: pass
+            try: self.setFrom(to)
+            except: pass
             
             # ensure to have only an error reported, to avoid sending unencrypted data on the network -> empty all query
             self = pyopenspime.util.clean_node(self)

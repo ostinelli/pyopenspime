@@ -43,7 +43,6 @@
 
 """ScopeNode, basic code."""
 
-
 ###### Imports
 import sys, os
 os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
@@ -53,7 +52,7 @@ from pyopenspime.client import Client
 
 class TheScopeNode(Client):
     """
-    PyOpenSpime 0.2 Basic ScopeNode
+    PyOpenSpime 0.2 Basic ScopeNode.
     """
 
     def on_request_received(self, reqobj):
