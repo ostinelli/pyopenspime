@@ -62,8 +62,12 @@ def validate(stanza, stanza_interpreter):
     @return:  True if stanza is to be handled by this extension, False otherwise.
     """
 
-    stanza_kind = stanza.getName().strip().lower()
-    stanza_type = stanza.getType().lower()
+    # get stanza kind: iq, message, presence
+    try: stanza_kind = stanza.getName().strip().lower()
+    except: pass
+    # get stanza type: get, set, result, error
+    try: stanza_type = stanza.getType().lower()
+    except: pass
 
     if stanza_kind == 'iq':
         # iq must be of type 'set'

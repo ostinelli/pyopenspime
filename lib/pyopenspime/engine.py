@@ -201,12 +201,15 @@ class StanzaInterpreter():
         self.log(10, u'StanzaInterpreter succesfully initialized.')
 
 
-    def validate(self, stanza):        
+    def validate(self, stanza, raise_errors=False):        
         """
         Check if incoming <message/> and <iq/> stanzas are handled by the OpenSpime protocol.
         
         @type  stanza: pyopenspime.xmpp.protocol.Stanza
         @param stanza: The incoming stanza.
+        @type  raise_errors: boolean
+        @param raise_errors: If set to True, instead of returning a managed error stanza, function will raise errors.
+        
         @rtype:   mixed
         @return:  if successful:    ReqObj():                              the ReqObj of the extension.
                   if error found:   pyopenspime.xmpp.protocol.Protocol:    stanza to be sent out as error.
@@ -216,53 +219,59 @@ class StanzaInterpreter():
         stanza_kind = stanza.getName().strip().lower()
 
         # decrypt stanza if necessary
-        try:
-            stanza = self.decrypt(stanza)
-        except DecryptionError:
-            # message could not be decrypted
-            if stanza_kind == 'iq':
-                return Error(stanza, 'modify', 'decryption-error', 'openspime:protocol:core:error', \
-                            'the incoming stanza was sent encrypted, though there were errors decrypting it (encrypted with wrong public RSA key?).')
-        except MissingPrivateKey:
-            # client has no private key to decrypt incoming message
-            if stanza_kind == 'iq':
-                return Error(stanza, 'cancel', 'decryption-not-enabled', 'openspime:protocol:core:error', \
-                            'the incoming stanza was sent encrypted, but the recipient entity is not enabled to decrypt it.')
-        except MalformedXML:
-            # message could not be decrypted
-            if stanza_kind == 'iq':
-                return Error(stanza, 'modify', 'xml-malformed-transport-node', 'openspime:protocol:core:error', \
-                            'the incoming stanza has been decrypted, but the <transport/> node contains non valid xml.')
-        except:
-            raise # XXX set to pass in production
+        if raise_errors == False:
+    
+            # decrypt
+            try:
+                stanza = self.decrypt(stanza)
+            except DecryptionError:
+                # message could not be decrypted
+                if stanza_kind == 'iq':
+                    return Error(stanza, 'modify', 'decryption-error', 'openspime:protocol:core:error', \
+                                'the incoming stanza was sent encrypted, though there were errors decrypting it (encrypted with wrong public RSA key?).')
+            except MissingPrivateKey:
+                # client has no private key to decrypt incoming message
+                if stanza_kind == 'iq':
+                    return Error(stanza, 'cancel', 'decryption-not-enabled', 'openspime:protocol:core:error', \
+                                'the incoming stanza was sent encrypted, but the recipient entity is not enabled to decrypt it.')
+            except MalformedXML:
+                # message could not be decrypted
+                if stanza_kind == 'iq':
+                    return Error(stanza, 'modify', 'xml-malformed-transport-node', 'openspime:protocol:core:error', \
+                                'the incoming stanza has been decrypted, but the <transport/> node contains non valid xml.')
+            except:
+                raise # XXX set to pass in production
 
-        # check stanza signature, if any
-        try:
+            # check stanza signature, if any
+            try:
+                valid_signature = self.check_signature(stanza)
+            except KeyCachePathNotSet:
+                # key cache not available
+                if stanza_kind == 'iq':
+                    return Error(stanza, 'cancel', 'signature-not-enabled', 'openspime:protocol:core:error', \
+                                'the stanza has a signature, but the recipient entity is not enabled to verify signatures.')
+            except SigneeCertifiedPublicKeyNotInCache, SigneeCertifiedPublicKeyCorruptedRetry:
+                raise
+            except SigneeCertifiedPublicKeyFromUnauthCert:
+                # unaccepted cert authority
+                if stanza_kind == 'iq':
+                    return Error(stanza, 'cancel', 'signature-error-invalid-cert-auth', 'openspime:protocol:core:error', \
+                                'the stanza is signed by a certification authority which is not accepted by recipient.')            
+            except SigneeCertifiedPublicKeyCorrupted:
+                # key cache not available
+                if stanza_kind == 'iq':
+                    return Error(stanza, 'cancel', 'signature-error-public-key-corrupted', 'openspime:protocol:core:error', \
+                                'the stanza has a signature which could not be validated because the public RSA key of the originator received from the cert authority is corrupted.')
+            except MalformedXML:
+                # malformed transport node
+                if stanza_kind == 'iq':
+                    return Error(stanza, 'modify', 'xml-malformed-transport-node', 'openspime:protocol:core:error', \
+                                'the <transport/> node of the incoming stanza contains non valid xml.')
+            except:
+                raise # XXX set to pass in production
+        else:
+            stanza = self.decrypt(stanza)
             valid_signature = self.check_signature(stanza)
-        except KeyCachePathNotSet:
-            # key cache not available
-            if stanza_kind == 'iq':
-                return Error(stanza, 'cancel', 'signature-not-enabled', 'openspime:protocol:core:error', \
-                            'the stanza has a signature, but the recipient entity is not enabled to verify signatures.')
-        except SigneeCertifiedPublicKeyNotInCache, SigneeCertifiedPublicKeyCorruptedRetry:
-            raise
-        except SigneeCertifiedPublicKeyFromUnauthCert:
-            # unaccepted cert authority
-            if stanza_kind == 'iq':
-                return Error(stanza, 'cancel', 'signature-error-invalid-cert-auth', 'openspime:protocol:core:error', \
-                            'the stanza is signed by a certification authority which is not accepted by recipient.')            
-        except SigneeCertifiedPublicKeyCorrupted:
-            # key cache not available
-            if stanza_kind == 'iq':
-                return Error(stanza, 'cancel', 'signature-error-public-key-corrupted', 'openspime:protocol:core:error', \
-                            'the stanza has a signature which could not be validated because the public RSA key of the originator received from the cert authority is corrupted.')
-        except MalformedXML:
-            # malformed transport node
-            if stanza_kind == 'iq':
-                return Error(stanza, 'modify', 'xml-malformed-transport-node', 'openspime:protocol:core:error', \
-                            'the <transport/> node of the incoming stanza contains non valid xml.')
-        except:
-            raise # XXX set to pass in production
 
         # loop available extensions
         for ext in PYOPENSPIME_EXTENSIONS_LOADED:

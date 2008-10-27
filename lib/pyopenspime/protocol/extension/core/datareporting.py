@@ -61,9 +61,11 @@ def validate(stanza, stanza_interpreter):
     """
     
     # get stanza kind: iq, message, presence
-    stanza_kind = stanza.getName().strip().lower()
+    try: stanza_kind = stanza.getName().strip().lower()
+    except: pass
     # get stanza type: get, set, result, error
-    stanza_type = stanza.getType().lower()
+    try: stanza_type = stanza.getType().lower()
+    except: pass
 
     if stanza_kind == 'iq':
         # iq must be of type 'set'
