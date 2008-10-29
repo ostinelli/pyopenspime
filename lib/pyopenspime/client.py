@@ -119,7 +119,7 @@ class Client(pyopenspime.xmpp.Client):
         self.osid_pass = osid_pass
         
         # get server if not explicitely stated
-        if server == None:
+        if server == '':
             server = self.osid.getDomain()                
         self.Server = server
         self.Port = port
