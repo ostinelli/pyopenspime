@@ -183,18 +183,20 @@ class StanzaInterpreter():
         # load accepted certified authorities        
         if accepted_cert_authorities_filepath <> '':
             if os.path.isfile(accepted_cert_authorities_filepath) == False:
-                msg = u'specified accepted certified authorities file \'%s\' does not exist or cannot be accessed.' % unicode(accepted_cert_authorities_filepath)
-                self.log(40, msg)
-                raise Exception, msg
-            # read
-            self.accepted_cert_authorities = []
-            f = open(accepted_cert_authorities_filepath, "r" )
-            for line in f:
-                line = line.strip().replace('\r','').replace('\n','')
-                if len(line) > 0 and line[:1] <> '#':
-                    self.accepted_cert_authorities.append(line)
-            self.log(10, u'accepted certified authorities file successfully read, loaded %d authorities.' % len(self.accepted_cert_authorities))
+                msg = u'specified accepted certified authorities file \'%s\' does not exist, digital signature will not be available.' % unicode(accepted_cert_authorities_filepath)
+                self.log(30, msg)
+                accepted_cert_authorities_filepath = None
+            else:
+                # read
+                self.accepted_cert_authorities = []
+                f = open(accepted_cert_authorities_filepath, "r" )
+                for line in f:
+                    line = line.strip().replace('\r','').replace('\n','')
+                    if len(line) > 0 and line[:1] <> '#':
+                        self.accepted_cert_authorities.append(line)
+                self.log(10, u'accepted certified authorities file successfully read, loaded %d authorities.' % len(self.accepted_cert_authorities))
         else:
+            self.log(30, u'accepted certified authorities file not specified, digital signature will not be available.')
             self.accepted_cert_authorities = None
 
         # log
