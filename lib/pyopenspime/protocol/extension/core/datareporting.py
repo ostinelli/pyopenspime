@@ -212,9 +212,11 @@ class ReqObj():
         if error_num == 1:
             stanza = Error(self.stanza, error_type='modify', error_cond='inconsistent-data-with-scope', error_namespace='openspime:protocol:extension:data:error', \
                          error_description='Data is not consistent with scope of this ScopeNode.')
-        if error_num == 2:
+        elif error_num == 2:
             stanza = Error(self.stanza, error_type='modify', error_cond='internal-server-error', error_namespace='urn:ietf:params:xml:ns:xmpp-stanzas', \
                          error_description='Server could not complete the request because of an internal error.')
+        else:
+            raise Exception, u'unsupported error number.'
 
         return stanza
     
