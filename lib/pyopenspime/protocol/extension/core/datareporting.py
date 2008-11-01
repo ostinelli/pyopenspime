@@ -203,6 +203,7 @@ class ReqObj():
         @type  error_num: int
         @param error_num: The error number of the response. Currently supported:
             * 1    : <inconsistent-data-with-scope/>, Data is not consistent with scope of this ScopeNode.
+            * 2    : <internal-server-error/>, Server could not complete the request because of an internal error.
 
         @rtype:   pyopenspime.xmpp.protocol.Stanza
         @return:  The stanza to be sent out as error message.
@@ -210,8 +211,11 @@ class ReqObj():
             
         if error_num == 1:
             stanza = Error(self.stanza, error_type='modify', error_cond='inconsistent-data-with-scope', error_namespace='openspime:protocol:extension:data:error', \
-                         error_description='Data is not consistent with scope of this ScopeNode.') 
-     
+                         error_description='Data is not consistent with scope of this ScopeNode.')
+        if error_num == 2:
+            stanza = Error(self.stanza, error_type='modify', error_cond='internal-server-error', error_namespace='urn:ietf:params:xml:ns:xmpp-stanzas', \
+                         error_description='Server could not complete the request because of an internal error.')
+
         return stanza
     
 
