@@ -31,7 +31,7 @@
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://code.google.com/p/pyopenspime/">PyOpenSpime</a></th>
+            ><a class="navbar" target="_top" href="http://code.google.com/p/pyopenspime">PyOpenSpime</a></th>
           </tr></table></th>
   </tr>
 </table>
@@ -59,16 +59,14 @@
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class Client</h1><p class="nomargin-top"><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client">source&nbsp;code</a></span></p>
-<pre class="base-tree">
-xmpp.client.CommonClient --+    
-                           |    
-          xmpp.client.Client --+
-                               |
-                              <strong class="uidshort">Client</strong>
-</pre>
+<dl><dt>Known Subclasses:</dt>
+<dd>
+      <ul class="subclass-list">
+<li><a href="pyopenspime.client.Component-class.html">Component</a></li>  </ul>
+</dd></dl>
 
 <hr />
-<p>PyOpenSpime XMPP Client</p>
+<p>PyOpenSpime XMPP Client.</p>
 
 <!-- ==================== INSTANCE METHODS ==================== -->
 <a name="section-InstanceMethods"></a>
@@ -97,7 +95,7 @@ xmpp.client.CommonClient --+
         <span class="summary-sig-arg">osid_or_osid_path</span>,
         <span class="summary-sig-arg">osid_pass</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
         <span class="summary-sig-arg">server</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
-        <span class="summary-sig-arg">port</span>=<span class="summary-sig-default">5222</span>,
+        <span class="summary-sig-arg">port</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">try_reconnect</span>=<span class="summary-sig-default">60</span>,
         <span class="summary-sig-arg">rsa_pub_key_path</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
         <span class="summary-sig-arg">rsa_priv_key_path</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
@@ -116,17 +114,17 @@ xmpp.client.CommonClient --+
       
     </td>
   </tr>
-<tr>
+<tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="__setattr__"></a><span class="summary-sig-name">__setattr__</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">name</span>,
-        <span class="summary-sig-arg">value</span>)</span></td>
+          <td><span class="summary-sig"><a name="_init_connector"></a><span class="summary-sig-name">_init_connector</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">server</span>,
+        <span class="summary-sig-arg">port</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__setattr__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client._init_connector">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -147,6 +145,26 @@ xmpp.client.CommonClient --+
       the server.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.inject_presence">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">boolean</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#inject_message" class="summary-sig-name">inject_message</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>)</span><br />
+      Injects a &lt;message/&gt; stanza, which will be treated exactly as 
+      if it had been received by the client as an XMPP stanza coming from 
+      the server.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.inject_message">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -268,8 +286,7 @@ xmpp.client.CommonClient --+
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a name="__on_request_received"></a><span class="summary-sig-name">__on_request_received</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">reqobj</span>)</span><br />
-      Called when an OpenSpime extension request has been received.</td>
+        <span class="summary-sig-arg">reqobj</span>)</span></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__on_request_received">source&nbsp;code</a></span>
             
@@ -561,7 +578,7 @@ xmpp.client.CommonClient --+
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#DisconnectHandler" class="summary-sig-name">DisconnectHandler</a>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a name="DisconnectHandler"></a><span class="summary-sig-name">DisconnectHandler</span>(<span class="summary-sig-arg">self</span>)</span><br />
       Handler to manage automatic reconnection.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.DisconnectHandler">source&nbsp;code</a></span>
@@ -656,13 +673,45 @@ xmpp.client.CommonClient --+
       
     </td>
   </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_auth"></a><span class="summary-sig-name">_auth</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client._auth">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_notify_presence"></a><span class="summary-sig-name">_notify_presence</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client._notify_presence">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#connect" class="summary-sig-name">connect</a>(<span class="summary-sig-arg">self</span>)</span><br />
+          <td><span class="summary-sig"><a name="connect"></a><span class="summary-sig-name">connect</span>(<span class="summary-sig-arg">self</span>)</span><br />
       Connects the Client to the server and initializes handlers.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.connect">source&nbsp;code</a></span>
@@ -762,24 +811,6 @@ xmpp.client.CommonClient --+
       
     </td>
   </tr>
-  <tr>
-    <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code>xmpp.client.Client</code></b>:
-      <code>auth</code>,
-      <code>getRoster</code>,
-      <code>sendInitPresence</code>,
-      <code>sendPresence</code>
-      </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code>xmpp.client.CommonClient</code></b>:
-      <code>RegisterDisconnectHandler</code>,
-      <code>UnregisterDisconnectHandler</code>,
-      <code>disconnected</code>,
-      <code>event</code>,
-      <code>isConnected</code>,
-      <code>reconnectAndReauth</code>
-      </p>
-    </td>
-  </tr>
 </table>
 <!-- ==================== METHOD DETAILS ==================== -->
 <a name="section-MethodDetails"></a>
@@ -810,7 +841,7 @@ xmpp.client.CommonClient --+
         <span class="sig-arg">osid_or_osid_path</span>,
         <span class="sig-arg">osid_pass</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
         <span class="sig-arg">server</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
-        <span class="sig-arg">port</span>=<span class="sig-default">5222</span>,
+        <span class="sig-arg">port</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">try_reconnect</span>=<span class="sig-default">60</span>,
         <span class="sig-arg">rsa_pub_key_path</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
         <span class="sig-arg">rsa_priv_key_path</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
@@ -858,9 +889,6 @@ xmpp.client.CommonClient --+
           verbosity level - 0 for error, 1 for warning, 2 for info, 3 for 
           debug).</li>
     </ul></dd>
-    <dt>Overrides:
-        xmpp.client.CommonClient.__init__
-    </dt>
   </dl>
 </td></tr></table>
 </div>
@@ -886,6 +914,34 @@ xmpp.client.CommonClient --+
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>stanza</code></strong> (pyopenspime.xmpp.protocol.Presence) - The &lt;presence/&gt; stanza.</li>
+    </ul></dd>
+    <dt>Returns: boolean</dt>
+        <dd>True if stanza is handled, False if not.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="inject_message"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">inject_message</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.inject_message">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Injects a &lt;message/&gt; stanza, which will be treated exactly as if
+  it had been received by the client as an XMPP stanza coming from the 
+  server.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stanza</code></strong> (pyopenspime.xmpp.protocol.Message) - The &lt;message/&gt; stanza.</li>
     </ul></dd>
     <dt>Returns: boolean</dt>
         <dd>True if stanza is handled, False if not.</dd>
@@ -1090,28 +1146,6 @@ xmpp.client.CommonClient --+
   </dl>
 </td></tr></table>
 </div>
-<a name="DisconnectHandler"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">DisconnectHandler</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.DisconnectHandler">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Handler to manage automatic reconnection.</p>
-  <dl class="fields">
-    <dt>Overrides:
-        xmpp.client.CommonClient.DisconnectHandler
-    </dt>
-  </dl>
-</td></tr></table>
-</div>
 <a name="on_disconnect"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -1173,28 +1207,6 @@ xmpp.client.CommonClient --+
   function. This one does nothing, should be overriden in derived 
   classes.</p>
   <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
-<a name="connect"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">connect</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.connect">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Connects the Client to the server and initializes handlers.</p>
-  <dl class="fields">
-    <dt>Overrides:
-        xmpp.client.CommonClient.connect
-    </dt>
   </dl>
 </td></tr></table>
 </div>
@@ -1269,14 +1281,14 @@ xmpp.client.CommonClient --+
       <th class="navbar" align="right" width="100%">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr><th class="navbar" align="center"
-            ><a class="navbar" target="_top" href="http://code.google.com/p/pyopenspime/">PyOpenSpime</a></th>
+            ><a class="navbar" target="_top" href="http://code.google.com/p/pyopenspime">PyOpenSpime</a></th>
           </tr></table></th>
   </tr>
 </table>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Wed Oct 15 10:25:18 2008
+    Generated by Epydoc 3.0.1 on Sat Nov 01 18:12:14 2008
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

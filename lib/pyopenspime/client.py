@@ -363,9 +363,7 @@ class Client():
 
 
     def __on_request_received(self, reqobj):
-        """
-        Called when an OpenSpime extension request has been received.
-        """
+        # Fired when an OpenSpime extension request has been received.
         
         if reqobj.extname == 'xmpp.pubkey':
             # accept incoming request, send key

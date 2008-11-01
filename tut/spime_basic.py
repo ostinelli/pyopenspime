@@ -50,7 +50,7 @@ def add_to_sys_path(paths):
             sys.path.append(path)
 import sys, os
 os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
-add_to_sys_path( ('lib',) )
+add_to_sys_path( ('../lib',) )
 from pyopenspime.client import Client
 import pyopenspime.protocol.extension.core.datareporting
 
