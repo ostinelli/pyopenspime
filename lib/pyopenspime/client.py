@@ -815,14 +815,6 @@ class Component(Client):
     """
     PyOpenSpime XMPP Component. Inherits all methods, events and functions from the Client class.
     """
-    
-    def __init__(self, osid_or_osid_path, osid_pass='', server='', port=None, try_reconnect=60, rsa_pub_key_path='', rsa_priv_key_path='', rsa_priv_key_pass='', \
-                 rsa_key_cache_path='cache', cert_authority='', accepted_cert_authorities_filepath='certification-authorities.conf', log_callback_function=None):
-
-        # init Common
-        Client.__init__(self, osid_or_osid_path, osid_pass, server, port, try_reconnect, rsa_pub_key_path, rsa_priv_key_path, rsa_priv_key_pass, \
-                 rsa_key_cache_path, cert_authority, accepted_cert_authorities_filepath, log_callback_function)
-
 
     def _init_connector(self, server, port):
         # start xmpp.component
