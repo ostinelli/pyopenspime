@@ -51,13 +51,15 @@ import pyopenspime.util
 
 def validate(stanza, stanza_interpreter):    
     """
-    Function called by StanzaInterpreter, used to determine if the incoming stanza is to be handled by this extension.
+    Function called by StanzaInterpreter, used to determine if the incoming stanza is to be handled by this extension. Returns ReqObj if it has been handled, None otherwise.
 
     @type  stanza: pyopenspime.xmpp.protocol.Protocol
     @param stanza: Incoming stanza.
+    @type  stanza_interpreter: pyopenspime.protocol.engine.StanzaInterpreter
+    @param stanza_interpreter: The Stanza Interpreter that is handling the stanza.
 
-    @rtype:   boolean
-    @return:  True if stanza is to be handled by this extension, False otherwise.
+    @rtype:   None or pyopenspime.protocol.extension.core.datareporting.ReqObj()
+    @return:  None or Extension's ReqObj.
     """
     
     # get stanza kind: iq, message, presence
@@ -67,61 +69,45 @@ def validate(stanza, stanza_interpreter):
     try: stanza_type = stanza.getType().lower()
     except: pass
 
+    # must be an iq of type 'set', or a message
     if stanza_kind == 'iq':
-        # iq must be of type 'set'
         if stanza_type <> 'set':
-            return False
-    
-    if stanza_kind == 'iq' or stanza_kind == 'message':
-        for n_root_child in stanza.getChildren():
-            if n_root_child.getName() == 'openspime':
-                for n_os_child in n_root_child.getChildren():
-                    if n_os_child.getName() == 'transport':
-                        for n_transport_child in n_os_child.getChildren():
-                            if n_transport_child.getName() == 'data':
-                                return True
-                                break
-                        break
-                break
-    return False
+            return None
+    else:
+        if stanza_kind <> 'message':
+            return None
 
-def main(stanza, stanza_interpreter):        
-    """
-    Function called by StanzaInterpreter when stanza is to be handled by this extension.
+    # look for the <data/> node within n_transport
+    n_data = None
+    for n_root_child in stanza.getChildren():
+        if n_root_child.getName() == 'openspime':
+            for n_os_child in n_root_child.getChildren():
+                if n_os_child.getName() == 'transport':
+                    for n_transport_child in n_os_child.getChildren():
+                        if n_transport_child.getName() == 'data':
+                            n_data = n_transport_child
+                            break
+                    break
+            break
 
-    @type  stanza: pyopenspime.xmpp.protocol.Protocol
-    @param stanza: Incoming stanza.
+    if n_data <> None:
+        # create ReqObj
+        reqobj = ReqObj(stanza_kind)
+        # save stanza
+        reqobj.stanza = stanza
+        # get entries
+        try:
+            for n_entry in n_data.getChildren():
+                if n_entry.getName() == 'entry':
+                    reqobj.add_entry(n_entry)
+        except:
+            pass
+        # return
+        return reqobj
 
-    @rtype:   pyopenspime.protocol.extension.core.datareporting.ReqObj()
-    @return:  Extension's ReqObj.
-    """
-    
-    # get stanza kind: iq, message, presence
-    stanza_kind = stanza.getName().strip().lower()
+    # not handled by exception
+    return None
 
-    # create ReqObj
-    reqobj = ReqObj(stanza_kind)
-        
-    # save stanza
-    reqobj.stanza = stanza
-    
-    # get entries
-    try:
-        for n_root_child in stanza.getChildren():
-            if n_root_child.getName() == 'openspime':
-                for n_os_child in n_root_child.getChildren():
-                    if n_os_child.getName() == 'transport':
-                        for n_transport_child in n_os_child.getChildren():
-                            if n_transport_child.getName() == 'data':
-                                for n_entry in n_transport_child.getChildren():
-                                    if n_entry.getName() == 'entry':
-                                        reqobj.add_entry(n_entry)
-                                break
-                        break
-                break
-    except:
-        pass
-    return reqobj
 
 
 class ReqObj():

@@ -46,6 +46,7 @@
 from pyopenspime.xmpp.protocol import Iq
 from pyopenspime.xmpp.simplexml import Node
 from pyopenspime.protocol.core import wrap, Error
+from pyopenspime.engine import get_originator_osid
 import pyopenspime.util
 import binascii
 import M2Crypto.RSA
@@ -53,13 +54,15 @@ import M2Crypto.RSA
 
 def validate(stanza, stanza_interpreter):        
     """
-    Function called by StanzaInterpreter, used to determine if the incoming stanza is to be handled by this extension.
+    Function called by StanzaInterpreter, used to determine if the incoming stanza is to be handled by this extension. Returns ReqObj if it has been handled, None otherwise.
 
     @type  stanza: pyopenspime.xmpp.protocol.Protocol
     @param stanza: Incoming stanza.
+    @type  stanza_interpreter: pyopenspime.protocol.engine.StanzaInterpreter
+    @param stanza_interpreter: The Stanza Interpreter that is handling the stanza.
 
-    @rtype:   boolean
-    @return:  True if stanza is to be handled by this extension, False otherwise.
+    @rtype:   None or pyopenspime.protocol.extension.core.datareporting.ReqObj()
+    @return:  None or Extension's ReqObj.
     """
 
     # get stanza kind: iq, message, presence
@@ -69,45 +72,35 @@ def validate(stanza, stanza_interpreter):
     try: stanza_type = stanza.getType().lower()
     except: pass
 
-    if stanza_kind == 'iq':
-        # iq must be of type 'set'
-        if stanza_type <> 'get':
-            return False
-        for n_root_child in stanza.getChildren():
-            if n_root_child.getName() == 'pubkeys':
-                return True
-                break
-    return False
+    # must be an iq of type 'get'
+    if stanza_kind == 'iq' and stanza_type <> 'get':
+        return None
 
-def main(stanza, stanza_interpreter):        
-    """
-    Function called by StanzaInterpreter when stanza is to be handled by this extension.
+    # get pubkeys child node
+    n_pubkeys = None
+    for n_root_child in stanza.getChildren():
+        if n_root_child.getName() == 'pubkeys':
+            n_pubkeys = n_root_child
+            break
 
-    @type  stanza: pyopenspime.xmpp.protocol.Protocol
-    @param stanza: Incoming stanza.
+    if n_pubkeys <> None:
+        # get osid_pubkey        
+        try: osid_pubkey = n_pubkeys.getAttr('jid')
+        except: osid_pubkey = ''
 
-    @rtype:   pyopenspime.protocol.extension.xmpp.pubkey.ReqObj()
-    @return:  Extension's ReqObj.
-    """
+        # create ReqObj
+        reqobj = ReqObj(osid_pubkey)
 
-    # get osid_pubkey    
-    try:
-        for n_root_child in stanza.getChildren():
-            if n_root_child.getName() == 'pubkeys':
-                osid_pubkey = n_root_child.getAttr('jid')
-                break
-    except:
-        pass
+        # save
+        reqobj.stanza_interpreter = stanza_interpreter
+        reqobj.stanza = stanza
 
-    # create ReqObj
-    reqobj = ReqObj(osid_pubkey)
+        # return
+        return reqobj
 
-    # save
-    reqobj.stanza_interpreter = stanza_interpreter
-    reqobj.stanza = stanza
+    # not handled by exception
+    return None
 
-    # return
-    return reqobj
 
 
 class ReqObj():
@@ -233,7 +226,7 @@ class ReqObj():
                     # osid name
                     osid_key_owner_hex = binascii.b2a_hex(osid_key_owner)
                     osid_key_owner_key_path = '%s/%s' % (self.stanza_interpreter.rsa_key_cache_path, osid_key_owner_hex)
-                    originator_osid = pyopenspime.util.get_originator_osid(stanza)
+                    originator_osid = pyopenspime.engine.get_originator_osid(stanza)
                     if originator_osid <> '':
                         if osid_key_owner <> originator_osid:
                             # it's a request to a third party, check if in accepted_cert_authorities [i.e. if it's an authority]

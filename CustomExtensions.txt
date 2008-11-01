@@ -23,18 +23,11 @@ following function and classes:
 def validate(stanza, stanza_interpreter):
 -----------------------------------------
 Function is used by PyOpenSpime to determine if an incoming stanza is
-to be handled by this extension. Must return True if stanza is to be
-handled by this extension, False otherwise.
-
-
-def main(stanza, stanza_interpreter):
------------------------------------------
-This is the main function called by PyOpenSpime when validate() has
-returned True. This function must return a request object ReqObj()
-that can be used by the OpenSpime client built on
-pyopenspime.client.Client(). Request Objects are entirely
-customizeable and can be personalized according to the needs of the
-extension.
+to be handled by this extension. This function must return a request
+object ReqObj() that can be used by the OpenSpime client built on
+pyopenspime.client.Client(), otherwise None. Request Objects are
+entirely customizeable and can be personalized according to the needs
+of the extension.
 
 
 class ReqObj():

@@ -49,12 +49,12 @@ from pyopenspime.engine import *
 import pyopenspime.xmpp, pyopenspime.util, pyopenspime.protocol.extension.xmpp.pubkey
 
 
-class Client(pyopenspime.xmpp.Client):
+class Client():
     """
     PyOpenSpime XMPP Client.
     """
     
-    def __init__(self, osid_or_osid_path, osid_pass='', server='', port=5222, try_reconnect=60, rsa_pub_key_path='', rsa_priv_key_path='', rsa_priv_key_pass='', rsa_key_cache_path='cache', \
+    def __init__(self, osid_or_osid_path, osid_pass='', server='', port=None, try_reconnect=60, rsa_pub_key_path='', rsa_priv_key_path='', rsa_priv_key_pass='', rsa_key_cache_path='cache', \
                  cert_authority='', accepted_cert_authorities_filepath='certification-authorities.conf', log_callback_function=None):
         """
         Initializes a Client.
@@ -105,24 +105,22 @@ class Client(pyopenspime.xmpp.Client):
         # set log callback function
         if log_callback_function != None:
             self.log = log_callback_function
-                
+
         # try to get openspime package
-        ospackage_info = pyopenspime.util.OsPackage(osid_or_osid_path, self.log).read()
+        ospackage_info = pyopenspime.engine.OsPackage(osid_or_osid_path, self.log).read()
         if ospackage_info <> None:
             # get values from package if nothing has been forced in init params
             if osid_pass == '': osid_pass = ospackage_info['osid_pass']
             if server == '': server = ospackage_info['server']
-            if port == '': port = ospackage_info['port']
+            if port == None and ospackage_info['port'] <> '':
+                port = ospackage_info['port']
+            else:
+                # set default port
+                port = 5222
         
         # save
         self.osid = pyopenspime.xmpp.JID(osid_or_osid_path)
         self.osid_pass = osid_pass
-        
-        # get server if not explicitely stated
-        if server == '':
-            server = self.osid.getDomain()                
-        self.Server = server
-        self.Port = port
         
         # init
         self.timeout = 60
@@ -144,17 +142,26 @@ class Client(pyopenspime.xmpp.Client):
         # init StanzaInterpreter
         self.__stanza_interpreter = StanzaInterpreter(osid_or_osid_path, rsa_pub_key_path, rsa_priv_key_path, rsa_priv_key_pass, rsa_key_cache_path, cert_authority, accepted_cert_authorities_filepath, \
                                                       log_callback_function)
+
+        # get server if not explicitely stated
+        if server == '':
+            server = self.osid.getDomain() 
         
-        # init component
-        self.Namespace, self.DBG = 'jabber:client', 'client' # check lines: 99 & 101 of xmpp.client 
-        pyopenspime.xmpp.Client.__init__(self, self.osid.getDomain(), port, [])
-        
+        # init connector component
+        self._init_connector(server, port)
+
+        # bind connector events
+        self.DisconnectHandler = self._connector.DisconnectHandler
+
+        # finished init       
         self.log(20, u'client succesfully initialized.')
 
-    
-    def __setattr__(self, name, value):        
-        # set default
-        self.__dict__[name] = value
+
+    def _init_connector(self, server, port):
+        # start xmpp.client
+
+        self.Namespace, self.DBG = 'jabber:client', 'client' # check lines: 99 of xmpp.client 
+        self._connector = pyopenspime.xmpp.Client(server, port, [])
 
 
     def inject_presence(self, stanza):
@@ -167,7 +174,7 @@ class Client(pyopenspime.xmpp.Client):
         @rtype:   boolean
         @return:  True if stanza is handled, False if not.
         """
-        return self.__presence_handler(self.Dispatcher, stanza)
+        return self.__presence_handler(self._connector.Dispatcher, stanza)
 
 
     def inject_message(self, stanza):
@@ -180,7 +187,7 @@ class Client(pyopenspime.xmpp.Client):
         @rtype:   boolean
         @return:  True if stanza is handled, False if not.
         """
-        return self.__message_handler(self.Dispatcher, stanza)
+        return self.__message_handler(self._connector.Dispatcher, stanza)
 
 
     def inject_iq(self, stanza):
@@ -193,16 +200,18 @@ class Client(pyopenspime.xmpp.Client):
         @rtype:   boolean
         @return:  True if stanza is handled, False if not.
         """
-        return self.__iq_handler(self.Dispatcher, stanza)
+        return self.__iq_handler(self._connector.Dispatcher, stanza)
 
         
     def __presence_handler(self, dispatcher, stanza):
-        # handles PRESENCE stanzas, not implemented - i.e. stanza not treated, return False        
+        # handles PRESENCE stanzas, not implemented - i.e. stanza not treated, return False
+        self.log(10, u'received <presence/> from <%s>.' % (stanza.getFrom()))
         return False
 
     
     def __message_handler(self, dispatcher, stanza):
-        # handles MESSAGE stanzas        
+        # handles MESSAGE stanzas
+        self.log(10, u'received <message/> from <%s>.' % (stanza.getFrom()))
         return self.__iq_and_message_common(stanza)
 
     
@@ -214,7 +223,7 @@ class Client(pyopenspime.xmpp.Client):
         iq_from = unicode(stanza.getFrom())
         iq_id = stanza.getID()
         iq_type = stanza.getType().lower()
-        self.log(10, u'received iq from <%s>.' % (iq_from))
+        self.log(10, u'received <iq/> from <%s>.' % (iq_from))
         # check if incoming IQ is a response to a done request
         self.log(10, u'check if incoming <iq/> stanza is a response to a done request')
         if iq_type == 'result' or iq_type == 'error':
@@ -282,7 +291,7 @@ class Client(pyopenspime.xmpp.Client):
             # signee certified public key not found in cache, we need to request it before proceeding
             self.log(10, u'signee certified public key not found in cache, we need to request it before proceeding')
             # get cert authority
-            osid_cert = pyopenspime.util.get_cert_osid(stanza)
+            osid_cert = get_cert_osid(stanza)
             # request key
             pubkey_reqobj = pyopenspime.protocol.extension.xmpp.pubkey.ReqObj(stanza.getFrom())
             awaiting_stanza_iq_trigger_id = self.send_request(pubkey_reqobj, osid_cert)
@@ -563,7 +572,7 @@ class Client(pyopenspime.xmpp.Client):
                     self.__iq_callback_handlers[ID] = (extname, callback_success, callback_failure, callback_timeout, time.time() + timeout)
             # send
             self.log(10, u'sending stanza with ID \'%s\'' % ID)
-            self.Dispatcher.send(stanza)
+            self._connector.Dispatcher.send(stanza)
 
             ##### print "OUTGOING STANZA: " + str(stanza)
         
@@ -582,38 +591,38 @@ class Client(pyopenspime.xmpp.Client):
         # get stanza kind: iq, message, presence
         stanza_kind = stanza.getName().strip().lower()
         if stanza_kind == 'iq':
-            self.__iq_handler(self.Dispatcher, stanza)
+            self.__iq_handler(self._connector.Dispatcher, stanza)
         elif stanza_kind == 'message':
-            self.__message_handler(self.Dispatcher, stanza)
+            self.__message_handler(self._connector.Dispatcher, stanza)
         elif stanza_kind == 'presence':
-            self.__presence_handler(self.Dispatcher, stanza)
+            self.__presence_handler(self._connector.Dispatcher, stanza)
 
         
     def __reconnect(self):        
         # reconnect client
         
         try:
-            self.__handlerssave = self.Dispatcher.dumpHandlers()
+            self._connector.__handlerssave = self._connector.Dispatcher.dumpHandlers()
             self.log(10, 'handlers dumped.')
-            if self.__dict__.has_key('ComponentBind'): self.ComponentBind.PlugOut()
-            if self.__dict__.has_key('Bind'): self.Bind.PlugOut()
-            self._route=0
-            if self.__dict__.has_key('NonSASL'): self.NonSASL.PlugOut()
-            if self.__dict__.has_key('SASL'): self.SASL.PlugOut()
-            if self.__dict__.has_key('TLS'): self.TLS.PlugOut()
-            self.Dispatcher.PlugOut()
+            if self._connector.__dict__.has_key('ComponentBind'): self._connector.ComponentBind.PlugOut()
+            if self._connector.__dict__.has_key('Bind'): self._connector.Bind.PlugOut()
+            self._connector._route=0
+            if self._connector.__dict__.has_key('NonSASL'): self._connector.NonSASL.PlugOut()
+            if self._connector.__dict__.has_key('SASL'): self._connector.SASL.PlugOut()
+            if self._connector.__dict__.has_key('TLS'): self._connector.TLS.PlugOut()
+            self._connector.Dispatcher.PlugOut()
             self.log(10, 'dispatcher plugged out.')
-            if self.__dict__.has_key('HTTPPROXYsocket'): self.HTTPPROXYsocket.PlugOut()
-            if self.__dict__.has_key('TCPsocket'): self.TCPsocket.PlugOut()
+            if self._connector.__dict__.has_key('HTTPPROXYsocket'): self._connector.HTTPPROXYsocket.PlugOut()
+            if self._connector.__dict__.has_key('TCPsocket'): self._connector.TCPsocket.PlugOut()
         except:
             pass
         try:
             self.connect()
             try:
-                self.Dispatcher.restoreHandlers(self.__handlerssave)
+                self._connector.Dispatcher.restoreHandlers(self._connector.__handlerssave)
             except:
                 pass
-            self.__handlerssave = None
+            self._connector.__handlerssave = None
             self.log(10, 'reconnected.')
             self.__trying_reconnection = False
         except:
@@ -651,8 +660,7 @@ class Client(pyopenspime.xmpp.Client):
 
         Note that reconnection attempts are handled automatically, therefore any blocking on_disconnect() derived function will therefore
         compromise such attempts.
-        """
-        
+        """        
         pass
 
 
@@ -665,8 +673,7 @@ class Client(pyopenspime.xmpp.Client):
         """
         Event raised on a successful connection to the XMPP server. This one does nothing, should be overriden in
         derived classes.
-        """
-        
+        """        
         pass
     
     
@@ -676,43 +683,52 @@ class Client(pyopenspime.xmpp.Client):
         """
         Called periodically every interval of seconds specified by the run() function. This one does nothing, should be overriden in
         derived classes.
-        """
-        
+        """        
         pass
 
-    
+
+    def _auth(self):
+        # authenticate
+        return self._connector.auth(self.osid.getNode(), self.osid_pass, self.osid.getResource())
+
+
+    def _notify_presence(self):
+        # notify, if available
+        self.log(10, u'notifying presence')
+        self._connector.sendInitPresence(0)
+
+        
     def connect(self):
         """
         Connects the Client to the server and initializes handlers.
         """
         
         # connect
-        self.log(20, u'connecting to <%s>' % unicode(self.Server))
-        if pyopenspime.xmpp.Client.connect(self) == "":
-            msg = u'could not connect to server <%s>, aborting.' % unicode(self.Server)
+        self.log(20, u'connecting to <%s>' % unicode(self._connector.Server))
+        if self._connector.connect() == "":
+            msg = u'could not connect to server <%s>, aborting.' % unicode(self._connector.Server)
             self.log(40, msg)
             raise Exception, msg
         self.log(10, u'connected.')
         
         # authenticate
         self.log(20, u'authenticating client on server')
-        if pyopenspime.xmpp.Client.auth(self, self.osid.getNode(), self.osid_pass, self.osid.getResource()) == None:
+        if self._auth() == None:
             msg = u'could not authenticate, aborting. check osid and password.'
             self.log(40, msg)
             raise Exception, msg
         self.log(10, u'authenticated.')
         
         # notify presence
-        self.log(10, u'notifying presence')
-        self.sendInitPresence(0)
+        self._notify_presence()
         
         # register handlers
         self.log(10, u'registering presence handler')
-        self.RegisterHandler('presence', self.__presence_handler)
+        self._connector.RegisterHandler('presence', self.__presence_handler)
         self.log(10, u'registering message handler')
-        self.RegisterHandler('message', self.__message_handler)
+        self._connector.RegisterHandler('message', self.__message_handler)
         self.log(10, u'registering iq handler')
-        self.RegisterHandler('iq', self.__iq_handler)
+        self._connector.RegisterHandler('iq', self.__iq_handler)
         
         # set connection status & raise event
         self.connected = True
@@ -759,7 +775,7 @@ class Client(pyopenspime.xmpp.Client):
         # @param delay: delay in seconds between loops
                 
         try:
-            result = self.Process(delay)
+            result = self._connector.Process(delay)
         except:
             self.log(40, "error (%s) while looping: %s" % (sys.exc_info()[0].__name__, sys.exc_info()[1]) )
             raise
@@ -783,7 +799,7 @@ class Client(pyopenspime.xmpp.Client):
         Disconnects from server and handles all incoming stanzas before closure.
         """
         self.try_reconnect = 0
-        self.disconnect()  
+        self._connector.disconnect()  
         self.log(20, u'disconnected.')  
 
     
@@ -795,5 +811,37 @@ class Client(pyopenspime.xmpp.Client):
         """
         pass
     
+        
+
+class Component(Client):
+    """
+    PyOpenSpime XMPP Component. Inherits all methods, events and functions from the Client class.
+    """
+    
+    def __init__(self, osid_or_osid_path, osid_pass='', server='', port=None, try_reconnect=60, rsa_pub_key_path='', rsa_priv_key_path='', rsa_priv_key_pass='', \
+                 rsa_key_cache_path='cache', cert_authority='', accepted_cert_authorities_filepath='certification-authorities.conf', log_callback_function=None):
+
+        # init Common
+        Client.__init__(self, osid_or_osid_path, osid_pass, server, port, try_reconnect, rsa_pub_key_path, rsa_priv_key_path, rsa_priv_key_pass, \
+                 rsa_key_cache_path, cert_authority, accepted_cert_authorities_filepath, log_callback_function)
+
+
+    def _init_connector(self, server, port):
+        # start xmpp.component
+
+        self.Namespace, self.DBG = pyopenspime.xmpp.dispatcher.NS_COMPONENT_ACCEPT, 'component'
+        self._connector = pyopenspime.xmpp.Component(server, port, debug=[])
+		
+		
+    def _auth(self):
+        # authenticate
+        return self._connector.auth(str(self.osid), self.osid_pass)
+			
+			
+    def _notify_presence(self):
+        # notify, if available
+        pass
+
+
 
 

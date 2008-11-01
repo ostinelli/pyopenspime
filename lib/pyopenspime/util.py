@@ -43,9 +43,8 @@
 """Utility Module."""
 
 # imports
-import random, time, os.path
+import random, time
 import pyopenspime.xmpp.simplexml
-from pyopenspime.xmpp.protocol import Protocol
 from xml.dom import minidom
 import c14n
 
@@ -184,53 +183,6 @@ def convert_to_canonical_xml(xml):
     return c14n.Canonicalize(doc)
 
 
-def get_originator_osid(stanza):
-
-    """Returns the originator OSID of an OpenSpime stanza, as specified in protocol v0.9.
-
-    @type  stanza: xmpp.protocol.Protocol
-    @param stanza: The full XMPP stanza.
-    
-    @rtype:   unicode
-    @return:  The originator_osid."""
-
-    # init
-    originator_osid = None
-    try:
-        for n_root_child in stanza.getChildren():
-            if n_root_child.getName() == 'openspime':
-                for n_originator in n_root_child.getChildren():
-                    if n_originator.getName() == 'originator':
-                        if n_originator.getAttr('osid') <> None:
-                            originator_osid = n_originator.getAttr('osid')
-                        break
-                break
-    except:
-        pass
-    if originator_osid == None:
-        originator_osid = str(stanza.getFrom())
-    return originator_osid
-
-
-def get_cert_osid(stanza):
-
-    """Returns the certification authority OSID of an OpenSpime stanza, as specified in protocol v0.9.
-
-    @type  stanza: xmpp.protocol.Protocol
-    @param stanza: The full XMPP stanza.
-    
-    @rtype:   unicode
-    @return:  The certification authority OSID."""
-
-    # init
-    cert_osid = None
-    # get originator node
-    n_originator = pyopenspime.util.parse_all_children(stanza, 'originator')
-    if n_originator <> None:
-        cert_osid = n_originator.getAttr('cert')
-    return cert_osid
-
-
 def iso_date_time(year=None, month=None, day=None, hour=None, minute=None, second=None):
 
     """Returns the current date and time in international standard ISO 8601.
@@ -272,107 +224,6 @@ def iso_date_time(year=None, month=None, day=None, hour=None, minute=None, secon
     # return format
     return "%s%s" % (time.strftime("%Y-%m-%dT%H:%M:%S", date), tz)
 
-
-class OsPackage():
-    """
-    Class to manage OpenSpime packages. Currently performs read-only operations.
-    """
-    
-    def __init__(self, osid_path, log_callback_function=None):
-        """
-        Initializes an OpenSpime package class.
-
-        @type  osid_path: str
-        @param osid_path: The full OSID of the client. If an OpenSpime configuration package is found, this is
-            the only parameter that is needed to initialize the Client.            
-        @type  log_callback_function: function
-        @param log_callback_function: Callback function for logger. Function should accept two parameters: unicode
-            (the log description) and integer (the verbosity level - 0 for error, 1 for warning, 2 for info,
-            3 for debug).
-
-        @rtype:   Dictionary
-        @return:  Dictionary containing: osid_pass, server, port, cert_authority, rsa_pub_key_path, rsa_priv_key_path, rsa_priv_key_pass
-        """
-        
-        # set log callback function
-        if log_callback_function != None:
-            self.log = log_callback_function
-        # save
-        self.osid_path = osid_path
-
-    def read(self):
-            
-        # try to get openspime package     
-        if os.path.isdir(self.osid_path) == True:
-            try:
-                # package found, read xml configuration
-                self.log(10, 'openspime configuration package found, reading')
-                f = open( "%s/conf.xml" % self.osid_path, "r" )
-                n_conf = pyopenspime.xmpp.simplexml.Node(node=f.read())
-                f.close()
-                # init
-                osid_pass = ''
-                server = ''
-                port = 0
-                cert_authority = ''
-                rsa_pub_key_path = ''
-                rsa_priv_key_path = ''
-                rsa_priv_key_pass = ''
-                # get values
-                self.log(10, 'getting values from package')
-                try:
-                    osid_pass = pyopenspime.util.parse_all_children(n_conf, 'osid-pass').getData()
-                except:
-                    self.log(10, 'could not get osid-pass from openspime configuration package.')
-                try:
-                    server = pyopenspime.util.parse_all_children(n_conf, 'server').getData()
-                except:
-                    self.log(10, 'could not get server from openspime configuration package.')
-                try:
-                    port = pyopenspime.util.parse_all_children(n_conf, 'port').getData()
-                except:
-                    self.log(10, 'could not get port from openspime configuration package.')
-                try:
-                    rsa_priv_key_pass = pyopenspime.util.parse_all_children(n_conf, 'rsa-priv-key-pass').getData()
-                except:
-                    self.log(10, 'could not get rsa-priv-key-pass from openspime configuration package.')
-                try:
-                    cert_authority = pyopenspime.util.parse_all_children(n_conf, 'cert-authority').getData()
-                except:
-                    self.log(10, 'could not get cert-authority from openspime configuration package.')
-                rsa_pub_key_path = '%s/keys/public.pem' % self.osid_path
-                if os.path.isfile(rsa_pub_key_path) == False:
-                    rsa_pub_key_path = ""
-                    self.log(30, 'could not find the rsa public key file.')
-                rsa_priv_key_path = '%s/keys/private.pem' % self.osid_path
-                if os.path.isfile(rsa_priv_key_path) == False:
-                    rsa_priv_key_path = ""
-                    self.log(30, 'could not find the rsa private key file.')
-                # return
-                output = {"osid_pass": osid_pass,
-                           "server": server,
-                           "port": port,
-                           "cert_authority": cert_authority,
-                           "rsa_pub_key_path": rsa_pub_key_path,
-                           "rsa_priv_key_path": rsa_priv_key_path,
-                           "rsa_priv_key_pass": rsa_priv_key_pass,
-                    }
-                return output
-            except:
-                msg = 'openspime configuration package is corrupted, aborting.'
-                self.log(40, 'openspime configuration package is corrupted, aborting.')
-                raise Exception, msg
-
-        # no openspime package found
-        return None
-    
-
-    def log(self, level, msg):
-        """
-        Logging function triggered on log messages.
-        Uses the same syntax of logger.Logger.append()
-        """
-        pass
 
 
     

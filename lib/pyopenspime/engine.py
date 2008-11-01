@@ -68,6 +68,110 @@ class SigneeCertifiedPublicKeyCorruptedRetry(EngineError): pass
 class SigneeCertifiedPublicKeyCorrupted(EngineError): pass
 
 
+
+class OsPackage():
+    """
+    Class to manage OpenSpime packages. Currently performs read-only operations.
+    """
+    
+    def __init__(self, osid_path, log_callback_function=None):
+        """
+        Initializes an OpenSpime package class.
+
+        @type  osid_path: str
+        @param osid_path: The full OSID of the client. If an OpenSpime configuration package is found, this is
+            the only parameter that is needed to initialize the Client.            
+        @type  log_callback_function: function
+        @param log_callback_function: Callback function for logger. Function should accept two parameters: unicode
+            (the log description) and integer (the verbosity level - 0 for error, 1 for warning, 2 for info,
+            3 for debug).
+
+        @rtype:   Dictionary
+        @return:  Dictionary containing: osid_pass, server, port, cert_authority, rsa_pub_key_path, rsa_priv_key_path, rsa_priv_key_pass
+        """
+        
+        # set log callback function
+        if log_callback_function != None:
+            self.log = log_callback_function
+        # save
+        self.osid_path = osid_path
+
+    def read(self):
+            
+        # try to get openspime package     
+        if os.path.isdir(self.osid_path) == True:
+            try:
+                # package found, read xml configuration
+                self.log(10, 'openspime configuration package found, reading')
+                f = open( "%s/conf.xml" % self.osid_path, "r" )
+                n_conf = pyopenspime.xmpp.simplexml.Node(node=f.read())
+                f.close()
+                # init
+                osid_pass = ''
+                server = ''
+                port = ''
+                cert_authority = ''
+                rsa_pub_key_path = ''
+                rsa_priv_key_path = ''
+                rsa_priv_key_pass = ''
+                # get values
+                self.log(10, 'getting values from package')
+                try:
+                    osid_pass = pyopenspime.util.parse_all_children(n_conf, 'osid-pass').getData()
+                except:
+                    self.log(10, 'could not get osid-pass from openspime configuration package.')
+                try:
+                    server = pyopenspime.util.parse_all_children(n_conf, 'server').getData()
+                except:
+                    self.log(10, 'could not get server from openspime configuration package.')
+                try:
+                    port = pyopenspime.util.parse_all_children(n_conf, 'port').getData()
+                except:
+                    self.log(10, 'could not get port from openspime configuration package.')
+                try:
+                    rsa_priv_key_pass = pyopenspime.util.parse_all_children(n_conf, 'rsa-priv-key-pass').getData()
+                except:
+                    self.log(10, 'could not get rsa-priv-key-pass from openspime configuration package.')
+                try:
+                    cert_authority = pyopenspime.util.parse_all_children(n_conf, 'cert-authority').getData()
+                except:
+                    self.log(10, 'could not get cert-authority from openspime configuration package.')
+                rsa_pub_key_path = '%s/keys/public.pem' % self.osid_path
+                if os.path.isfile(rsa_pub_key_path) == False:
+                    rsa_pub_key_path = ""
+                    self.log(30, 'could not find the rsa public key file.')
+                rsa_priv_key_path = '%s/keys/private.pem' % self.osid_path
+                if os.path.isfile(rsa_priv_key_path) == False:
+                    rsa_priv_key_path = ""
+                    self.log(30, 'could not find the rsa private key file.')
+                # return
+                output = {"osid_pass": osid_pass,
+                           "server": server,
+                           "port": port,
+                           "cert_authority": cert_authority,
+                           "rsa_pub_key_path": rsa_pub_key_path,
+                           "rsa_priv_key_path": rsa_priv_key_path,
+                           "rsa_priv_key_pass": rsa_priv_key_pass,
+                    }
+                return output
+            except:
+                msg = 'openspime configuration package is corrupted, aborting.'
+                self.log(40, 'openspime configuration package is corrupted, aborting.')
+                raise Exception, msg
+
+        # no openspime package found
+        return None
+    
+
+    def log(self, level, msg):
+        """
+        Logging function triggered on log messages.
+        Uses the same syntax of logger.Logger.append()
+        """
+        pass
+
+
+
 class StanzaInterpreter():
     """
     Class that handles all outgoing requests and incoming responses. This class also handles key cache management.
@@ -109,7 +213,7 @@ class StanzaInterpreter():
             self.log = log_callback_function
                 
         # try to get openspime package
-        ospackage_info = pyopenspime.util.OsPackage(osid_or_osid_path, self.log).read()
+        ospackage_info = OsPackage(osid_or_osid_path, self.log).read()
         if ospackage_info <> None:
             # get values from package if nothing has been forced in init params
             if cert_authority == '': cert_authority = ospackage_info['cert_authority']
@@ -154,10 +258,6 @@ class StanzaInterpreter():
         # init
         self.encrypt = False
         self.sign = False
-
-        # import extensions loaded
-        for ext in PYOPENSPIME_EXTENSIONS_LOADED:
-            exec( 'import pyopenspime.protocol.extension.%s' % ext )
 
         # create EnDec object
         self.endec = EnDec()
@@ -278,12 +378,10 @@ class StanzaInterpreter():
         # loop available extensions
         for ext in PYOPENSPIME_EXTENSIONS_LOADED:
             self.log(10, u'trying \'%s\' extension for validity' % ext)
-            # call extension validate function
-            exec( 'result = pyopenspime.protocol.extension.%s.validate(stanza, self)' % ext )
-            if result == True:
-                # ok we have a match, call core main function                
-                self.log(10, u'extension \'%s\' matches, calling main function' % ext)
-                exec( 'reqobj = pyopenspime.protocol.extension.%s.main(stanza, self)' % ext )
+            # call extension
+            exec( 'reqobj = pyopenspime.protocol.extension.%s.validate(stanza, self)' % ext )
+            if hasattr(reqobj, 'extname') == True:
+                # ok we have a match, return reqest object              
                 self.log(10, u'received \'%s\' extension request object.' % ext)
                 return reqobj
             else:           
@@ -330,7 +428,7 @@ class StanzaInterpreter():
                     raise RecipientPublicKeyNotInCache(msg)
             
             # get originator
-            originator_osid = pyopenspime.util.get_originator_osid(stanza)
+            originator_osid = get_originator_osid(stanza)
             # get <originator/> node
             n_originator = pyopenspime.util.parse_all_children(n_openspime, 'originator')
             # get <transport/> node
@@ -349,7 +447,7 @@ class StanzaInterpreter():
                 # get <originator/> node
                 n_originator = pyopenspime.util.parse_all_children(n_openspime, 'originator')
                 if n_originator <> None:
-                    originator_osid = pyopenspime.util.get_originator_osid(stanza)
+                    originator_osid = get_originator_osid(stanza)
                 else:
                     # create node
                     n_originator = n_transport.addChild(name=u'originator')
@@ -474,14 +572,14 @@ class StanzaInterpreter():
                         raise KeyCachePathNotSet(msg)
 
                     # check that certification authority is accepted
-                    osid_cert = pyopenspime.util.get_cert_osid(stanza)
+                    osid_cert = get_cert_osid(stanza)
                     if not osid_cert in self.accepted_cert_authorities:
                         msg = u'incoming stanza is signed from an unaccepted certification authority: <%s>.' % osid_cert
                         self.log(40, msg)
                         raise SigneeCertifiedPublicKeyFromUnauthCert(msg)
                         
                     # get originator
-                    originator_osid = pyopenspime.util.get_originator_osid(stanza)
+                    originator_osid = get_originator_osid(stanza)
                     # check if public key of originator is in cache
                     self.log(10, u'checking if originator certified public rsa key is in cache')
                     originator_osid_hex = binascii.b2a_hex(originator_osid)
@@ -573,6 +671,51 @@ class StanzaInterpreter():
 
 
 
+def get_originator_osid(stanza):
+
+    """Returns the originator OSID of an OpenSpime stanza, as specified in protocol v0.9.
+
+    @type  stanza: xmpp.protocol.Protocol
+    @param stanza: The full XMPP stanza.
+    
+    @rtype:   unicode
+    @return:  The originator_osid."""
+
+    # init
+    originator_osid = None
+    try:
+        for n_root_child in stanza.getChildren():
+            if n_root_child.getName() == 'openspime':
+                for n_originator in n_root_child.getChildren():
+                    if n_originator.getName() == 'originator':
+                        if n_originator.getAttr('osid') <> None:
+                            originator_osid = n_originator.getAttr('osid')
+                        break
+                break
+    except:
+        pass
+    if originator_osid == None:
+        originator_osid = str(stanza.getFrom())
+    return originator_osid
+
+
+def get_cert_osid(stanza):
+
+    """Returns the certification authority OSID of an OpenSpime stanza, as specified in protocol v0.9.
+
+    @type  stanza: xmpp.protocol.Protocol
+    @param stanza: The full XMPP stanza.
+    
+    @rtype:   unicode
+    @return:  The certification authority OSID."""
+
+    # init
+    cert_osid = None
+    # get originator node
+    n_originator = pyopenspime.util.parse_all_children(stanza, 'originator')
+    if n_originator <> None:
+        cert_osid = n_originator.getAttr('cert')
+    return cert_osid
 
 
 
