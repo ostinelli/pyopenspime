@@ -185,10 +185,14 @@ class ReqObj():
         Builds a 'error' stanza according to the OpenSpime Data Reporting protocol extension.
 
         @type  error_type: unicode
-        @param error_type: The error type as defined by the XMPP protocol. Value MUST be 'cancel' -- do not retry
-        (the error is unrecoverable), 'continue' -- proceed (the condition was only a warning), 'modify' -- retry
-        after changing the data sent, 'auth' -- retry after providing credentials, 'wait' -- retry after waiting
-        (the error is temporary).
+        @param error_type: The error type as defined by the XMPP protocol. Value MUST be:
+        
+            'cancel' -- do not retry (the error is unrecoverable)
+            'continue' -- proceed (the condition was only a warning)
+            'modify' -- retry after changing the data sent
+            'auth' -- retry after providing credentials
+            'wait' -- retry after waiting (the error is temporary).
+            
         @type  error_cond: unicode
         @param error_cond: The error condition.
         @type  error_namespace: unicode
