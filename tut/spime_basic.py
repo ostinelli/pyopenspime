@@ -41,7 +41,22 @@
 # DAMAGES OR LOSSES), EVEN IF WIDETAG INC OR SUCH AUTHOR HAS BEEN ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGES.
 
+
 """Spime, basic code."""
+
+
+#################
+# Configuration #
+#################
+
+# SpimeID
+SpimeID = 'dev-spime-2@developer.openspime.com/spime'
+# SNID [i.e. the ScopeNode receiving data from this spime
+SNID = 'dev-scopenode-2@developer.openspime.com/scope'
+
+#################
+
+
 
 ###### Set paths and imports
 def add_to_sys_path(paths):
@@ -51,8 +66,11 @@ def add_to_sys_path(paths):
 import sys, os
 os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
 add_to_sys_path( ('../lib',) )
+import logging
 from pyopenspime.client import Client
 import pyopenspime.protocol.extension.core.datareporting
+
+
 
 class TheSpime(Client):
     """
@@ -83,26 +101,27 @@ class TheSpime(Client):
             </entry>""")
 
         # send request
-        req_id = self.send_request(dr_reqobj, 'dev-scopenode-2@developer.openspime.com/scope', encrypt = True, sign = True)
+        req_id = self.send_request(dr_reqobj, SNID, encrypt = True, sign = True)
 
     def on_response_success(self, stanza_id, stanza):
-        print "iq with id '%s' was successfully received by recipient." % stanza_id
+        self.log(20, "iq with id '%s' was successfully received by recipient." % stanza_id)
         
     def on_response_failure(self, stanza_id, error_cond, error_description, stanza):
-        print "error in sending iq with id '%s' [%s]: %s" % (stanza_id, error_cond, error_description)
+        self.log(40, "error in sending iq with id '%s' [%s]: %s" % (stanza_id, error_cond, error_description) )
 
     def on_response_timeout(self, stanza_id):
-        print "timeout waiting for response to sent iq with id '%s'." % stanza_id
-            
-    
+        self.log(40, "timeout waiting for response to sent iq with id '%s'." % stanza_id)
 
-if __name__ == "__main__":
-    ###### Logging
-    import logging
-    logging.basicConfig(level = 10, format='%(asctime)s %(levelname)s %(message)s')
-    log = logging.getLogger("MySpime")
+
     
-    ###### OpenSpime
-    c = TheSpime('dev-spime-2@developer.openspime.com/spime', log_callback_function = log.log)
+###### START application
+if __name__ == "__main__":
+    
+    ### Logging
+    logging.basicConfig(level = 10, format='%(asctime)s %(levelname)s %(message)s')
+    log = logging.getLogger("Spime [%s]" % SpimeID)
+    
+    ### Spime
+    c = TheSpime(SpimeID, log_callback_function = log.log)
     c.run();
 

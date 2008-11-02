@@ -41,7 +41,20 @@
 # DAMAGES OR LOSSES), EVEN IF WIDETAG INC OR SUCH AUTHOR HAS BEEN ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGES.
 
+
 """OpenSpime protocol engine."""
+
+
+#################
+# Configuration #
+#################
+
+# OSID
+OSID = 'dev-spime-2@developer.openspime.com/spime'
+
+#################
+
+
 
 ###### Set paths and imports
 def add_to_sys_path(paths):
@@ -51,10 +64,8 @@ def add_to_sys_path(paths):
 import sys, os
 os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
 add_to_sys_path( ('lib',) )
-import pyopenspime.xmpp.protocol
+import logging, pyopenspime.xmpp.protocol, pyopenspime.protocol.extension.core.datareporting, pyopenspime.protocol.extension.xmpp.pubkey
 from pyopenspime.engine import StanzaInterpreter
-import pyopenspime.protocol.extension.core.datareporting
-import pyopenspime.protocol.extension.xmpp.pubkey
 
 
 
@@ -67,7 +78,9 @@ class TheStanzaInterpreter(StanzaInterpreter):
         """
         Creates sequentially 2 extension stanzas and interpret them. Display results on screen.
         """        
-        ##### create new datareporting and print request on screen
+
+        ### create new datareporting and print request on screen
+
         new_datareporting_stanza = self.datareporting_create()
         print '\n============== \/ DATA REPORTING ==============\n\nrequest to be sent out:\n\n%s\n\n' % new_datareporting_stanza
         
@@ -87,7 +100,8 @@ class TheStanzaInterpreter(StanzaInterpreter):
                 print '\nstanza to be sent out as confirmation is:\n\n%s\n\n' % str(reqobj.accepted())
         print '============== /\ DATA REPORTING ==============\n\n'
 
-        ##### create new public key request and print request on screen
+        ### create new public key request and print request on screen
+
         new_pubkey_stanza = self.pubkey_create()
         print '\n============== \/ PUBLIC KEY ==============\n\nrequest to be sent out:\n\n%s\n\n' % new_pubkey_stanza
 
@@ -104,11 +118,13 @@ class TheStanzaInterpreter(StanzaInterpreter):
                 # response raises error. this is because we have build a request for 
                 print '\nstanza to be sent out as response is:\n\n%s\n\n' % str(reqobj.accepted())
         print '============== /\ PUBLIC KEY ==============\n\n'
+        
 
     def datareporting_create(self):
         """
         Creates a new data reporting stanza.
         """
+        
         # create data reporting message which requests for confirmation (i.e. of type 'iq')
         dr_reqobj = pyopenspime.protocol.extension.core.datareporting.ReqObj('iq')
 
@@ -132,11 +148,14 @@ class TheStanzaInterpreter(StanzaInterpreter):
         # return
         return stanza_request
 
+
     def pubkey_create(self):
         """
         Creates a new public key request stanza.
         """
+        
         ### create new public key request and print request on screen
+        
         pubkey_reqobj = pyopenspime.protocol.extension.xmpp.pubkey.ReqObj('dev-spime-2@developer.openspime.com/spime')
         # create request
         stanza_request = pubkey_reqobj.build()
@@ -149,15 +168,17 @@ class TheStanzaInterpreter(StanzaInterpreter):
         return stanza_request
 
 
-if __name__ == "__main__":
-    ###### Logging
-    import logging
-    logging.basicConfig(level = 10, format='%(asctime)s %(levelname)s %(message)s')
-    log = logging.getLogger("MySpime")
-    
-    ###### OpenSpime
-    si = TheStanzaInterpreter('dev-spime-2@developer.openspime.com/spime', log_callback_function = log.log)
 
-    ###### run examples and print results to screen
+###### START application
+if __name__ == "__main__":
+    
+    ### Logging
+    logging.basicConfig(level = 10, format='%(asctime)s %(levelname)s %(message)s')
+    log = logging.getLogger("Engine [%s]" % OSID)
+    
+    ### Engine
+    si = TheStanzaInterpreter(OSID, log_callback_function = log.log)
+
+    ### run examples and print results to screen
     si.run_examples()
 

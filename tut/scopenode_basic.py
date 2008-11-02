@@ -41,7 +41,20 @@
 # DAMAGES OR LOSSES), EVEN IF WIDETAG INC OR SUCH AUTHOR HAS BEEN ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGES.
 
+
 """ScopeNode, basic code."""
+
+
+#################
+# Configuration #
+#################
+
+# SNID
+SNID = 'dev-scopenode-2@developer.openspime.com/scope'
+
+#################
+
+
 
 ###### set paths and imports
 def add_to_sys_path(paths):
@@ -51,7 +64,9 @@ def add_to_sys_path(paths):
 import sys, os
 os.chdir(os.path.abspath(os.path.dirname(sys.argv[0])))
 add_to_sys_path( ('../lib',) )
+import logging
 from pyopenspime.client import Client
+
 
 
 class TheScopeNode(Client):
@@ -80,12 +95,14 @@ class TheScopeNode(Client):
             return True
 
 
+
+###### START application
 if __name__ == "__main__":
-    ###### Logging
-    import logging
-    logging.basicConfig(level = 10, format='%(asctime)s %(levelname)s %(message)s')
-    log = logging.getLogger("MyScopeNode")
     
-    ###### OpenSpime
-    c = TheScopeNode('dev-scopenode-2@developer.openspime.com/scope', log_callback_function = log.log)
+    ### Logging
+    logging.basicConfig(level = 10, format='%(asctime)s %(levelname)s %(message)s')
+    log = logging.getLogger("ScopeNode [%s]" % SNID)
+    
+    ### ScopeNode
+    c = TheScopeNode(SNID, log_callback_function = log.log)
     c.run();
