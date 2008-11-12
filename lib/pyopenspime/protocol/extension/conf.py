@@ -12,6 +12,5 @@
 PYOPENSPIME_EXTENSIONS_LOADED = (
         'xmpp.pubkey',
         'core.datareporting',
-        'custom.semlamp',
     )
 
