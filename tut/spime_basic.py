@@ -103,10 +103,10 @@ class TheSpime(Client):
         # send request
         req_id = self.send_request(dr_reqobj, SNID, encrypt = True, sign = True)
 
-    def on_response_success(self, stanza_id, stanza):
+    def on_response_success(self, stanza_id, stanza, resobj):
         self.log(20, "iq with id '%s' was successfully received by recipient." % stanza_id)
         
-    def on_response_failure(self, stanza_id, error_cond, error_description, stanza):
+    def on_response_failure(self, stanza_id, error_cond, error_description, stanza, resobj):
         self.log(40, "error in sending iq with id '%s' [%s]: %s" % (stanza_id, error_cond, error_description) )
 
     def on_response_timeout(self, stanza_id):

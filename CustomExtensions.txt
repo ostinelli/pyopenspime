@@ -16,7 +16,7 @@ Create a file and give it an extension name, for instance myext.py.
 
 PYOPENSPIME EXTENSION PYTHON MODULE DIRECTIVES
 ----------------------------------------------------------------------
-The myext.py module created for this example must contain the
+The myext.py module created for this example MUST contain the
 following function and classes:
 
 
@@ -25,32 +25,35 @@ def validate(stanza, stanza_interpreter):
 Function is used by PyOpenSpime to determine if an incoming stanza is
 to be handled by this extension. This function must return a request
 object ReqObj() that can be used by the OpenSpime client built on
-pyopenspime.client.Client(), otherwise None. Request Objects are
-entirely customizeable and can be personalized according to the needs
-of the extension.
+pyopenspime.client.Client(), otherwise None. If a ReqObj() is
+returned by this function, it will automatically be passed to the
+client as parameter of the event 'on_request_received'.
+Request Objects are entirely customizeable and can be personalized
+according to the needs of the extension.
 
 
 class ReqObj():
 -----------------------------------------
-This is the extension's Request Object, which will be passed to the
-client as parameter of the event 'on_request_received'.
-This class is used both to build an outgoing stanza request (i.e.
-when preparing the request from the requester), and to interpret an
-incoming stanza request(i.e. the one received by the recipient of the
-request).
+This is the extension's Request Object. This class is used both to
+build an outgoing stanza request (i.e. when preparing the request from
+the requester), and to interpret an incoming stanza request(i.e. the
+one received by the recipient of the request).
 ReqObj() MUST have the 'extname' attribute which must correspond to
 the extension name given to the module, and its relative location.
 In the example given, the name would be 'custom.myext'.
 
-The ReqObj() class must have the following functions:
+The ReqObj() class MUST have the following functions:
 
     . def build(self): 
 	-------------------------------------
 	Function to build the <transport/> node content of the extension's
 	stanza. This one is called when a client sends out a request with:
 	self.send_request(reqobj, 'node@developer.openspime.com/scope').
-	Must return the <transport/> node content typical to the extension.
-	
+	Must return the complete XMPP stanza to be sent out as request.
+
+The ReqObj() class MAY have the following functions (it MUST have them
+if the extension handles <iq/> stanzas):
+
 	.def accepted(self, ...):  
 	-------------------------------------
 	Should return the response <iq/> stanza of the extension. This is
@@ -66,6 +69,24 @@ The ReqObj() class must have the following functions:
 	Function may be entirely customized, and parameters could be passed
 	if necessary to build the error response. For example:
 	self.send_response( reqobj.error(1) )
+	
+
+	
+The myext.py module created for this example MAY also contain the
+following function and classes:
+
+
+class ResObj():
+-----------------------------------------
+This is the extension's Response Object, which will be passed to the
+client as parameter of the events 'on_response_success' and 
+'on_response_failure'. This class is used to interpret an incoming
+response (i.e. a response received by the original requester).
+ResObj() MUST have the 'extname' attribute which must correspond to
+the extension name given to the module, and its relative location.
+In the example given, the name would be 'custom.myext'.
+
+The ResObj() class MAY have the following functions:
 
     .def on_success(self, stanza):
 	-------------------------------------
@@ -86,6 +107,7 @@ The ReqObj() class must have the following functions:
 	'on_response_timeout' should be fired, otherwise False will prevent
 	the event to be fired.
 
+	
 
 ACTIVATE THE EXTENSION
 ======================================================================

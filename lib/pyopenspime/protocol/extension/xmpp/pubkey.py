@@ -109,6 +109,9 @@ class ReqObj():
     def __init__(self, osid_pubkey):        
         """
         Initialize a PubKey XMPP Extension Request object.
+         
+        @type  osid_pubkey: str
+        @param osid_pubkey: The requested pubkey's OSID.
         """
 
         # set extension name here, MUST correspond to the one activated in pyopenspime.protocol.extension.conf
@@ -124,7 +127,7 @@ class ReqObj():
         Builds the <transport/> node content of the data reporting stanza.
          
         @rtype:   pyopenspime.xmpp.simplexml.Node
-        @return:  The <transport/> node content typical to the extension.
+        @return:  The complete XMPP stanza to be sent out as request.
         """
         
         # empty existing stanza
@@ -209,9 +212,27 @@ class ReqObj():
         return iq_ko
     
 
+class ResObj():
+    """PubKey XMPP Extension Response object."""
+    
+    def __init__(self):        
+        """
+        Initialize a PubKey XMPP Extension Response object.
+        """
+
+        # set extension name here, MUST correspond to the one activated in pyopenspime.protocol.extension.conf
+        self.extname = 'xmpp.pubkey'
+        
+
     def on_success(self, stanza):
         """
         If defined, event is called upon successful response to done request. Must return True if the client event on_response_success should be fired.
+        
+        @type  stanza: pyopenspime.xmpp.protocol.Protocol
+        @param stanza: The stanza received as response.
+
+        @rtype:   boolean
+        @return:  True if client's event on_response_success should be fired, False if not.
         """
 
         # key received, save key
@@ -248,6 +269,12 @@ class ReqObj():
     def on_failure(self, stanza):
         """
         If defined, event is called upon failure response to done request. Must return True if the client event on_response_failure should be fired.
+        
+        @type  stanza: pyopenspime.xmpp.protocol.Protocol
+        @param stanza: The stanza received as response.
+
+        @rtype:   boolean
+        @return:  True if client's event on_response_failure should be fired, False if not.
         """
         return True
     
@@ -255,6 +282,12 @@ class ReqObj():
     def on_timeout(self, stanza_id):
         """
         If defined, event is called upon timeout waiting response for done request. Must return True if the client event on_response_timeout should be fired.
+
+        @type  stanza_id: str
+        @param stanza_id: The id of the request stanza.
+
+        @rtype:   boolean
+        @return:  True if client's event on_response_timeout should be fired, False if not.
         """
         return True
         

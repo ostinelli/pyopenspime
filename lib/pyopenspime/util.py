@@ -51,13 +51,15 @@ import c14n
 
 def convert_client_type_to_name(typ):
         
-    """Convert an OSclient type to a literal name.
+    """
+    Convert an OSclient type to a literal name.
 
     @type  typ: int
     @param typ: The OSclient type.
 
     @rtype:   unicode
-    @return:  The literal name of the OSclient type (Spime, ScopeNode, Service)."""
+    @return:  The literal name of the OSclient type (Spime, ScopeNode, Service).
+    """
 
     if osc_type == 0:
         return u"Spime"
@@ -69,13 +71,15 @@ def convert_client_type_to_name(typ):
 
 def to_utf8(s):
         
-    """Convert a string to utf8.
+    """
+    Convert a string to utf8.
 
     @type  s: str
     @param s: The string to be converted.
     
     @rtype:   utf-8 str
-    @return:  The utf-8 converted string."""
+    @return:  The utf-8 converted string.
+    """
 
     # Convevert `s` to UTF-8 if it is Unicode, leave unchanged if it is string or None and convert to string overwise
     if s is None:
@@ -90,13 +94,15 @@ def to_utf8(s):
 
 def generate_rnd_str(str_len):    
         
-    """Generates a random string.
+    """
+    Generates a random string.
 
     @type  str_len: int
     @param str_len: The lenght of the string.
     
     @rtype:   unicode
-    @return:  The newly generated string."""
+    @return:  The newly generated string.
+    """
 
     # string elements
     items = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v', \
@@ -109,7 +115,8 @@ def generate_rnd_str(str_len):
 
 def parse_all_children(node, node_name, deep_first=False):
         
-    """Recursively parses all children nodes of a node to find the first node that matches a name.
+    """
+    Recursively parses all children nodes of a node to find the first node that matches a name.
 
     @type  node: xmpp.simplexml.Node
     @param node: The node to parse.
@@ -120,7 +127,8 @@ def parse_all_children(node, node_name, deep_first=False):
         children first before going deep. Defaults to I{False}.
     
     @rtype:   pyopenspime.xmpp.simplexml.Node
-    @return:  The found node, or None if none found."""
+    @return:  The found node, or None if none found.
+    """
 
     # get children
     children = node.getChildren()
@@ -154,13 +162,15 @@ def parse_all_children(node, node_name, deep_first=False):
 
 def clean_node(node):
         
-    """Recursively deletes all content of a node.
+    """
+    Recursively deletes all content of a node.
 
     @type  node: xmpp.simplexml.Node
     @param node: The node to clean.
     
     @rtype:   xmpp.simplexml.Node
-    @return:  The cleaned node."""
+    @return:  The cleaned node.
+    """
 
     for child in node.getChildren():
         node.delChild(child)
@@ -170,14 +180,16 @@ def clean_node(node):
 
 def convert_to_canonical_xml(xml):
         
-    """Converts and XML string to the Canonical XML format as per W3C Canonical XML
+    """
+    Converts and XML string to the Canonical XML format as per W3C Canonical XML
     Version 1.0 <http://www.w3.org/TR/xml-c14n> specifications.
 
     @type  xml: unicode or str
     @param xml: The XML to be converted.
     
     @rtype:   unicode
-    @return:  The canonical XML."""
+    @return:  The canonical XML.
+    """
 
     doc = minidom.parseString(pyopenspime.util.to_utf8(xml))
     return c14n.Canonicalize(doc)
@@ -185,7 +197,8 @@ def convert_to_canonical_xml(xml):
 
 def iso_date_time(year=None, month=None, day=None, hour=None, minute=None, second=None):
 
-    """Returns the current date and time in international standard ISO 8601.
+    """
+    Returns the current date and time in international standard ISO 8601.
     
     @type  year: int
     @param year: The year of the date. Defaults to the one of the current date.
@@ -201,7 +214,8 @@ def iso_date_time(year=None, month=None, day=None, hour=None, minute=None, secon
     @param second: The second of the date. Defaults to the one of the current date.
     
     @rtype:   unicode
-    @return:  The datetime string."""
+    @return:  The datetime string.
+    """
     
     def str_min_len(str_num, str_len):
         while len(str_num) < str_len:

@@ -378,20 +378,44 @@ class Client():
         """
         Event fired upon OpenSpime request received. MUST return True if stanza is handled, False if not so that a 'feature-not-implemented' error is sent back as response.
         This one does nothing, should be overriden in derived classes.
+        
+        @type  reqobj: Extension's ReqObj()
+        @param reqobj: The OpenSpime request object.
+
+        @rtype:   boolean
+        @return:  True if stanza is handled, False if not so that a 'feature-not-implemented' error is sent back as response.
         """
         pass
 
 
-    def on_response_success(self, stanza_id, stanza):       
+    def on_response_success(self, stanza_id, stanza, resobj):       
         """
         Event raised on successful request. This one does nothing, should be overriden in derived classes.
+
+        @type  stanza_id: str
+        @param stanza_id: The id of the request stanza.
+        @type  stanza: pyopenspime.xmpp.protocol.Protocol
+        @param stanza: The stanza received as response.
+        @type  resobj: Extension's ResObj() or None
+        @param resobj: A response object of the extension if available, otherwise None.
         """
         pass
     
 
-    def on_response_failure(self, stanza_id, error_cond, error_description, stanza):     
+    def on_response_failure(self, stanza_id, error_cond, error_description, stanza, resobj):     
         """
         Event raised on failure on request. This one does nothing, should be overriden in derived classes.
+        
+        @type  stanza_id: str
+        @param stanza_id: The id of the request stanza.
+        @type  error_cond: unicode
+        @param error_cond: The error condition.
+        @type  error_description: unicode
+        @param error_description: The error description.
+        @type  stanza: pyopenspime.xmpp.protocol.Protocol
+        @param stanza: The stanza received as response.
+        @type  resobj: Extension's ResObj() or None
+        @param resobj: A response object of the extension if available, otherwise None.
         """
         pass
 
@@ -399,6 +423,9 @@ class Client():
     def on_response_timeout(self, stanza_id):      
         """
         Event raised on timeout waiting a response to a request. This one does nothing, should be overriden in derived classes.
+        
+        @type  stanza_id: str
+        @param stanza_id: The id of the request stanza.
         """
         pass
 
@@ -406,39 +433,39 @@ class Client():
     def __iq_on_success(self, stanza, extname):
         # handles callbacks to extension in case of success, otherwise defaults to self.on_response_status
 
-        # create reqobj to call reqobj events
+        # create resobj to call resobj events
         try:
-            exec( "reqobj = pyopenspime.protocol.extension.%s.ReqObj('%s')" % (extname, stanza.getName().strip().lower()) )
-            reqobj.stanza_interpreter = self.__stanza_interpreter
+            exec( "resobj = pyopenspime.protocol.extension.%s.ResObj()" % (extname) )
+            resobj.stanza_interpreter = self.__stanza_interpreter
         except:
-            reqobj = None
+            resobj = None
         launch_event = True
         # launch reqobj events
-        if hasattr(reqobj, 'on_success'):
-            launch_event = reqobj.on_success(stanza)
-        # launch event if not blocked by reqobj events
+        if hasattr(resobj, 'on_success'):
+            launch_event = resobj.on_success(stanza)
+        # launch event if not blocked by resobj
         if launch_event == True:
-            self.on_response_success(stanza.getID(), stanza)
+            self.on_response_success(stanza.getID(), stanza, resobj)
         
 
     def __iq_on_failure(self, stanza, extname):
         # handles callbacks to extension in case of failure, otherwise defaults to self.on_response_status
 
-        # create reqobj to call reqobj events
+        # create resobj to call resobj events
         try:
-            exec( "reqobj = pyopenspime.protocol.extension.%s.ReqObj('%s')" % (extname, stanza.getName().strip().lower()) )
-            reqobj.stanza_interpreter = self.__stanza_interpreter
+            exec( "resobj = pyopenspime.protocol.extension.%s.ResObj()" % (extname) )
+            resobj.stanza_interpreter = self.__stanza_interpreter
         except:
-            reqobj = None
+            resobj = None
         launch_event = True
-        # launch reqobj events
-        if hasattr(reqobj, 'on_failure'):
-            launch_event = reqobj.on_failure(stanza)
-        # launch event if not blocked by reqobj events
+        # launch resobj events
+        if hasattr(resobj, 'on_failure'):
+            launch_event = resobj.on_failure(stanza)
+        # launch event if not blocked by resobj
         if launch_event == True:
             # get error desc
             error = self.__stanza_interpreter.get_error(stanza)
-            self.on_response_failure(stanza.getID(), error['error_cond'], error['error_description'], stanza)
+            self.on_response_failure(stanza.getID(), error['error_cond'], error['error_description'], stanza, resobj)
 
 
     def __iq_on_timeout(self, stanza_id, extname):

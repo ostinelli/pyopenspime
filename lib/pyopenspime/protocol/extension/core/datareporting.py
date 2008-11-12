@@ -145,7 +145,7 @@ class ReqObj():
         Builds the <transport/> node content of the data reporting stanza.
          
         @rtype:   pyopenspime.xmpp.simplexml.Node
-        @return:  The <transport/> node content typical to the extension.
+        @return:  The complete XMPP stanza to be sent out as request.
         """
 
         # empty existing stanza
@@ -221,9 +221,33 @@ class ReqObj():
         return stanza
     
 
+
+#
+# The ResObj class here below can be omitted. It is here for educational purposes only.
+#
+
+class ResObj():
+    """Data Reporting Extension Response object."""
+
+    
+    def __init__(self, kind=None):        
+        """
+        Initialize a Data Reporting Extension Response object.
+        """
+
+        # set extension name here, MUST correspond to the one activated in pyopenspime.protocol.extension.conf
+        self.extname = 'core.datareporting'
+
+
     def on_success(self, stanza):
         """
         If defined, event is called upon successful response to done request. Must return True if the client event on_response_success should be fired.
+        
+        @type  stanza: pyopenspime.xmpp.protocol.Protocol
+        @param stanza: The stanza received as response.
+
+        @rtype:   boolean
+        @return:  True if client's event on_response_success should be fired, False if not.
         """
         return True
     
@@ -231,6 +255,12 @@ class ReqObj():
     def on_failure(self, stanza):
         """
         If defined, event is called upon failure response to done request. Must return True if the client event on_response_failure should be fired.
+        
+        @type  stanza: pyopenspime.xmpp.protocol.Protocol
+        @param stanza: The stanza received as response.
+
+        @rtype:   boolean
+        @return:  True if client's event on_response_failure should be fired, False if not.
         """
         return True
     
@@ -238,6 +268,12 @@ class ReqObj():
     def on_timeout(self, stanza_id):
         """
         If defined, event is called upon timeout waiting response for done request. Must return True if the client event on_response_timeout should be fired.
+
+        @type  stanza_id: str
+        @param stanza_id: The id of the request stanza.
+
+        @rtype:   boolean
+        @return:  True if client's event on_response_timeout should be fired, False if not.
         """
         return True
         
