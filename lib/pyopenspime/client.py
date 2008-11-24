@@ -773,8 +773,10 @@ class Client():
         def runloop():
             t = 0
             while self.loop():
+                if self.connected == False:
+                    break
                 t += 1
-                if t > timer and timer > 0:
+                if t > timer and timer > 0 and self.connected == True:
                     self.log(10, 'calling timer')
                     self.on_timer()
                     t = 0
@@ -819,11 +821,12 @@ class Client():
         return pyopenspime.util.generate_rnd_str(16)
 
     
-    def closeconnection(self):
+    def disconnect(self):
         """
         Disconnects from server and handles all incoming stanzas before closure.
         """
         self.try_reconnect = 0
+        self.connected = False
         self._connector.disconnect()  
         self.log(20, u'disconnected.')  
 
