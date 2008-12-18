@@ -1,0 +1,1360 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>pyopenspime.client.Client</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://code.google.com/p/pyopenspime/">PyOpenSpime v0.2</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Package&nbsp;pyopenspime ::
+        <a href="pyopenspime.client-module.html">Module&nbsp;client</a> ::
+        Class&nbsp;Client
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="pyopenspime.client.Client-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class Client</h1><p class="nomargin-top"><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client">source&nbsp;code</a></span></p>
+<dl><dt>Known Subclasses:</dt>
+<dd>
+      <ul class="subclass-list">
+<li><a href="pyopenspime.client.Component-class.html">Component</a></li>  </ul>
+</dd></dl>
+
+<hr />
+<p>PyOpenSpime XMPP Client.</p>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">osid_or_osid_path</span>,
+        <span class="summary-sig-arg">osid_pass</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">server</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">port</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">try_reconnect</span>=<span class="summary-sig-default">60</span>,
+        <span class="summary-sig-arg">rsa_pub_key_path</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">rsa_priv_key_path</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">rsa_priv_key_pass</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">rsa_key_cache_path</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">cache</code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">cert_authority</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">accepted_cert_authorities_filepath</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">certification-authorities.conf</code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">log_callback_function</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Initializes a Client.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_init_connector"></a><span class="summary-sig-name">_init_connector</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">server</span>,
+        <span class="summary-sig-arg">port</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client._init_connector">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">boolean</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#inject_presence" class="summary-sig-name">inject_presence</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>)</span><br />
+      Injects a &lt;presence/&gt; stanza, which will be treated exactly as 
+      if it had been received by the client as an XMPP stanza coming from 
+      the server.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.inject_presence">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">boolean</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#inject_message" class="summary-sig-name">inject_message</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>)</span><br />
+      Injects a &lt;message/&gt; stanza, which will be treated exactly as 
+      if it had been received by the client as an XMPP stanza coming from 
+      the server.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.inject_message">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">boolean</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#inject_iq" class="summary-sig-name">inject_iq</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>)</span><br />
+      Injects an &lt;iq/&gt; stanza, which will be treated exactly as if it
+      had been received by the client as an XMPP stanza coming from the 
+      server.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.inject_iq">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__presence_handler"></a><span class="summary-sig-name">__presence_handler</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">dispatcher</span>,
+        <span class="summary-sig-arg">stanza</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__presence_handler">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__message_handler"></a><span class="summary-sig-name">__message_handler</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">dispatcher</span>,
+        <span class="summary-sig-arg">stanza</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__message_handler">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__iq_handler"></a><span class="summary-sig-name">__iq_handler</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">dispatcher</span>,
+        <span class="summary-sig-arg">stanza</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__iq_handler">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__iq_and_message_common"></a><span class="summary-sig-name">__iq_and_message_common</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__iq_and_message_common">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__iq_callback_timeout"></a><span class="summary-sig-name">__iq_callback_timeout</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__iq_callback_timeout">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__on_request_received"></a><span class="summary-sig-name">__on_request_received</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">reqobj</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__on_request_received">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">boolean</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#on_request_received" class="summary-sig-name">on_request_received</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">reqobj</span>)</span><br />
+      Event fired upon OpenSpime request received.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.on_request_received">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#on_response_success" class="summary-sig-name">on_response_success</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza_id</span>,
+        <span class="summary-sig-arg">stanza</span>,
+        <span class="summary-sig-arg">resobj</span>)</span><br />
+      Event raised on successful request.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.on_response_success">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#on_response_failure" class="summary-sig-name">on_response_failure</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza_id</span>,
+        <span class="summary-sig-arg">error_cond</span>,
+        <span class="summary-sig-arg">error_description</span>,
+        <span class="summary-sig-arg">stanza</span>,
+        <span class="summary-sig-arg">resobj</span>)</span><br />
+      Event raised on failure on request.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.on_response_failure">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#on_response_timeout" class="summary-sig-name">on_response_timeout</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza_id</span>)</span><br />
+      Event raised on timeout waiting a response to a request.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.on_response_timeout">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__iq_on_success"></a><span class="summary-sig-name">__iq_on_success</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>,
+        <span class="summary-sig-arg">extname</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__iq_on_success">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__iq_on_failure"></a><span class="summary-sig-name">__iq_on_failure</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>,
+        <span class="summary-sig-arg">extname</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__iq_on_failure">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__iq_on_timeout"></a><span class="summary-sig-name">__iq_on_timeout</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza_id</span>,
+        <span class="summary-sig-arg">extname</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__iq_on_timeout">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__save_awaiting_stanza_to_be_sent"></a><span class="summary-sig-name">__save_awaiting_stanza_to_be_sent</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">awaiting_stanza_iq_trigger_id</span>,
+        <span class="summary-sig-arg">stanza</span>,
+        <span class="summary-sig-arg">to_osid</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">encrypt</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">sign</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">extname</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">callback_success</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">callback_failure</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">callback_timeout</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">timeout</span>=<span class="summary-sig-default">60</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__save_awaiting_stanza_to_be_sent">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__save_awaiting_stanza_to_be_treated"></a><span class="summary-sig-name">__save_awaiting_stanza_to_be_treated</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">awaiting_stanza_iq_trigger_id</span>,
+        <span class="summary-sig-arg">stanza</span>,
+        <span class="summary-sig-arg">timeout</span>=<span class="summary-sig-default">60</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__save_awaiting_stanza_to_be_treated">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="send_request"></a><span class="summary-sig-name">send_request</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">reqobj</span>,
+        <span class="summary-sig-arg">to_osid</span>,
+        <span class="summary-sig-arg">encrypt</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">sign</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Function to send out OpenSpime requests.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.send_request">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="send_response"></a><span class="summary-sig-name">send_response</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>,
+        <span class="summary-sig-arg">encrypt</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">sign</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Function to send out OpenSpime responses.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.send_response">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">unicode</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#send_stanza" class="summary-sig-name">send_stanza</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>,
+        <span class="summary-sig-arg">to_osid</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">encrypt</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">sign</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">extname</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">callback_success</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">callback_failure</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">callback_timeout</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">timeout</span>=<span class="summary-sig-default">60</span>)</span><br />
+      Sends out a stanza.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.send_stanza">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#treat_stanza" class="summary-sig-name">treat_stanza</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">stanza</span>)</span><br />
+      Treats a manually added stanza.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.treat_stanza">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__reconnect"></a><span class="summary-sig-name">__reconnect</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__reconnect">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="DisconnectHandler"></a><span class="summary-sig-name">DisconnectHandler</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Handler to manage automatic reconnection.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.DisconnectHandler">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__on_disconnect"></a><span class="summary-sig-name">__on_disconnect</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__on_disconnect">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#on_disconnect" class="summary-sig-name">on_disconnect</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Event raised on a disconnection to the XMPP server.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.on_disconnect">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="__on_connect"></a><span class="summary-sig-name">__on_connect</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__on_connect">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#on_connect" class="summary-sig-name">on_connect</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Event raised on a successful connection to the XMPP server.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.on_connect">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#on_timer" class="summary-sig-name">on_timer</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Called periodically every interval of seconds specified by the run() 
+      function.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.on_timer">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_auth"></a><span class="summary-sig-name">_auth</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client._auth">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_notify_presence"></a><span class="summary-sig-name">_notify_presence</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client._notify_presence">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#connect" class="summary-sig-name">connect</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Connects the Client to the server and initializes handlers.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.connect">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#run" class="summary-sig-name">run</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">timer</span>=<span class="summary-sig-default">0</span>,
+        <span class="summary-sig-arg">threaded</span>=<span class="summary-sig-default">True</span>)</span><br />
+      Connects and starts the core running loop.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.run">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="loop"></a><span class="summary-sig-name">loop</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">delay</span>=<span class="summary-sig-default">1</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.loop">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="serialize"></a><span class="summary-sig-name">serialize</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.serialize">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="disconnect"></a><span class="summary-sig-name">disconnect</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Disconnects from server and handles all incoming stanzas before 
+      closure.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.disconnect">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="pyopenspime.client.Client-class.html#log" class="summary-sig-name">log</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">level</span>,
+        <span class="summary-sig-arg">msg</span>)</span><br />
+      Logging function triggered on log messages.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.log">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">osid_or_osid_path</span>,
+        <span class="sig-arg">osid_pass</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">server</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">port</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">try_reconnect</span>=<span class="sig-default">60</span>,
+        <span class="sig-arg">rsa_pub_key_path</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">rsa_priv_key_path</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">rsa_priv_key_pass</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">rsa_key_cache_path</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">cache</code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">cert_authority</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">accepted_cert_authorities_filepath</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">certification-authorities.conf</code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">log_callback_function</span>=<span class="sig-default">None</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.__init__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Initializes a Client.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>osid_or_osid_path</code></strong> (str) - The full OSID of the client. If an OpenSpime configuration 
+          package is found, this is the only parameter that is needed to 
+          initialize the Client.</li>
+        <li><strong class="pname"><code>osid_pass</code></strong> (str) - The full OSID password. <i>Taken from the OpenSpime configuration
+          package if found</i>.</li>
+        <li><strong class="pname"><code>server</code></strong> (str) - The server address. Defaults to the OSID domain.</li>
+        <li><strong class="pname"><code>port</code></strong> (int) - The server port. Defaults to <i>5222</i>.</li>
+        <li><strong class="pname"><code>try_reconnect</code></strong> (int) - Reconnects if connection drops. Set to 0 if no reconnect, 
+          otherwise integer expresses interval to reconnection trials in 
+          seconds. Defaults to <i>60</i>.</li>
+        <li><strong class="pname"><code>rsa_pub_key_path</code></strong> (unicode) - The path to the RSA public key .pem file. <i>Taken from the 
+          OpenSpime configuration package if found</i>.</li>
+        <li><strong class="pname"><code>rsa_priv_key_path</code></strong> (unicode) - The path to the RSA private key .pem file. <i>Taken from the 
+          OpenSpime configuration package if found</i>.</li>
+        <li><strong class="pname"><code>rsa_priv_key_pass</code></strong> (unicode) - The RSA private key .pem file password. <i>Taken from the 
+          OpenSpime configuration package if found</i>.</li>
+        <li><strong class="pname"><code>rsa_key_cache_path</code></strong> (unicode) - The path to cached public RSA keys of entities. Defaults to 
+          <i>/cache</i>.</li>
+        <li><strong class="pname"><code>cert_authority</code></strong> (unicode) - The client's certification authority. <i>Taken from the OpenSpime
+          configuration package if found</i>.</li>
+        <li><strong class="pname"><code>accepted_cert_authorities_filepath</code></strong> (unicode) - The path to the file of accepted certification authorities. 
+          Defaults to file <i>certification-authorities.conf</i> in root 
+          folder.</li>
+        <li><strong class="pname"><code>log_callback_function</code></strong> (function) - Callback function for logger. Function should accept two 
+          parameters: unicode (the log description) and integer (the 
+          verbosity level - 0 for error, 1 for warning, 2 for info, 3 for 
+          debug).</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="inject_presence"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">inject_presence</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.inject_presence">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Injects a &lt;presence/&gt; stanza, which will be treated exactly as 
+  if it had been received by the client as an XMPP stanza coming from the 
+  server.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stanza</code></strong> (pyopenspime.xmpp.protocol.Presence) - The &lt;presence/&gt; stanza.</li>
+    </ul></dd>
+    <dt>Returns: boolean</dt>
+        <dd>True if stanza is handled, False if not.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="inject_message"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">inject_message</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.inject_message">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Injects a &lt;message/&gt; stanza, which will be treated exactly as if
+  it had been received by the client as an XMPP stanza coming from the 
+  server.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stanza</code></strong> (pyopenspime.xmpp.protocol.Message) - The &lt;message/&gt; stanza.</li>
+    </ul></dd>
+    <dt>Returns: boolean</dt>
+        <dd>True if stanza is handled, False if not.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="inject_iq"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">inject_iq</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.inject_iq">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Injects an &lt;iq/&gt; stanza, which will be treated exactly as if it 
+  had been received by the client as an XMPP stanza coming from the 
+  server.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stanza</code></strong> (pyopenspime.xmpp.protocol.Iq) - The &lt;iq/&gt; stanza.</li>
+    </ul></dd>
+    <dt>Returns: boolean</dt>
+        <dd>True if stanza is handled, False if not.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="on_request_received"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">on_request_received</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">reqobj</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.on_request_received">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Event fired upon OpenSpime request received. MUST return True if 
+  stanza is handled, False if not so that a 'feature-not-implemented' error
+  is sent back as response. This one does nothing, should be overriden in 
+  derived classes.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>reqobj</code></strong> (Extension's ReqObj()) - The OpenSpime request object.</li>
+    </ul></dd>
+    <dt>Returns: boolean</dt>
+        <dd>True if stanza is handled, False if not so that a 
+          'feature-not-implemented' error is sent back as response.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="on_response_success"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">on_response_success</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza_id</span>,
+        <span class="sig-arg">stanza</span>,
+        <span class="sig-arg">resobj</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.on_response_success">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Event raised on successful request. This one does nothing, should be 
+  overriden in derived classes.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stanza_id</code></strong> (str) - The id of the request stanza.</li>
+        <li><strong class="pname"><code>stanza</code></strong> (pyopenspime.xmpp.protocol.Protocol) - The stanza received as response.</li>
+        <li><strong class="pname"><code>resobj</code></strong> (Extension's ResObj() or None) - A response object of the extension if available, otherwise None.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="on_response_failure"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">on_response_failure</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza_id</span>,
+        <span class="sig-arg">error_cond</span>,
+        <span class="sig-arg">error_description</span>,
+        <span class="sig-arg">stanza</span>,
+        <span class="sig-arg">resobj</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.on_response_failure">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Event raised on failure on request. This one does nothing, should be 
+  overriden in derived classes.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stanza_id</code></strong> (str) - The id of the request stanza.</li>
+        <li><strong class="pname"><code>error_cond</code></strong> (unicode) - The error condition.</li>
+        <li><strong class="pname"><code>error_description</code></strong> (unicode) - The error description.</li>
+        <li><strong class="pname"><code>stanza</code></strong> (pyopenspime.xmpp.protocol.Protocol) - The stanza received as response.</li>
+        <li><strong class="pname"><code>resobj</code></strong> (Extension's ResObj() or None) - A response object of the extension if available, otherwise None.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="on_response_timeout"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">on_response_timeout</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza_id</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.on_response_timeout">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Event raised on timeout waiting a response to a request. This one does
+  nothing, should be overriden in derived classes.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stanza_id</code></strong> (str) - The id of the request stanza.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="send_stanza"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">send_stanza</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza</span>,
+        <span class="sig-arg">to_osid</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">encrypt</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">sign</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">extname</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string"></code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">callback_success</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">callback_failure</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">callback_timeout</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">timeout</span>=<span class="sig-default">60</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.send_stanza">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Sends out a stanza.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stanza</code></strong> (pyopenspime.xmpp.protocol.Protocol) - The stanza to be sent.</li>
+        <li><strong class="pname"><code>to_osid</code></strong> (unicode) - The recipient of the message.</li>
+        <li><strong class="pname"><code>encrypt</code></strong> (boolean) - If encryption is requested, set to True. Defaults to 
+          <i>False</i>.</li>
+        <li><strong class="pname"><code>sign</code></strong> (boolean) - If signature is requested, set to True. Defaults to <i>False</i>.</li>
+        <li><strong class="pname"><code>extname</code></strong> (str) - If stanza is representative of a request, the extension name of 
+          the request send out.</li>
+        <li><strong class="pname"><code>callback_success</code></strong> (function) - Callback function called when a 'result' response is received. 
+          This parameter is ignored if the stanza being sent is not an 
+          &lt;iq/&gt; stanza.</li>
+        <li><strong class="pname"><code>callback_failure</code></strong> (function) - Callback function called when a 'error' response is received. 
+          This parameter is ignored if the stanza being sent is not an 
+          &lt;iq/&gt; stanza.</li>
+        <li><strong class="pname"><code>callback_timeout</code></strong> (function) - Callback function called when no response is received after the 
+          timeout period. This parameter is ignored if the stanza being 
+          sent is not an &lt;iq/&gt; stanza.</li>
+        <li><strong class="pname"><code>timeout</code></strong> (int) - If a callback_timeout function has been specified, this parameter
+          specifies the timeout in seconds after which the callback_timeout
+          function is called if no response is received. This parameter 
+          also specifies the time life of the callback_success and 
+          callback_failure functions, after which their handler will be 
+          removed. This parameter is ignored if the stanza being sent is 
+          not an &lt;iq/&gt; stanza.</li>
+    </ul></dd>
+    <dt>Returns: unicode</dt>
+        <dd>ID of sent stanza.</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="treat_stanza"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">treat_stanza</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">stanza</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.treat_stanza">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Treats a manually added stanza.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>stanza</code></strong> (pyopenspime.xmpp.protocol.Protocol) - The stanza to be sent.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="on_disconnect"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">on_disconnect</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.on_disconnect">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Event raised on a disconnection to the XMPP server. This one does 
+  nothing, should be overriden in derived classes.</p>
+  <p>Note that reconnection attempts are handled automatically, therefore 
+  any blocking on_disconnect() derived function will therefore compromise 
+  such attempts.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="on_connect"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">on_connect</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.on_connect">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Event raised on a successful connection to the XMPP server. This one 
+  does nothing, should be overriden in derived classes.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="on_timer"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">on_timer</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.on_timer">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Called periodically every interval of seconds specified by the run() 
+  function. This one does nothing, should be overriden in derived 
+  classes.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="connect"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">connect</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.connect">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Connects the Client to the server and initializes handlers. Should not
+  be used directly unless you know what you're doing. Use 'run' 
+  instead.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="run"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">run</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">timer</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">threaded</span>=<span class="sig-default">True</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.run">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Connects and starts the core running loop.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>timer</code></strong> (int) - Specifies the seconds interval at which the function on_timer() 
+          is called in the client. Defaults to 0 (i.e. on_timer() is never 
+          called).</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="log"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">log</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">level</span>,
+        <span class="sig-arg">msg</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="pyopenspime.client-pysrc.html#Client.log">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Logging function triggered on log messages. Uses the same syntax of 
+  logger.Logger.append()</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://code.google.com/p/pyopenspime/">PyOpenSpime v0.2</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Dec 18 12:31:01 2008
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>
