@@ -151,7 +151,8 @@ class Client():
         self._init_connector(server, port)
 
         # bind connector events
-        self.DisconnectHandler = self._connector.DisconnectHandler
+        self._connector.UnregisterDisconnectHandler(self._connector.DisconnectHandler)
+        self._connector.RegisterDisconnectHandler(self.DisconnectHandler)
 
         # finished init       
         self.log(20, u'client succesfully initialized.')
@@ -725,7 +726,7 @@ class Client():
         
     def connect(self):
         """
-        Connects the Client to the server and initializes handlers.
+        Connects the Client to the server and initializes handlers. Should not be used directly unless you know what you're doing. Use 'run' instead.
         """
         
         # connect
@@ -762,7 +763,7 @@ class Client():
 
     def run(self, timer=0, threaded=True):
         """
-        Core running loop.
+        Connects and starts the core running loop.
         
         @type  timer: int
         @param timer: Specifies the seconds interval at which the function on_timer() is called in the client. Defaults to 0 (i.e. on_timer() is never called).
