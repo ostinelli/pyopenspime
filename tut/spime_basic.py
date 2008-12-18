@@ -51,7 +51,7 @@
 
 # SpimeID
 SpimeID = 'dev-spime-2@developer.openspime.com/spime'
-# SNID [i.e. the ScopeNode receiving data from this spime
+# SNID [i.e. the ScopeNode receiving data from this spime]
 SNID = 'dev-scopenode-2@developer.openspime.com/scope'
 
 #################
