@@ -1,0 +1,1 @@
+An OpenSpime library implemented in Python. Currently nearly supports the complete OpenSpime Core protocol and fully supports the Data Reporting extension.
